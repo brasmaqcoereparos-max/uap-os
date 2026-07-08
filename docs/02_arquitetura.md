@@ -1,84 +1,100 @@
-# 2. Arquitetura do Sistema
+# Arquitetura do UAP OS
 
-## Visão Geral da Arquitetura
+# Flow Engine
 
-O UAP-OS segue um modelo de arquitetura em camadas com componentes modulares e bem definidos.
+## Objetivo
 
-## Camadas da Arquitetura
+O Flow Engine é o núcleo responsável por executar qualquer automação criada pelo usuário.
 
-### Camada 1: Hardware
-- Processadores, memória, periféricos
-- Interfaces físicas
-- Controladores e barramentos
+Ele interpreta os componentes, suas conexões e executa os eventos na ordem correta.
 
-### Camada 2: Firmware e Kernel
-- Bootloader
-- Drivers de hardware
-- Gerenciamento de memória
-- Scheduler de processos
+O usuário nunca programa diretamente. Toda lógica é construída visualmente.
 
-### Camada 3: Runtime
-- Motor de execução de aplicações
-- Gerenciador de recursos
-- Sistema de plugins
-- Chamadas de sistema (syscalls)
+---
 
-### Camada 4: Backend
-- Serviços centrais
-- APIs REST/gRPC
-- Autenticação e autorização
-- Gerenciamento de dados
+## Funcionamento
 
-### Camada 5: Frontend
-- Interface gráfica ou CLI
-- Comunicação com backend
-- Renderização e apresentação
+Todo projeto é composto por:
 
-## Componentes Principais
+* Componentes
+* Conexões
+* Fluxos
+* Eventos
 
-### Gerenciador de Recursos
-Responsável por:
-- Alocação e liberação de memória
-- Gerenciamento de processos
-- Escalonamento de CPU
-- Controle de I/O
+O Flow Engine lê o projeto e transforma essas informações em uma automação executável.
 
-### Sistema de Plugins
-Permite:
-- Extensão de funcionalidades
-- Carregamento dinâmico de módulos
-- Validação de segurança
-- Versionamento de plugins
+---
 
-### API de Sistema
-Fornece:
-- Interfaces padronizadas
-- Abstração de hardware
-- Serviços de sistema operacional
-- Comunicação inter-processos
+## Fluxo básico
 
-## Fluxo de Execução
+Entrada
 
-```
-1. Boot do Sistema
-   ↓
-2. Inicialização do Firmware
-   ↓
-3. Carregamento do Runtime
-   ↓
-4. Inicialização dos Serviços Backend
-   ↓
-5. Inicialização do Frontend
-   ↓
-6. Carregamento de Plugins
-   ↓
-7. Pronto para Executar Aplicações
-```
+↓
 
-## Padrões de Design
+Evento
 
-- **MVC/MVVM** - Para componentes de interface
-- **Strategy Pattern** - Para algoritmos plugáveis
-- **Observer Pattern** - Para eventos do sistema
-- **Factory Pattern** - Para criação de objetos
-- **Singleton** - Para serviços únicos
+↓
+
+Flow Engine
+
+↓
+
+Validação
+
+↓
+
+Execução
+
+↓
+
+Saída
+
+---
+
+## Tipos de Eventos
+
+* Clique
+* Sensor ativado
+* Sensor desativado
+* Temporizador
+* Agendamento
+* Mudança de valor
+* Recebimento MQTT
+* Recebimento HTTP
+* Recebimento Serial
+* Inicialização do sistema
+
+---
+
+## Tipos de Ações
+
+* Ligar
+* Desligar
+* Alternar
+* Esperar
+* Incrementar
+* Decrementar
+* Comparar
+* Enviar mensagem
+* Imprimir
+* Acionar motor
+* Alterar velocidade
+* Publicar MQTT
+* Chamar API
+* Executar Plugin
+
+---
+
+## Regras
+
+O Flow Engine nunca conhecerá dispositivos específicos.
+
+Ele executará apenas Componentes Universais.
+
+Dessa forma qualquer equipamento poderá ser utilizado sem alterar o núcleo do sistema.
+
+---
+
+## Objetivo Final
+
+Separar completamente a lógica da automação do hardware físico, permitindo que o mesmo projeto funcione em diferentes dispositivos apenas trocando os drivers.
