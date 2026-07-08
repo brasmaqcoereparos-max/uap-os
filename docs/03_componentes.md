@@ -1,113 +1,105 @@
-# 3. Componentes do Sistema
+# Componentes Universais
 
-## Visão Geral
+## Conceito
 
-O UAP-OS é composto por diversos componentes interdependentes que trabalham juntos para fornecer uma plataforma robusta.
+No UAP OS tudo é um componente.
 
-## 1. Backend
+Não importa se é um relé, uma câmera, um motor, uma impressora ou um serviço de pagamento. Todos seguem a mesma estrutura lógica.
 
-**Responsabilidades:**
-- Processamento de requisições
-- Gerenciamento de dados
-- Lógica de negócio
-- Autenticação e autorização
+---
 
-**Tecnologias sugeridas:**
-- Node.js, Python, Go, ou Rust
-- APIs REST ou gRPC
-- Bancos de dados (SQL/NoSQL)
+## Estrutura padrão
 
-## 2. Frontend
+Todo componente possui:
 
-**Responsabilidades:**
-- Interface com usuário
-- Renderização de UI
-- Comunicação com backend
-- Validação do lado cliente
+* Identificador único
+* Nome
+* Categoria
+* Entradas
+* Saídas
+* Configurações
+* Eventos
+* Estado
+* Ícone
+* Versão
+* Fabricante
+* Driver
 
-**Tecnologias sugeridas:**
-- Web (React, Vue, Angular)
-- Desktop (Electron, Qt)
-- Mobile (React Native, Flutter)
+---
 
-## 3. Runtime
+## Categorias
 
-**Responsabilidades:**
-- Execução de aplicações
-- Gerenciamento de processos
-- Acesso a recursos de hardware
-- Isolamento de segurança
+### Entradas
 
-**Componentes principais:**
-- Virtual Machine ou Interpretador
-- Garbage Collector
-- JIT Compiler (opcional)
-- Gerenciador de Memória
+* Botão
+* Sensor PIR
+* Sensor Ultrassônico
+* RFID
+* NFC
+* QR Code
+* Câmera
+* Microfone
+* Temperatura
+* Umidade
 
-## 4. Firmware
+### Saídas
 
-**Responsabilidades:**
-- Inicialização do hardware
-- Drivers de dispositivos
-- Gerenciamento de interrupts
-- Acesso direto a hardware
+* Relé
+* Motor
+* Servo
+* PWM
+* LED
+* Display
+* Impressora
+* Buzzer
+* Válvula
+* Bomba
 
-**Características:**
-- Código de baixo nível
-- Otimizado para performance
-- Suporte a múltiplas arquiteturas
+### Controle
 
-## 5. Plugins
+* Timer
+* Delay
+* Contador
+* Agenda
+* Variável
+* Condição
+* Loop
+* Conversão
 
-**Tipos de plugins:**
-- Plugins de funcionalidade
-- Plugins de hardware
-- Plugins de serviços
-- Plugins de segurança
+### Comunicação
 
-**Sistema de plugin:**
-- Interface padronizada
-- Carregamento dinâmico
-- Versionamento
-- Validação de segurança
+* MQTT
+* HTTP
+* WebSocket
+* Modbus
+* Serial
+* Bluetooth
+* Wi-Fi
+* TCP/IP
 
-## 6. Examples
+### Serviços
 
-**Conteúdo:**
-- Aplicações de exemplo
-- Tutoriais
-- Casos de uso
-- Demonstrações
+* PIX
+* Banco de Dados
+* WhatsApp
+* E-mail
+* SMS
+* API Externa
 
-## 7. Tools
+---
 
-**Ferramentas incluídas:**
-- Compilador
-- Debugger
-- Profiler
-- Packaging tools
-- Build system
+## Regras
 
-## 8. Hardware
+Todo componente deve ser reutilizável.
 
-**Documentação de hardware:**
-- Especificações de drivers
-- Configurações de dispositivos
-- Abstrações de hardware
-- Suporte a arquiteturas
+Todo componente deve possuir configuração visual.
 
-## Matriz de Dependências
+Nenhum componente poderá exigir programação para utilização.
 
-```
-Frontend ────────→ Backend
-  ↑                  ↓
-  └──────────┬───────┘
-             ↓
-         Runtime
-             ↓
-         Firmware
-             ↓
-         Hardware
-             
-Plugins → (podem estender qualquer camada)
-```
+Todo componente poderá ser utilizado em qualquer tipo de projeto.
+
+---
+
+## Objetivo
+
+Permitir que qualquer automação seja construída apenas conectando componentes visuais entre si.
