@@ -1,1 +1,3 @@
+APP_NAME = "UAP OS"
 
+APP_VERSION = "0.1.0"
