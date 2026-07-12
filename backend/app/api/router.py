@@ -1,7 +1,7 @@
 from fastapi import APIRouter
-
+from app.modules.projects.router import router as project_router
 router = APIRouter()
-
+router.include_router(project_router)
 
 @router.get("/health")
 def health():
