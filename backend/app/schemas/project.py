@@ -6,8 +6,13 @@ class ProjectCreate(BaseModel):
     description: str = ""
 
 
+class ProjectUpdate(BaseModel):
+    name: str
+    description: str = ""
+
+
 class ProjectResponse(BaseModel):
-    id: str
+    id: int
     name: str
     description: str
 
