@@ -28,7 +28,7 @@ def get_project(project_id: int, db: Session = Depends(get_db)):
 
 @router.post("/")
 def create_project(
-    project: ProjectUpdate,
+    project: ProjectCreate,
     db: Session = Depends(get_db),
 ):
     return ProjectService.create(
@@ -41,7 +41,7 @@ def create_project(
 @router.put("/{project_id}")
 def update_project(
     project_id: int,
-    project: ProjectCreate,
+    project: ProjectUpdate, 
     db: Session = Depends(get_db),
 ):
     updated = ProjectService.update(
