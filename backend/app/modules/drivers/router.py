@@ -11,3 +11,8 @@ router = APIRouter(
 @router.get("/")
 def list_drivers():
     return DriverService.supported()
+
+
+@router.get("/supported")
+def supported_drivers():
+    return DriverService.supported()
