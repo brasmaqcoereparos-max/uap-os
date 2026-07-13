@@ -1,17 +1,18 @@
 from sqlalchemy.orm import Session
 
 from app.models.device import Device
+from app.repositories.device_repository import DeviceRepository
 
 
 class DeviceService:
 
     @staticmethod
     def list(db: Session):
-        return db.query(Device).all()
+        return DeviceRepository.list(db)
 
     @staticmethod
     def get(db: Session, device_id: str):
-        return db.query(Device).filter(Device.id == device_id).first()
+        return DeviceRepository.get(db, device_id)
 
     @staticmethod
     def create(
@@ -30,11 +31,7 @@ class DeviceService:
             serial_port=serial_port,
         )
 
-        db.add(device)
-        db.commit()
-        db.refresh(device)
-
-        return device
+        return DeviceRepository.create(db, device)
 
     @staticmethod
     def update(
@@ -46,7 +43,7 @@ class DeviceService:
         ip_address: str,
         serial_port: str,
     ):
-        device = db.query(Device).filter(Device.id == device_id).first()
+        device = DeviceRepository.get(db, device_id)
 
         if not device:
             return None
@@ -63,13 +60,15 @@ class DeviceService:
         return device
 
     @staticmethod
-    def delete(db: Session, device_id: str):
-        device = db.query(Device).filter(Device.id == device_id).first()
+    def delete(
+        db: Session,
+        device_id: str,
+    ):
+        device = DeviceRepository.get(db, device_id)
 
         if not device:
             return False
 
-        db.delete(device)
-        db.commit()
+        DeviceRepository.delete(db, device)
 
         return True
