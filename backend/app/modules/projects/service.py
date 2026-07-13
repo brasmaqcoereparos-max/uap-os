@@ -1,17 +1,18 @@
 from sqlalchemy.orm import Session
 
 from app.models.project import Project
+from app.repositories.project_repository import ProjectRepository
 
 
 class ProjectService:
 
     @staticmethod
     def list(db: Session):
-        return db.query(Project).all()
+        return ProjectRepository.list(db)
 
     @staticmethod
-    def get(db: Session, project_id: int):
-        return db.query(Project).filter(Project.id == project_id).first()
+    def get(db: Session, project_id: str):
+        return ProjectRepository.get(db, project_id)
 
     @staticmethod
     def create(
@@ -24,20 +25,16 @@ class ProjectService:
             description=description,
         )
 
-        db.add(project)
-        db.commit()
-        db.refresh(project)
-
-        return project
+        return ProjectRepository.create(db, project)
 
     @staticmethod
     def update(
         db: Session,
-        project_id: int,
+        project_id: str,
         name: str,
         description: str = "",
     ):
-        project = db.query(Project).filter(Project.id == project_id).first()
+        project = ProjectRepository.get(db, project_id)
 
         if not project:
             return None
@@ -53,14 +50,13 @@ class ProjectService:
     @staticmethod
     def delete(
         db: Session,
-        project_id: int,
+        project_id: str,
     ):
-        project = db.query(Project).filter(Project.id == project_id).first()
+        project = ProjectRepository.get(db, project_id)
 
         if not project:
             return False
 
-        db.delete(project)
-        db.commit()
+        ProjectRepository.delete(db, project)
 
         return True
