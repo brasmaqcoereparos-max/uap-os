@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
+from app.security.password import hash_password
 
 
 class UserService:
@@ -24,7 +25,7 @@ class UserService:
         user = User(
             name=name,
             email=email,
-            password=password,
+            password=hash_password(password),
         )
 
         return UserRepository.create(db, user)
