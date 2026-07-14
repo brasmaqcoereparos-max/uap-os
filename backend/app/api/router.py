@@ -7,6 +7,7 @@ from app.modules.users.router import router as users_router
 from app.modules.plugins.router import router as plugins_router
 from app.modules.automation.router import router as automation_router
 from app.modules.events.router import router as events_router
+from app.modules.flows.router import router as flows_router
 
 router = APIRouter()
 
@@ -17,6 +18,7 @@ router.include_router(users_router)
 router.include_router(plugins_router)
 router.include_router(automation_router)
 router.include_router(events_router)
+router.include_router(flows_router)
 
 
 @router.get("/health")
