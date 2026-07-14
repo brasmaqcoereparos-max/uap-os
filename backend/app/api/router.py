@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.modules.auth.router import router as auth_router
 from app.modules.projects.router import router as project_router
 from app.modules.devices.router import router as devices_router
 from app.modules.drivers.router import router as drivers_router
@@ -13,6 +14,7 @@ from app.modules.dashboard.router import router as dashboard_router
 
 router = APIRouter()
 
+router.include_router(auth_router)
 router.include_router(project_router)
 router.include_router(devices_router)
 router.include_router(drivers_router)
