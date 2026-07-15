@@ -1,12 +1,15 @@
 import threading
 import time
 
+from app.runtime.registry import registry
+
 
 class RuntimeEngine:
 
     def __init__(self):
         self.running = False
         self.thread = None
+        self.cycle = 0
 
     def start(self):
         if self.running:
@@ -27,6 +30,8 @@ class RuntimeEngine:
     def status(self):
         return {
             "running": self.running,
+            "cycle": self.cycle,
+            "registry": registry.stats(),
         }
 
     def loop(self):
@@ -35,7 +40,23 @@ class RuntimeEngine:
             time.sleep(0.1)
 
     def execute_cycle(self):
-        pass
+        self.cycle += 1
+
+        for driver in registry.drivers.values():
+            if hasattr(driver, "update"):
+                driver.update()
+
+        for device in registry.devices.values():
+            if hasattr(device, "update"):
+                device.update()
+
+        for flow in registry.flows.values():
+            if hasattr(flow, "execute"):
+                flow.execute()
+
+        for automation in registry.automations.values():
+            if hasattr(automation, "execute"):
+                automation.execute()
 
 
 engine = RuntimeEngine()
