@@ -1,8 +1,13 @@
 from fastapi import APIRouter
 
+# Runtime
 from app.runtime.router import router as runtime_engine_router
+from app.runtime.router_health import router as runtime_health_router
 
+# Authentication
 from app.modules.auth.router import router as auth_router
+
+# Modules
 from app.modules.projects.router import router as project_router
 from app.modules.devices.router import router as devices_router
 from app.modules.drivers.router import router as drivers_router
@@ -16,9 +21,14 @@ from app.modules.dashboard.router import router as dashboard_router
 
 router = APIRouter()
 
+# Runtime Engine
 router.include_router(runtime_engine_router)
+router.include_router(runtime_health_router)
 
+# Authentication
 router.include_router(auth_router)
+
+# Core Modules
 router.include_router(project_router)
 router.include_router(devices_router)
 router.include_router(drivers_router)
@@ -33,7 +43,10 @@ router.include_router(dashboard_router)
 
 @router.get("/health")
 def health():
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "application": "UAP OS",
+    }
 
 
 @router.get("/version")
@@ -41,4 +54,5 @@ def version():
     return {
         "application": "UAP OS",
         "version": "0.2.0",
+        "runtime": "enabled",
     }
