@@ -23,7 +23,7 @@ class User(Base):
     )
 
     email: Mapped[str] = mapped_column(
-        String(150),
+        String(120),
         unique=True,
         nullable=False,
     )
@@ -34,6 +34,7 @@ class User(Base):
     )
 
     role: Mapped[str] = mapped_column(
-        String(50),
+        String(30),
         default="user",
+        nullable=False,
     )
