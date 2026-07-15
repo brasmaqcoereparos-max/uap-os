@@ -3,6 +3,7 @@ from fastapi import APIRouter
 # Runtime
 from app.runtime.router import router as runtime_engine_router
 from app.runtime.router_health import router as runtime_health_router
+from app.runtime.router_ws import router as websocket_router
 
 # Authentication
 from app.modules.auth.router import router as auth_router
@@ -21,9 +22,10 @@ from app.modules.dashboard.router import router as dashboard_router
 
 router = APIRouter()
 
-# Runtime Engine
+# Runtime
 router.include_router(runtime_engine_router)
 router.include_router(runtime_health_router)
+router.include_router(websocket_router)
 
 # Authentication
 router.include_router(auth_router)
@@ -53,6 +55,7 @@ def health():
 def version():
     return {
         "application": "UAP OS",
-        "version": "0.2.0",
+        "version": "0.3.0",
         "runtime": "enabled",
+        "websocket": "enabled",
     }
