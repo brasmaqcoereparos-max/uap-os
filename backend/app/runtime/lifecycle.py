@@ -3,6 +3,7 @@ from app.runtime.device_manager import device_manager
 from app.runtime.plugin_manager import plugin_manager
 from app.runtime.flow_manager import flow_manager
 from app.runtime.automation_manager import automation_manager
+from app.runtime.runtime_loader import runtime_loader
 from app.runtime.logger import runtime_logger
 
 
@@ -10,6 +11,8 @@ class RuntimeLifecycle:
 
     def startup(self):
         runtime_logger.info("Initializing Runtime...")
+
+        runtime_loader.load()
 
         driver_manager.connect_all()
         device_manager.connect_all()
