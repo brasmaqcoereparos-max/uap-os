@@ -2,6 +2,7 @@ import threading
 import time
 
 from app.runtime.registry import registry
+from app.runtime.scheduler import scheduler
 
 
 class RuntimeEngine:
@@ -41,6 +42,8 @@ class RuntimeEngine:
 
     def execute_cycle(self):
         self.cycle += 1
+
+        scheduler.execute()
 
         for driver in registry.drivers.values():
             if hasattr(driver, "update"):
