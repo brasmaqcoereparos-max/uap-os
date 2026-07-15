@@ -6,6 +6,8 @@ from app.runtime.scheduler import scheduler
 from app.runtime.command_queue import command_queue
 from app.runtime.command_processor import command_processor
 from app.runtime.logger import runtime_logger
+from app.runtime.metrics import runtime_metrics
+from app.runtime.config import runtime_config
 
 
 class RuntimeEngine:
@@ -42,21 +44,27 @@ class RuntimeEngine:
         return {
             "running": self.running,
             "cycle": self.cycle,
-            "registry": registry.stats(),
             "queue": command_queue.size(),
+            "registry": registry.stats(),
+            "metrics": runtime_metrics.status(),
         }
 
     def loop(self):
         while self.running:
             try:
                 self.execute_cycle()
+
             except Exception as exc:
+                runtime_metrics.error()
                 runtime_logger.error(str(exc))
 
-            time.sleep(0.1)
+            time.sleep(
+                runtime_config.ENGINE_CYCLE_TIME
+            )
 
     def execute_cycle(self):
         self.cycle += 1
+        runtime_metrics.cycle()
 
         scheduler.execute()
 
