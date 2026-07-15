@@ -4,8 +4,8 @@ import time
 from app.runtime.registry import registry
 from app.runtime.scheduler import scheduler
 from app.runtime.command_queue import command_queue
+from app.runtime.command_processor import command_processor
 from app.runtime.logger import runtime_logger
-from app.runtime.websocket_manager import websocket_manager
 
 
 class RuntimeEngine:
@@ -34,6 +34,10 @@ class RuntimeEngine:
         runtime_logger.info("Runtime Engine stopped")
         self.running = False
 
+    def restart(self):
+        self.stop()
+        self.start()
+
     def status(self):
         return {
             "running": self.running,
@@ -56,10 +60,7 @@ class RuntimeEngine:
 
         scheduler.execute()
 
-        command = command_queue.get()
-
-        if command:
-            runtime_logger.info(f"Command: {command}")
+        command_processor.process()
 
         for driver in registry.drivers.values():
             if hasattr(driver, "update"):
