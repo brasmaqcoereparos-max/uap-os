@@ -1,12 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
-from app.modules.simulator.programming.canvas.canvas import (
-    canvas,
+from app.modules.simulator.programming.canvas.canvas import canvas
+from app.modules.simulator.programming.canvas.node import Node
+from app.modules.simulator.programming.canvas.service import (
+    canvas_service,
 )
-from app.modules.simulator.programming.canvas.node import (
-    Node,
-)
-
 from app.modules.simulator.programming.block_library import (
     block_library,
 )
@@ -19,7 +17,7 @@ router = APIRouter(
 
 @router.get("/")
 def status():
-    return canvas.status()
+    return canvas_service.status()
 
 
 @router.post("/clear")
@@ -61,6 +59,68 @@ def create_node(
     canvas.add_node(node)
 
     return node.to_dict()
+
+
+@router.put("/node/{node_id}/move")
+def move_node(
+    node_id: str,
+    x: int,
+    y: int,
+):
+
+    node = canvas_service.move_node(
+        node_id,
+        x,
+        y,
+    )
+
+    if node is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Node not found",
+        )
+
+    return node
+
+
+@router.put("/node/{node_id}/rename")
+def rename_node(
+    node_id: str,
+    name: str,
+):
+
+    node = canvas_service.rename_node(
+        node_id,
+        name,
+    )
+
+    if node is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Node not found",
+        )
+
+    return node
+
+
+@router.put("/node/{node_id}/config")
+def update_config(
+    node_id: str,
+    config: dict,
+):
+
+    node = canvas_service.update_config(
+        node_id,
+        config,
+    )
+
+    if node is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Node not found",
+        )
+
+    return node
 
 
 @router.post("/connect")
