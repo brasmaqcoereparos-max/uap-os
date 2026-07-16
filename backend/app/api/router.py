@@ -23,6 +23,9 @@ from app.modules.dashboard.router import router as dashboard_router
 # Education
 from app.modules.education.router import router as education_router
 
+# Simulator
+from app.modules.simulator.router import router as simulator_router
+
 router = APIRouter()
 
 # Runtime
@@ -33,7 +36,7 @@ router.include_router(websocket_router)
 # Authentication
 router.include_router(auth_router)
 
-# Core Modules
+# Core
 router.include_router(project_router)
 router.include_router(devices_router)
 router.include_router(drivers_router)
@@ -48,13 +51,18 @@ router.include_router(dashboard_router)
 # Education
 router.include_router(education_router)
 
+# Simulator
+router.include_router(simulator_router)
+
 
 @router.get("/health")
 def health():
     return {
         "status": "ok",
         "application": "UAP OS",
+        "runtime": True,
         "education": True,
+        "simulator": True,
     }
 
 
@@ -62,8 +70,9 @@ def health():
 def version():
     return {
         "application": "UAP OS",
-        "version": "0.4.0",
+        "version": "0.5.0",
         "runtime": "enabled",
         "education": "enabled",
+        "simulator": "enabled",
         "websocket": "enabled",
     }
