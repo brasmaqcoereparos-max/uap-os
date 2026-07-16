@@ -1,5 +1,6 @@
 from app.modules.simulator.programming.canvas.node import Node
 from app.modules.simulator.programming.canvas.connection import Connection
+from app.modules.simulator.programming.canvas.grid import grid
 
 
 class Canvas:
@@ -16,16 +17,14 @@ class Canvas:
 
         self.offset_y = 0
 
-        self.grid_size = 20
-
-        self.snap_to_grid = True
+        self.grid = grid
 
     def add_node(self, node: Node):
 
-        if self.snap_to_grid:
+        if self.grid.snap:
 
-            node.x = round(node.x / self.grid_size) * self.grid_size
-            node.y = round(node.y / self.grid_size) * self.grid_size
+            node.x = round(node.x / self.grid.size) * self.grid.size
+            node.y = round(node.y / self.grid.size) * self.grid.size
 
         self.nodes[node.id] = node
 
@@ -49,7 +48,8 @@ class Canvas:
             del self.nodes[node_id]
 
         self.connections = [
-            c for c in self.connections
+            c
+            for c in self.connections
             if c.source != node_id and c.target != node_id
         ]
 
@@ -77,7 +77,8 @@ class Canvas:
     ):
 
         self.connections = [
-            c for c in self.connections
+            c
+            for c in self.connections
             if not (
                 c.source == source and
                 c.target == target
@@ -108,8 +109,7 @@ class Canvas:
             "zoom": self.zoom,
             "offset_x": self.offset_x,
             "offset_y": self.offset_y,
-            "grid_size": self.grid_size,
-            "snap_to_grid": self.snap_to_grid,
+            "grid": self.grid.to_dict(),
             "nodes": [
                 n.to_dict()
                 for n in self.nodes.values()
