@@ -1,7 +1,5 @@
 from app.modules.simulator.programming.canvas.node import Node
-from app.modules.simulator.programming.canvas.connection import (
-    Connection,
-)
+from app.modules.simulator.programming.canvas.connection import Connection
 
 
 class Canvas:
@@ -20,6 +18,23 @@ class Canvas:
         self.nodes[node.id] = node
 
         return node
+
+    def get_node(
+        self,
+        node_id: str,
+    ):
+
+        return self.nodes.get(node_id)
+
+    def all_nodes(self):
+
+        return list(
+            self.nodes.values()
+        )
+
+    def all_connections(self):
+
+        return self.connections
 
     def remove_node(
         self,
@@ -52,6 +67,21 @@ class Canvas:
                 target_port,
             )
         )
+
+    def disconnect(
+        self,
+        source,
+        target,
+    ):
+
+        self.connections = [
+            c
+            for c in self.connections
+            if not (
+                c.source == source
+                and c.target == target
+            )
+        ]
 
     def clear(self):
 
