@@ -1,16 +1,42 @@
-from app.modules.simulator.programming.workspace import workspace
+from app.modules.simulator.programming.canvas.canvas import (
+    canvas,
+)
 
 
 class BlockCompiler:
 
     def compile(self):
 
+        graph = []
+
+        for node in canvas.nodes.values():
+
+            outputs = []
+
+            for connection in canvas.connections:
+
+                if connection.source == node.id:
+
+                    outputs.append(
+                        connection.target
+                    )
+
+            graph.append(
+                {
+                    "id": node.id,
+                    "name": node.name,
+                    "type": node.block_type,
+                    "outputs": outputs,
+                }
+            )
+
         return {
             "compiled": True,
-            "blocks": len(workspace.blocks),
+            "nodes": len(canvas.nodes),
             "connections": len(
-                workspace.connections
+                canvas.connections
             ),
+            "graph": graph,
         }
 
 
