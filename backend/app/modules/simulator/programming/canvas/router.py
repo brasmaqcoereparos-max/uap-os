@@ -2,22 +2,14 @@ from fastapi import APIRouter, HTTPException
 
 from app.modules.simulator.programming.canvas.canvas import canvas
 from app.modules.simulator.programming.canvas.node import Node
-from app.modules.simulator.programming.canvas.service import (
-    canvas_service,
-)
-from app.modules.simulator.programming.block_library import (
-    block_library,
-)
+from app.modules.simulator.programming.canvas.service import canvas_service
+from app.modules.simulator.programming.block_library import block_library
 
 router = APIRouter(
     prefix="/canvas",
     tags=["Canvas"],
 )
 
-
-# ==========================================================
-# CANVAS
-# ==========================================================
 
 @router.get("/")
 def status():
@@ -29,14 +21,26 @@ def clear():
 
     canvas.clear()
 
-    return {
-        "message": "Canvas cleared"
-    }
+    return {"message": "Canvas cleared"}
 
 
-# ==========================================================
-# NODES
-# ==========================================================
+@router.get("/nodes")
+def list_nodes():
+
+    return [
+        node.to_dict()
+        for node in canvas.all_nodes()
+    ]
+
+
+@router.get("/connections")
+def list_connections():
+
+    return [
+        c.to_dict()
+        for c in canvas.all_connections()
+    ]
+
 
 @router.get("/node/{node_id}")
 def get_node(node_id: str):
@@ -44,10 +48,7 @@ def get_node(node_id: str):
     node = canvas_service.get_node(node_id)
 
     if node is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Node not found",
-        )
+        raise HTTPException(404, "Node not found")
 
     return node
 
@@ -63,11 +64,7 @@ def create_node(
     metadata = block_library.get(block_type)
 
     if metadata is None:
-
-        raise HTTPException(
-            status_code=404,
-            detail="Unknown block",
-        )
+        raise HTTPException(404, "Unknown block")
 
     node = Node(
         name=name,
@@ -85,15 +82,6 @@ def create_node(
     return node.to_dict()
 
 
-@router.get("/nodes")
-def list_nodes():
-
-    return [
-        node.to_dict()
-        for node in canvas.all_nodes()
-    ]
-
-
 @router.put("/node/{node_id}/move")
 def move_node(
     node_id: str,
@@ -108,11 +96,7 @@ def move_node(
     )
 
     if node is None:
-
-        raise HTTPException(
-            status_code=404,
-            detail="Node not found",
-        )
+        raise HTTPException(404, "Node not found")
 
     return node
 
@@ -129,36 +113,13 @@ def rename_node(
     )
 
     if node is None:
-
-        raise HTTPException(
-            status_code=404,
-            detail="Node not found",
-        )
-
-    return node
-
-
-@router.put("/node/{node_id}/select")
-def select_node(
-    node_id: str,
-):
-
-    node = canvas_service.select_node(
-        node_id,
-    )
-
-    if node is None:
-
-        raise HTTPException(
-            status_code=404,
-            detail="Node not found",
-        )
+        raise HTTPException(404, "Node not found")
 
     return node
 
 
 @router.put("/node/{node_id}/config")
-def update_config(
+def config(
     node_id: str,
     config: dict,
 ):
@@ -169,38 +130,74 @@ def update_config(
     )
 
     if node is None:
-
-        raise HTTPException(
-            status_code=404,
-            detail="Node not found",
-        )
+        raise HTTPException(404, "Node not found")
 
     return node
 
 
-@router.delete("/node/{node_id}")
-def remove_node(
-    node_id: str,
-):
+@router.put("/node/{node_id}/select")
+def select(node_id: str):
 
-    canvas.remove_node(node_id)
+    node = canvas_service.select_node(
+        node_id,
+    )
 
-    return {
-        "message": "Node removed"
-    }
+    if node is None:
+        raise HTTPException(404, "Node not found")
+
+    return node
 
 
-# ==========================================================
-# CONNECTIONS
-# ==========================================================
+@router.put("/node/{node_id}/lock")
+def lock(node_id: str):
 
-@router.get("/connections")
-def list_connections():
+    node = canvas_service.lock_node(
+        node_id,
+    )
 
-    return [
-        connection.to_dict()
-        for connection in canvas.all_connections()
-    ]
+    if node is None:
+        raise HTTPException(404, "Node not found")
+
+    return node
+
+
+@router.put("/node/{node_id}/unlock")
+def unlock(node_id: str):
+
+    node = canvas_service.unlock_node(
+        node_id,
+    )
+
+    if node is None:
+        raise HTTPException(404, "Node not found")
+
+    return node
+
+
+@router.put("/node/{node_id}/hide")
+def hide(node_id: str):
+
+    node = canvas_service.hide_node(
+        node_id,
+    )
+
+    if node is None:
+        raise HTTPException(404, "Node not found")
+
+    return node
+
+
+@router.put("/node/{node_id}/show")
+def show(node_id: str):
+
+    node = canvas_service.show_node(
+        node_id,
+    )
+
+    if node is None:
+        raise HTTPException(404, "Node not found")
+
+    return node
 
 
 @router.post("/connect")
@@ -218,9 +215,7 @@ def connect(
         target_port,
     )
 
-    return {
-        "message": "Connected"
-    }
+    return {"message": "Connected"}
 
 
 @router.delete("/connect")
@@ -233,3 +228,13 @@ def disconnect(
         source,
         target,
     )
+
+
+@router.delete("/node/{node_id}")
+def remove_node(node_id: str):
+
+    canvas.remove_node(node_id)
+
+    return {
+        "message": "Node removed"
+    }
