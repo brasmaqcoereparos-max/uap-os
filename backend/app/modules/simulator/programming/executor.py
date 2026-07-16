@@ -1,4 +1,6 @@
-from app.modules.simulator.programming.workspace import workspace
+from app.modules.simulator.programming.compiler import (
+    compiler,
+)
 
 from app.modules.simulator.programming.blocks.start_block import StartBlock
 from app.modules.simulator.programming.blocks.delay_block import DelayBlock
@@ -13,6 +15,7 @@ from app.modules.simulator.programming.blocks.analog_read_block import AnalogRea
 class BlockExecutor:
 
     def __init__(self):
+
         self.context = {}
 
     def execute(self):
@@ -21,7 +24,7 @@ class BlockExecutor:
 
         self.context = {}
 
-        for block in workspace.blocks:
+        for block in compiler.execution_order():
 
             execution.append(
                 self.execute_block(block)
@@ -34,15 +37,12 @@ class BlockExecutor:
 
     def execute_block(self, block):
 
-        block_type = block.block_type.lower()
+        t = block.block_type.lower()
 
-        if block_type == "start":
-            obj = StartBlock(
-                block.id,
-                block.name,
-            )
+        if t == "start":
+            obj = StartBlock(block.id, block.name)
 
-        elif block_type == "delay":
+        elif t == "delay":
             obj = DelayBlock(
                 block.id,
                 block.config.get(
@@ -51,7 +51,7 @@ class BlockExecutor:
                 ),
             )
 
-        elif block_type == "if":
+        elif t == "if":
             obj = IfBlock(
                 block.id,
                 block.config.get(
@@ -64,7 +64,7 @@ class BlockExecutor:
                 ),
             )
 
-        elif block_type == "loop":
+        elif t == "loop":
             obj = LoopBlock(
                 block.id,
                 block.config.get(
@@ -73,7 +73,7 @@ class BlockExecutor:
                 ),
             )
 
-        elif block_type == "digital_write":
+        elif t == "digital_write":
             obj = DigitalWriteBlock(
                 block.id,
                 block.config.get(
@@ -86,7 +86,7 @@ class BlockExecutor:
                 ),
             )
 
-        elif block_type == "digital_read":
+        elif t == "digital_read":
             obj = DigitalReadBlock(
                 block.id,
                 block.config.get(
@@ -95,7 +95,7 @@ class BlockExecutor:
                 ),
             )
 
-        elif block_type == "analog_write":
+        elif t == "analog_write":
             obj = AnalogWriteBlock(
                 block.id,
                 block.config.get(
@@ -108,7 +108,7 @@ class BlockExecutor:
                 ),
             )
 
-        elif block_type == "analog_read":
+        elif t == "analog_read":
             obj = AnalogReadBlock(
                 block.id,
                 block.config.get(
@@ -118,11 +118,13 @@ class BlockExecutor:
             )
 
         else:
-            return f"Unknown block: {block.block_type}"
+            return f"Unknown block {t}"
 
-        self.context = obj.execute(self.context)
+        self.context = obj.execute(
+            self.context
+        )
 
-        return f"Executed: {block.name}"
+        return f"Executed {block.name}"
 
 
 executor = BlockExecutor()
