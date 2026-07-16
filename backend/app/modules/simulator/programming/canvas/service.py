@@ -6,10 +6,8 @@ class CanvasService:
     def status(self):
         return canvas.status()
 
-    def get_node(
-        self,
-        node_id,
-    ):
+    def get_node(self, node_id):
+
         node = canvas.get_node(node_id)
 
         if node:
@@ -17,12 +15,7 @@ class CanvasService:
 
         return None
 
-    def move_node(
-        self,
-        node_id,
-        x,
-        y,
-    ):
+    def move_node(self, node_id, x, y):
 
         node = canvas.get_node(node_id)
 
@@ -34,11 +27,21 @@ class CanvasService:
 
         return node.to_dict()
 
-    def rename_node(
-        self,
-        node_id,
-        name,
-    ):
+    def select_node(self, node_id):
+
+        for n in canvas.all_nodes():
+            n.selected = False
+
+        node = canvas.get_node(node_id)
+
+        if node is None:
+            return None
+
+        node.selected = True
+
+        return node.to_dict()
+
+    def rename_node(self, node_id, name):
 
         node = canvas.get_node(node_id)
 
