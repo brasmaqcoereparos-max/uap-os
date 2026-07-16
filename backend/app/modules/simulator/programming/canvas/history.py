@@ -1,3 +1,5 @@
+import copy
+
 
 class CanvasHistory:
 
@@ -7,7 +9,11 @@ class CanvasHistory:
 
         self.redo_stack = []
 
-    def save(self, state):
+    def save(self, canvas):
+
+        state = copy.deepcopy(
+            canvas.status()
+        )
 
         self.undo_stack.append(state)
 
@@ -18,14 +24,28 @@ class CanvasHistory:
         if not self.undo_stack:
             return None
 
-        return self.undo_stack.pop()
+        state = self.undo_stack.pop()
+
+        self.redo_stack.append(state)
+
+        return state
 
     def redo(self):
 
         if not self.redo_stack:
             return None
 
-        return self.redo_stack.pop()
+        state = self.redo_stack.pop()
+
+        self.undo_stack.append(state)
+
+        return state
+
+    def clear(self):
+
+        self.undo_stack.clear()
+
+        self.redo_stack.clear()
 
 
 history = CanvasHistory()
