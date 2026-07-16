@@ -2,8 +2,12 @@ from fastapi import APIRouter, HTTPException
 
 from app.modules.simulator.programming.canvas.canvas import canvas
 from app.modules.simulator.programming.canvas.node import Node
-from app.modules.simulator.programming.canvas.service import canvas_service
-from app.modules.simulator.programming.block_library import block_library
+from app.modules.simulator.programming.canvas.service import (
+    canvas_service,
+)
+from app.modules.simulator.programming.block_library import (
+    block_library,
+)
 
 router = APIRouter(
     prefix="/canvas",
@@ -11,10 +15,28 @@ router = APIRouter(
 )
 
 
+# ==========================================================
+# CANVAS
+# ==========================================================
+
 @router.get("/")
 def status():
     return canvas_service.status()
 
+
+@router.post("/clear")
+def clear():
+
+    canvas.clear()
+
+    return {
+        "message": "Canvas cleared"
+    }
+
+
+# ==========================================================
+# NODES
+# ==========================================================
 
 @router.get("/node/{node_id}")
 def get_node(node_id: str):
@@ -30,16 +52,6 @@ def get_node(node_id: str):
     return node
 
 
-@router.post("/clear")
-def clear():
-
-    canvas.clear()
-
-    return {
-        "message": "Canvas cleared"
-    }
-
-
 @router.post("/node")
 def create_node(
     name: str,
@@ -50,25 +62,36 @@ def create_node(
 
     metadata = block_library.get(block_type)
 
-    config = {}
+    if metadata is None:
 
-    if metadata:
-        config = metadata.get(
-            "properties",
-            {},
-        ).copy()
+        raise HTTPException(
+            status_code=404,
+            detail="Unknown block",
+        )
 
     node = Node(
         name=name,
         block_type=block_type,
         x=x,
         y=y,
-        config=config,
+        config=metadata.get(
+            "properties",
+            {},
+        ).copy(),
     )
 
     canvas.add_node(node)
 
     return node.to_dict()
+
+
+@router.get("/nodes")
+def list_nodes():
+
+    return [
+        node.to_dict()
+        for node in canvas.all_nodes()
+    ]
 
 
 @router.put("/node/{node_id}/move")
@@ -85,6 +108,7 @@ def move_node(
     )
 
     if node is None:
+
         raise HTTPException(
             status_code=404,
             detail="Node not found",
@@ -105,6 +129,26 @@ def rename_node(
     )
 
     if node is None:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Node not found",
+        )
+
+    return node
+
+
+@router.put("/node/{node_id}/select")
+def select_node(
+    node_id: str,
+):
+
+    node = canvas_service.select_node(
+        node_id,
+    )
+
+    if node is None:
+
         raise HTTPException(
             status_code=404,
             detail="Node not found",
@@ -125,12 +169,38 @@ def update_config(
     )
 
     if node is None:
+
         raise HTTPException(
             status_code=404,
             detail="Node not found",
         )
 
     return node
+
+
+@router.delete("/node/{node_id}")
+def remove_node(
+    node_id: str,
+):
+
+    canvas.remove_node(node_id)
+
+    return {
+        "message": "Node removed"
+    }
+
+
+# ==========================================================
+# CONNECTIONS
+# ==========================================================
+
+@router.get("/connections")
+def list_connections():
+
+    return [
+        connection.to_dict()
+        for connection in canvas.all_connections()
+    ]
 
 
 @router.post("/connect")
@@ -163,15 +233,3 @@ def disconnect(
         source,
         target,
     )
-
-
-@router.delete("/node/{node_id}")
-def remove_node(
-    node_id: str,
-):
-
-    canvas.remove_node(node_id)
-
-    return {
-        "message": "Node removed"
-    }
