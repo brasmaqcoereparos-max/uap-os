@@ -1,5 +1,6 @@
 from app.modules.simulator.programming.canvas.canvas import canvas
 from app.modules.simulator.programming.canvas.history import history
+from app.modules.simulator.programming.canvas.commands import commands
 
 
 class CanvasService:
@@ -16,6 +17,32 @@ class CanvasService:
     def redo(self):
         return history.redo()
 
+    def copy(self, node_id):
+
+        return commands.copy(node_id)
+
+    def paste(self):
+
+        self.save_history()
+
+        node = commands.paste()
+
+        if node:
+            return node.to_dict()
+
+        return None
+
+    def duplicate(self, node_id):
+
+        self.save_history()
+
+        node = commands.duplicate(node_id)
+
+        if node:
+            return node.to_dict()
+
+        return None
+
     def get_node(self, node_id):
 
         node = canvas.get_node(node_id)
@@ -29,10 +56,7 @@ class CanvasService:
 
         node = canvas.get_node(node_id)
 
-        if node is None:
-            return None
-
-        if node.locked:
+        if node is None or node.locked:
             return None
 
         self.save_history()
@@ -64,7 +88,6 @@ class CanvasService:
             return None
 
         self.save_history()
-
         node.locked = True
 
         return node.to_dict()
@@ -77,7 +100,6 @@ class CanvasService:
             return None
 
         self.save_history()
-
         node.locked = False
 
         return node.to_dict()
@@ -90,7 +112,6 @@ class CanvasService:
             return None
 
         self.save_history()
-
         node.visible = False
 
         return node.to_dict()
@@ -103,7 +124,6 @@ class CanvasService:
             return None
 
         self.save_history()
-
         node.visible = True
 
         return node.to_dict()
@@ -116,7 +136,6 @@ class CanvasService:
             return None
 
         self.save_history()
-
         node.name = name
 
         return node.to_dict()
@@ -129,7 +148,6 @@ class CanvasService:
             return None
 
         self.save_history()
-
         node.config.update(config)
 
         return node.to_dict()
