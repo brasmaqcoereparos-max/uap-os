@@ -13,6 +13,12 @@ class Node:
 
     y: int = 100
 
+    width: int = 180
+
+    height: int = 60
+
+    selected: bool = False
+
     id: str = field(
         default_factory=lambda: str(uuid.uuid4())
     )
@@ -27,5 +33,8 @@ class Node:
             "type": self.block_type,
             "x": self.x,
             "y": self.y,
+            "width": self.width,
+            "height": self.height,
+            "selected": self.selected,
             "config": self.config,
         }
