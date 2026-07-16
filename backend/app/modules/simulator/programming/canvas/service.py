@@ -2,12 +2,18 @@ from app.modules.simulator.programming.canvas.canvas import canvas
 from app.modules.simulator.programming.canvas.history import history
 from app.modules.simulator.programming.canvas.commands import commands
 from app.modules.simulator.programming.canvas.grid import grid
+from app.modules.simulator.programming.canvas.ruler import ruler
 
 
 class CanvasService:
 
     def status(self):
-        return canvas.status()
+
+        data = canvas.status()
+
+        data["ruler"] = ruler.to_dict()
+
+        return data
 
     def save_history(self):
         history.save(canvas)
@@ -22,6 +28,7 @@ class CanvasService:
         return commands.copy(node_id)
 
     def paste(self):
+
         self.save_history()
 
         node = commands.paste()
@@ -32,6 +39,7 @@ class CanvasService:
         return None
 
     def duplicate(self, node_id):
+
         self.save_history()
 
         node = commands.duplicate(node_id)
@@ -41,28 +49,50 @@ class CanvasService:
 
         return None
 
-    def grid_status(self):
+    def grid_status():
         return grid.to_dict()
 
-    def show_grid(self):
+    def show_grid():
         grid.show()
         return grid.to_dict()
 
-    def hide_grid(self):
+    def hide_grid():
         grid.hide()
         return grid.to_dict()
 
-    def enable_snap(self):
+    def enable_snap():
         grid.enable_snap()
         return grid.to_dict()
 
-    def disable_snap(self):
+    def disable_snap():
         grid.disable_snap()
         return grid.to_dict()
 
-    def set_grid_size(self, size):
+    def set_grid_size(size):
         grid.set_size(size)
         return grid.to_dict()
+
+    def ruler_status(self):
+
+        return ruler.to_dict()
+
+    def enable_ruler(self):
+
+        ruler.enable()
+
+        return ruler.to_dict()
+
+    def disable_ruler(self):
+
+        ruler.disable()
+
+        return ruler.to_dict()
+
+    def move_ruler(self, x, y):
+
+        ruler.set_origin(x, y)
+
+        return ruler.to_dict()
 
     def get_node(self, node_id):
 
@@ -86,6 +116,7 @@ class CanvasService:
         self.save_history()
 
         if grid.snap:
+
             x = round(x / grid.size) * grid.size
             y = round(y / grid.size) * grid.size
 
