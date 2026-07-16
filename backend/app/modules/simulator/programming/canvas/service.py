@@ -1,10 +1,20 @@
 from app.modules.simulator.programming.canvas.canvas import canvas
+from app.modules.simulator.programming.canvas.history import history
 
 
 class CanvasService:
 
     def status(self):
         return canvas.status()
+
+    def save_history(self):
+        history.save(canvas)
+
+    def undo(self):
+        return history.undo()
+
+    def redo(self):
+        return history.redo()
 
     def get_node(self, node_id):
 
@@ -24,6 +34,8 @@ class CanvasService:
 
         if node.locked:
             return None
+
+        self.save_history()
 
         node.x = x
         node.y = y
@@ -51,6 +63,8 @@ class CanvasService:
         if node is None:
             return None
 
+        self.save_history()
+
         node.locked = True
 
         return node.to_dict()
@@ -61,6 +75,8 @@ class CanvasService:
 
         if node is None:
             return None
+
+        self.save_history()
 
         node.locked = False
 
@@ -73,6 +89,8 @@ class CanvasService:
         if node is None:
             return None
 
+        self.save_history()
+
         node.visible = False
 
         return node.to_dict()
@@ -83,6 +101,8 @@ class CanvasService:
 
         if node is None:
             return None
+
+        self.save_history()
 
         node.visible = True
 
@@ -95,6 +115,8 @@ class CanvasService:
         if node is None:
             return None
 
+        self.save_history()
+
         node.name = name
 
         return node.to_dict()
@@ -105,6 +127,8 @@ class CanvasService:
 
         if node is None:
             return None
+
+        self.save_history()
 
         node.config.update(config)
 
@@ -123,6 +147,8 @@ class CanvasService:
         return canvas.status()
 
     def disconnect(self, source, target):
+
+        self.save_history()
 
         canvas.disconnect(source, target)
 
