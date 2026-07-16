@@ -2,12 +2,8 @@ from fastapi import APIRouter, HTTPException
 
 from app.modules.simulator.programming.canvas.canvas import canvas
 from app.modules.simulator.programming.canvas.node import Node
-from app.modules.simulator.programming.canvas.service import (
-    canvas_service,
-)
-from app.modules.simulator.programming.block_library import (
-    block_library,
-)
+from app.modules.simulator.programming.canvas.service import canvas_service
+from app.modules.simulator.programming.block_library import block_library
 
 router = APIRouter(
     prefix="/canvas",
@@ -18,6 +14,20 @@ router = APIRouter(
 @router.get("/")
 def status():
     return canvas_service.status()
+
+
+@router.get("/node/{node_id}")
+def get_node(node_id: str):
+
+    node = canvas_service.get_node(node_id)
+
+    if node is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Node not found",
+        )
+
+    return node
 
 
 @router.post("/clear")
@@ -143,8 +153,22 @@ def connect(
     }
 
 
+@router.delete("/connect")
+def disconnect(
+    source: str,
+    target: str,
+):
+
+    return canvas_service.disconnect(
+        source,
+        target,
+    )
+
+
 @router.delete("/node/{node_id}")
-def remove_node(node_id: str):
+def remove_node(
+    node_id: str,
+):
 
     canvas.remove_node(node_id)
 
