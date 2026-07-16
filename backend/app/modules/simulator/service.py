@@ -12,54 +12,111 @@ from app.modules.simulator.components.virtual_ultrasonic import (
     VirtualUltrasonic,
 )
 
+from app.modules.simulator.boards.arduino_uno import ArduinoUNO
+from app.modules.simulator.boards.esp32 import ESP32Board
+from app.modules.simulator.boards.raspberry_pi import RaspberryPiBoard
+
 
 class SimulatorService:
 
     def __init__(self):
         self.devices = {}
+        self.boards = {}
+
+    # ------------------------
+    # Registro
+    # ------------------------
 
     def add(self, device):
         self.devices[device.id] = device
 
-    # --------------------
+    def add_board(self, board):
+        self.boards[board.id] = board
+
+    # ------------------------
+    # Placas
+    # ------------------------
+
+    def create_arduino(
+        self,
+        board_id: str,
+        name: str,
+    ):
+        board = ArduinoUNO(board_id, name)
+        self.add_board(board)
+        return board.status()
+
+    def create_esp32(
+        self,
+        board_id: str,
+        name: str,
+    ):
+        board = ESP32Board(board_id, name)
+        self.add_board(board)
+        return board.status()
+
+    def create_raspberry(
+        self,
+        board_id: str,
+        name: str,
+    ):
+        board = RaspberryPiBoard(board_id, name)
+        self.add_board(board)
+        return board.status()
+
+    def list_boards(self):
+        return [
+            board.status()
+            for board in self.boards.values()
+        ]
+
+    def get_board(self, board_id):
+        board = self.boards.get(board_id)
+
+        if board:
+            return board.status()
+
+        return None
+
+    # ------------------------
     # Atuadores
-    # --------------------
+    # ------------------------
 
-    def create_led(self, device_id: str, name: str):
-        device = VirtualLED(device_id, name)
-        self.add(device)
-        return device.status()
+    def create_led(self, device_id, name):
+        obj = VirtualLED(device_id, name)
+        self.add(obj)
+        return obj.status()
 
-    def create_button(self, device_id: str, name: str):
-        device = VirtualButton(device_id, name)
-        self.add(device)
-        return device.status()
+    def create_button(self, device_id, name):
+        obj = VirtualButton(device_id, name)
+        self.add(obj)
+        return obj.status()
 
-    def create_relay(self, device_id: str, name: str):
-        device = VirtualRelay(device_id, name)
-        self.add(device)
-        return device.status()
+    def create_relay(self, device_id, name):
+        obj = VirtualRelay(device_id, name)
+        self.add(obj)
+        return obj.status()
 
-    # --------------------
+    # ------------------------
     # Sensores
-    # --------------------
+    # ------------------------
 
-    def create_temperature(self, device_id: str, name: str):
-        sensor = VirtualTemperature(device_id, name)
-        self.add(sensor)
-        return sensor.status()
+    def create_temperature(self, device_id, name):
+        obj = VirtualTemperature(device_id, name)
+        self.add(obj)
+        return obj.status()
 
-    def create_humidity(self, device_id: str, name: str):
-        sensor = VirtualHumidity(device_id, name)
-        self.add(sensor)
-        return sensor.status()
+    def create_humidity(self, device_id, name):
+        obj = VirtualHumidity(device_id, name)
+        self.add(obj)
+        return obj.status()
 
-    def create_ultrasonic(self, device_id: str, name: str):
-        sensor = VirtualUltrasonic(device_id, name)
-        self.add(sensor)
-        return sensor.status()
+    def create_ultrasonic(self, device_id, name):
+        obj = VirtualUltrasonic(device_id, name)
+        self.add(obj)
+        return obj.status()
 
-    # --------------------
+    # ------------------------
 
     def update(self):
         for device in self.devices.values():
