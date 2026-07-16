@@ -6,13 +6,25 @@ class CanvasService:
     def status(self):
         return canvas.status()
 
+    def get_node(
+        self,
+        node_id,
+    ):
+        node = canvas.get_node(node_id)
+
+        if node:
+            return node.to_dict()
+
+        return None
+
     def move_node(
         self,
-        node_id: str,
-        x: int,
-        y: int,
+        node_id,
+        x,
+        y,
     ):
-        node = canvas.nodes.get(node_id)
+
+        node = canvas.get_node(node_id)
 
         if node is None:
             return None
@@ -24,10 +36,11 @@ class CanvasService:
 
     def rename_node(
         self,
-        node_id: str,
-        name: str,
+        node_id,
+        name,
     ):
-        node = canvas.nodes.get(node_id)
+
+        node = canvas.get_node(node_id)
 
         if node is None:
             return None
@@ -38,10 +51,11 @@ class CanvasService:
 
     def update_config(
         self,
-        node_id: str,
-        config: dict,
+        node_id,
+        config,
     ):
-        node = canvas.nodes.get(node_id)
+
+        node = canvas.get_node(node_id)
 
         if node is None:
             return None
@@ -49,6 +63,21 @@ class CanvasService:
         node.config.update(config)
 
         return node.to_dict()
+
+    def disconnect(
+        self,
+        source,
+        target,
+    ):
+
+        canvas.disconnect(
+            source,
+            target,
+        )
+
+        return {
+            "message": "Disconnected"
+        }
 
 
 canvas_service = CanvasService()
