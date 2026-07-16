@@ -1,17 +1,10 @@
 from fastapi import APIRouter
 
-from app.modules.simulator.codegen.arduino_generator import (
-    ArduinoGenerator,
-)
-from app.modules.simulator.codegen.esp32_generator import (
-    ESP32Generator,
-)
-from app.modules.simulator.codegen.micropython_generator import (
-    MicroPythonGenerator,
-)
-from app.modules.simulator.codegen.python_generator import (
-    PythonGenerator,
-)
+from app.modules.simulator.codegen.arduino_generator import ArduinoGenerator
+from app.modules.simulator.codegen.esp32_generator import ESP32Generator
+from app.modules.simulator.codegen.micropython_generator import MicroPythonGenerator
+from app.modules.simulator.codegen.python_generator import PythonGenerator
+from app.modules.simulator.programming.compiler import compiler
 
 router = APIRouter(
     prefix="/codegen",
@@ -19,9 +12,13 @@ router = APIRouter(
 )
 
 
+@router.get("/graph")
+def graph():
+    return compiler.compile()
+
+
 @router.get("/arduino")
 def arduino():
-
     return {
         "language": "Arduino",
         "code": ArduinoGenerator().generate(),
@@ -30,7 +27,6 @@ def arduino():
 
 @router.get("/esp32")
 def esp32():
-
     return {
         "language": "ESP32",
         "code": ESP32Generator().generate(),
@@ -39,7 +35,6 @@ def esp32():
 
 @router.get("/micropython")
 def micropython():
-
     return {
         "language": "MicroPython",
         "code": MicroPythonGenerator().generate(),
@@ -48,7 +43,6 @@ def micropython():
 
 @router.get("/python")
 def python():
-
     return {
         "language": "Python",
         "code": PythonGenerator().generate(),
