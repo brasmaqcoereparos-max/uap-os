@@ -1,36 +1,15 @@
+from app.modules.simulator.programming.canvas.canvas import canvas
+
+
 class Workspace:
 
-    def __init__(self):
-        self.blocks = []
-        self.connections = []
+    def status(self):
 
-    def add_block(self, block):
-        self.blocks.append(block)
-
-    def connect(
-        self,
-        source,
-        target,
-    ):
-        self.connections.append(
-            {
-                "source": source,
-                "target": target,
-            }
-        )
+        return canvas.status()
 
     def clear(self):
-        self.blocks.clear()
-        self.connections.clear()
 
-    def status(self):
-        return {
-            "blocks": [
-                b.to_dict()
-                for b in self.blocks
-            ],
-            "connections": self.connections,
-        }
+        canvas.clear()
 
 
 workspace = Workspace()
