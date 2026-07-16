@@ -8,7 +8,7 @@ from app.runtime.router_ws import router as websocket_router
 # Authentication
 from app.modules.auth.router import router as auth_router
 
-# Core Modules
+# Core
 from app.modules.projects.router import router as project_router
 from app.modules.devices.router import router as devices_router
 from app.modules.drivers.router import router as drivers_router
@@ -25,6 +25,11 @@ from app.modules.education.router import router as education_router
 
 # Simulator
 from app.modules.simulator.router import router as simulator_router
+
+# Visual Programming
+from app.modules.simulator.programming.router import (
+    router as programming_router,
+)
 
 router = APIRouter()
 
@@ -54,6 +59,9 @@ router.include_router(education_router)
 # Simulator
 router.include_router(simulator_router)
 
+# Visual Programming
+router.include_router(programming_router)
+
 
 @router.get("/health")
 def health():
@@ -63,6 +71,7 @@ def health():
         "runtime": True,
         "education": True,
         "simulator": True,
+        "visual_programming": True,
     }
 
 
@@ -70,9 +79,10 @@ def health():
 def version():
     return {
         "application": "UAP OS",
-        "version": "0.5.0",
+        "version": "0.6.0",
         "runtime": "enabled",
         "education": "enabled",
         "simulator": "enabled",
+        "visual_programming": "enabled",
         "websocket": "enabled",
     }
