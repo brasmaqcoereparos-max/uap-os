@@ -10,36 +10,31 @@ class Canvas:
 
         self.connections = []
 
-    def add_node(
-        self,
-        node: Node,
-    ):
+        self.zoom = 1.0
+
+        self.offset_x = 0
+
+        self.offset_y = 0
+
+    def add_node(self, node: Node):
 
         self.nodes[node.id] = node
 
         return node
 
-    def get_node(
-        self,
-        node_id: str,
-    ):
+    def get_node(self, node_id):
 
         return self.nodes.get(node_id)
 
     def all_nodes(self):
 
-        return list(
-            self.nodes.values()
-        )
+        return list(self.nodes.values())
 
     def all_connections(self):
 
         return self.connections
 
-    def remove_node(
-        self,
-        node_id,
-    ):
+    def remove_node(self, node_id):
 
         if node_id in self.nodes:
             del self.nodes[node_id]
@@ -83,6 +78,20 @@ class Canvas:
             )
         ]
 
+    def set_zoom(self, zoom):
+
+        self.zoom = zoom
+
+    def move_view(
+        self,
+        dx,
+        dy,
+    ):
+
+        self.offset_x += dx
+
+        self.offset_y += dy
+
     def clear(self):
 
         self.nodes.clear()
@@ -92,6 +101,9 @@ class Canvas:
     def status(self):
 
         return {
+            "zoom": self.zoom,
+            "offset_x": self.offset_x,
+            "offset_y": self.offset_y,
             "nodes": [
                 n.to_dict()
                 for n in self.nodes.values()
