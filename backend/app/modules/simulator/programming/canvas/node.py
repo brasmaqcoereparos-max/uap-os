@@ -19,11 +19,17 @@ class Node:
 
     selected: bool = False
 
+    locked: bool = False
+
+    visible: bool = True
+
     id: str = field(
         default_factory=lambda: str(uuid.uuid4())
     )
 
-    config: dict = field(default_factory=dict)
+    config: dict = field(
+        default_factory=dict
+    )
 
     def to_dict(self):
 
@@ -36,5 +42,7 @@ class Node:
             "width": self.width,
             "height": self.height,
             "selected": self.selected,
+            "locked": self.locked,
+            "visible": self.visible,
             "config": self.config,
         }
