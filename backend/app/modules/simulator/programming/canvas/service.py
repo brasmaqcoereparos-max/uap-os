@@ -15,28 +15,22 @@ class CanvasService:
 
         return None
 
-    def move_node(
-        self,
-        node_id,
-        x,
-        y,
-    ):
+    def move_node(self, node_id, x, y):
 
         node = canvas.get_node(node_id)
 
         if node is None:
             return None
 
-        node.x = x
+        if node.locked:
+            return None
 
+        node.x = x
         node.y = y
 
         return node.to_dict()
 
-    def select_node(
-        self,
-        node_id,
-    ):
+    def select_node(self, node_id):
 
         for n in canvas.all_nodes():
             n.selected = False
@@ -50,11 +44,51 @@ class CanvasService:
 
         return node.to_dict()
 
-    def rename_node(
-        self,
-        node_id,
-        name,
-    ):
+    def lock_node(self, node_id):
+
+        node = canvas.get_node(node_id)
+
+        if node is None:
+            return None
+
+        node.locked = True
+
+        return node.to_dict()
+
+    def unlock_node(self, node_id):
+
+        node = canvas.get_node(node_id)
+
+        if node is None:
+            return None
+
+        node.locked = False
+
+        return node.to_dict()
+
+    def hide_node(self, node_id):
+
+        node = canvas.get_node(node_id)
+
+        if node is None:
+            return None
+
+        node.visible = False
+
+        return node.to_dict()
+
+    def show_node(self, node_id):
+
+        node = canvas.get_node(node_id)
+
+        if node is None:
+            return None
+
+        node.visible = True
+
+        return node.to_dict()
+
+    def rename_node(self, node_id, name):
 
         node = canvas.get_node(node_id)
 
@@ -65,11 +99,7 @@ class CanvasService:
 
         return node.to_dict()
 
-    def update_config(
-        self,
-        node_id,
-        config,
-    ):
+    def update_config(self, node_id, config):
 
         node = canvas.get_node(node_id)
 
@@ -86,29 +116,15 @@ class CanvasService:
 
         return canvas.status()
 
-    def move_view(
-        self,
-        dx,
-        dy,
-    ):
+    def move_view(self, dx, dy):
 
-        canvas.move_view(
-            dx,
-            dy,
-        )
+        canvas.move_view(dx, dy)
 
         return canvas.status()
 
-    def disconnect(
-        self,
-        source,
-        target,
-    ):
+    def disconnect(self, source, target):
 
-        canvas.disconnect(
-            source,
-            target,
-        )
+        canvas.disconnect(source, target)
 
         return {
             "message": "Disconnected"
