@@ -16,7 +16,16 @@ class Canvas:
 
         self.offset_y = 0
 
+        self.grid_size = 20
+
+        self.snap_to_grid = True
+
     def add_node(self, node: Node):
+
+        if self.snap_to_grid:
+
+            node.x = round(node.x / self.grid_size) * self.grid_size
+            node.y = round(node.y / self.grid_size) * self.grid_size
 
         self.nodes[node.id] = node
 
@@ -40,10 +49,8 @@ class Canvas:
             del self.nodes[node_id]
 
         self.connections = [
-            c
-            for c in self.connections
-            if c.source != node_id
-            and c.target != node_id
+            c for c in self.connections
+            if c.source != node_id and c.target != node_id
         ]
 
     def connect(
@@ -70,11 +77,10 @@ class Canvas:
     ):
 
         self.connections = [
-            c
-            for c in self.connections
+            c for c in self.connections
             if not (
-                c.source == source
-                and c.target == target
+                c.source == source and
+                c.target == target
             )
         ]
 
@@ -89,13 +95,11 @@ class Canvas:
     ):
 
         self.offset_x += dx
-
         self.offset_y += dy
 
     def clear(self):
 
         self.nodes.clear()
-
         self.connections.clear()
 
     def status(self):
@@ -104,6 +108,8 @@ class Canvas:
             "zoom": self.zoom,
             "offset_x": self.offset_x,
             "offset_y": self.offset_y,
+            "grid_size": self.grid_size,
+            "snap_to_grid": self.snap_to_grid,
             "nodes": [
                 n.to_dict()
                 for n in self.nodes.values()
