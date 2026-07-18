@@ -5,37 +5,11 @@ from app.modules.simulator.programming.compiler.compiler_ir import (
 
 class CompilerIRBuilder:
 
-    def build(
-
-        self,
-
-        nodes,
-
-    ):
+    def begin(self):
 
         compiler_ir.clear()
 
-        for node in nodes:
-
-            compiler_ir.add(
-
-                node.get(
-
-                    "block_type",
-
-                    "UNKNOWN",
-
-                ),
-
-                node.get(
-
-                    "id",
-
-                ),
-
-            )
-
-        return compiler_ir.all()
-
-
-compiler_ir_builder = CompilerIRBuilder()
+    def emit(
+        self,
+        opcode,
+        *
