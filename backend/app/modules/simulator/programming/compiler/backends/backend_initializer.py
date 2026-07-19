@@ -6,6 +6,14 @@ from app.modules.simulator.programming.compiler.backends.arduino_backend import 
     arduino_backend,
 )
 
+from app.modules.simulator.programming.compiler.backends.esp32_backend import (
+    esp32_backend,
+)
+
+from app.modules.simulator.programming.compiler.backends.rp2040_backend import (
+    rp2040_backend,
+)
+
 
 class BackendInitializer:
 
@@ -21,6 +29,18 @@ class BackendInitializer:
         compiler_backend_manager.register(
 
             arduino_backend,
+
+        )
+
+        compiler_backend_manager.register(
+
+            esp32_backend,
+
+        )
+
+        compiler_backend_manager.register(
+
+            rp2040_backend,
 
         )
 
