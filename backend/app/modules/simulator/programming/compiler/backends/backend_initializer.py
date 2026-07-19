@@ -18,6 +18,10 @@ from app.modules.simulator.programming.compiler.backends.stm32_backend import (
     stm32_backend,
 )
 
+from app.modules.simulator.programming.compiler.backends.python_backend import (
+    python_backend,
+)
+
 
 class BackendInitializer:
 
@@ -44,6 +48,10 @@ class BackendInitializer:
 
         compiler_backend_manager.register(
             stm32_backend,
+        )
+
+        compiler_backend_manager.register(
+            python_backend,
         )
 
         cls.initialized = True
