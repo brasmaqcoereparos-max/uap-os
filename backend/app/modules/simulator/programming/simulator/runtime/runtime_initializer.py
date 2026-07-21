@@ -18,6 +18,22 @@ from app.modules.simulator.programming.simulator.runtime.instructions.instructio
     instruction_wait,
 )
 
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_label import (
+    instruction_label,
+)
+
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_goto import (
+    instruction_goto,
+)
+
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_if import (
+    instruction_if,
+)
+
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_call import (
+    instruction_call,
+)
+
 
 class RuntimeInitializer:
 
@@ -31,35 +47,43 @@ class RuntimeInitializer:
             return
 
         runtime_instruction_set.register(
-
             "MOV",
-
             instruction_mov,
-
         )
 
         runtime_instruction_set.register(
-
             "SET",
-
             instruction_set,
-
         )
 
         runtime_instruction_set.register(
-
             "GET",
-
             instruction_get,
-
         )
 
         runtime_instruction_set.register(
-
             "WAIT",
-
             instruction_wait,
+        )
 
+        runtime_instruction_set.register(
+            "LABEL",
+            instruction_label,
+        )
+
+        runtime_instruction_set.register(
+            "GOTO",
+            instruction_goto,
+        )
+
+        runtime_instruction_set.register(
+            "IF",
+            instruction_if,
+        )
+
+        runtime_instruction_set.register(
+            "CALL",
+            instruction_call,
         )
 
         cls.initialized = True
