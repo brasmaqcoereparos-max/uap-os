@@ -2,53 +2,22 @@ from app.modules.simulator.programming.simulator.runtime.runtime_instruction_set
     runtime_instruction_set,
 )
 
-from app.modules.simulator.programming.simulator.runtime.instructions.instruction_mov import (
-    instruction_mov,
-)
-
-from app.modules.simulator.programming.simulator.runtime.instructions.instruction_set import (
-    instruction_set,
-)
-
-from app.modules.simulator.programming.simulator.runtime.instructions.instruction_get import (
-    instruction_get,
-)
-
-from app.modules.simulator.programming.simulator.runtime.instructions.instruction_wait import (
-    instruction_wait,
-)
-
-from app.modules.simulator.programming.simulator.runtime.instructions.instruction_label import (
-    instruction_label,
-)
-
-from app.modules.simulator.programming.simulator.runtime.instructions.instruction_goto import (
-    instruction_goto,
-)
-
-from app.modules.simulator.programming.simulator.runtime.instructions.instruction_if import (
-    instruction_if,
-)
-
-from app.modules.simulator.programming.simulator.runtime.instructions.instruction_call import (
-    instruction_call,
-)
-
-from app.modules.simulator.programming.simulator.runtime.instructions.instruction_return import (
-    instruction_return,
-)
-
-from app.modules.simulator.programming.simulator.runtime.instructions.instruction_add import (
-    instruction_add,
-)
-
-from app.modules.simulator.programming.simulator.runtime.instructions.instruction_sub import (
-    instruction_sub,
-)
-
-from app.modules.simulator.programming.simulator.runtime.instructions.instruction_mul import (
-    instruction_mul,
-)
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_mov import instruction_mov
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_set import instruction_set
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_get import instruction_get
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_wait import instruction_wait
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_label import instruction_label
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_goto import instruction_goto
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_if import instruction_if
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_call import instruction_call
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_return import instruction_return
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_add import instruction_add
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_sub import instruction_sub
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_mul import instruction_mul
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_div import instruction_div
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_eq import instruction_eq
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_ne import instruction_ne
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_gt import instruction_gt
 
 
 class RuntimeInitializer:
@@ -71,8 +40,14 @@ class RuntimeInitializer:
         runtime_instruction_set.register("IF", instruction_if)
         runtime_instruction_set.register("CALL", instruction_call)
         runtime_instruction_set.register("RETURN", instruction_return)
+
         runtime_instruction_set.register("ADD", instruction_add)
         runtime_instruction_set.register("SUB", instruction_sub)
         runtime_instruction_set.register("MUL", instruction_mul)
+        runtime_instruction_set.register("DIV", instruction_div)
+
+        runtime_instruction_set.register("EQ", instruction_eq)
+        runtime_instruction_set.register("NE", instruction_ne)
+        runtime_instruction_set.register("GT", instruction_gt)
 
         cls.initialized = True
