@@ -18,6 +18,9 @@ from app.modules.simulator.programming.simulator.runtime.instructions.instructio
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_eq import instruction_eq
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_ne import instruction_ne
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_gt import instruction_gt
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_pin_mode import instruction_pin_mode
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_digital_write import instruction_digital_write
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_digital_read import instruction_digital_read
 
 
 class RuntimeInitializer:
@@ -28,13 +31,13 @@ class RuntimeInitializer:
     def initialize(cls):
 
         if cls.initialized:
-
             return
 
         runtime_instruction_set.register("MOV", instruction_mov)
         runtime_instruction_set.register("SET", instruction_set)
         runtime_instruction_set.register("GET", instruction_get)
         runtime_instruction_set.register("WAIT", instruction_wait)
+
         runtime_instruction_set.register("LABEL", instruction_label)
         runtime_instruction_set.register("GOTO", instruction_goto)
         runtime_instruction_set.register("IF", instruction_if)
@@ -49,5 +52,9 @@ class RuntimeInitializer:
         runtime_instruction_set.register("EQ", instruction_eq)
         runtime_instruction_set.register("NE", instruction_ne)
         runtime_instruction_set.register("GT", instruction_gt)
+
+        runtime_instruction_set.register("PIN_MODE", instruction_pin_mode)
+        runtime_instruction_set.register("DIGITAL_WRITE", instruction_digital_write)
+        runtime_instruction_set.register("DIGITAL_READ", instruction_digital_read)
 
         cls.initialized = True
