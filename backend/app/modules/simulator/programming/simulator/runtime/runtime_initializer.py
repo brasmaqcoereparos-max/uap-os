@@ -34,6 +34,22 @@ from app.modules.simulator.programming.simulator.runtime.instructions.instructio
     instruction_call,
 )
 
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_return import (
+    instruction_return,
+)
+
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_add import (
+    instruction_add,
+)
+
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_sub import (
+    instruction_sub,
+)
+
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_mul import (
+    instruction_mul,
+)
+
 
 class RuntimeInitializer:
 
@@ -46,44 +62,17 @@ class RuntimeInitializer:
 
             return
 
-        runtime_instruction_set.register(
-            "MOV",
-            instruction_mov,
-        )
-
-        runtime_instruction_set.register(
-            "SET",
-            instruction_set,
-        )
-
-        runtime_instruction_set.register(
-            "GET",
-            instruction_get,
-        )
-
-        runtime_instruction_set.register(
-            "WAIT",
-            instruction_wait,
-        )
-
-        runtime_instruction_set.register(
-            "LABEL",
-            instruction_label,
-        )
-
-        runtime_instruction_set.register(
-            "GOTO",
-            instruction_goto,
-        )
-
-        runtime_instruction_set.register(
-            "IF",
-            instruction_if,
-        )
-
-        runtime_instruction_set.register(
-            "CALL",
-            instruction_call,
-        )
+        runtime_instruction_set.register("MOV", instruction_mov)
+        runtime_instruction_set.register("SET", instruction_set)
+        runtime_instruction_set.register("GET", instruction_get)
+        runtime_instruction_set.register("WAIT", instruction_wait)
+        runtime_instruction_set.register("LABEL", instruction_label)
+        runtime_instruction_set.register("GOTO", instruction_goto)
+        runtime_instruction_set.register("IF", instruction_if)
+        runtime_instruction_set.register("CALL", instruction_call)
+        runtime_instruction_set.register("RETURN", instruction_return)
+        runtime_instruction_set.register("ADD", instruction_add)
+        runtime_instruction_set.register("SUB", instruction_sub)
+        runtime_instruction_set.register("MUL", instruction_mul)
 
         cls.initialized = True
