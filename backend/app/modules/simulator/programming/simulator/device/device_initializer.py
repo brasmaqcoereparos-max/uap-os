@@ -22,6 +22,11 @@ from app.modules.simulator.programming.simulator.devices.stepper_motor_device im
 from app.modules.simulator.programming.simulator.devices.conveyor_device import ConveyorDevice
 from app.modules.simulator.programming.simulator.devices.elevator_device import ElevatorDevice
 
+from app.modules.simulator.programming.simulator.devices.rfid_reader_device import RFIDReaderDevice
+from app.modules.simulator.programming.simulator.devices.barcode_scanner_device import BarcodeScannerDevice
+from app.modules.simulator.programming.simulator.devices.qr_reader_device import QRReaderDevice
+from app.modules.simulator.programming.simulator.devices.load_cell_device import LoadCellDevice
+
 
 class DeviceInitializer:
 
@@ -54,6 +59,12 @@ class DeviceInitializer:
         device_manager.add(HumiditySensorDevice("HUMIDITY"))
         device_manager.add(PressureSensorDevice("PRESSURE"))
         device_manager.add(LightSensorDevice("LIGHT"))
+        device_manager.add(LoadCellDevice("LOAD_CELL"))
+
+        # Identificação
+        device_manager.add(RFIDReaderDevice("RFID"))
+        device_manager.add(BarcodeScannerDevice("BARCODE"))
+        device_manager.add(QRReaderDevice("QR"))
 
         # Atuadores
         device_manager.add(DCMotorDevice("DC_MOTOR", 25))
