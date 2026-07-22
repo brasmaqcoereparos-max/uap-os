@@ -1,6 +1,4 @@
-from app.modules.simulator.programming.simulator.runtime.runtime_instruction_set import (
-    runtime_instruction_set,
-)
+from app.modules.simulator.programming.simulator.runtime.runtime_instruction_set import runtime_instruction_set
 
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_mov import instruction_mov
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_set import instruction_set
@@ -11,16 +9,22 @@ from app.modules.simulator.programming.simulator.runtime.instructions.instructio
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_if import instruction_if
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_call import instruction_call
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_return import instruction_return
+
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_add import instruction_add
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_sub import instruction_sub
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_mul import instruction_mul
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_div import instruction_div
+
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_eq import instruction_eq
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_ne import instruction_ne
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_gt import instruction_gt
+
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_pin_mode import instruction_pin_mode
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_digital_write import instruction_digital_write
 from app.modules.simulator.programming.simulator.runtime.instructions.instruction_digital_read import instruction_digital_read
+
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_pwm_write import instruction_pwm_write
+from app.modules.simulator.programming.simulator.runtime.instructions.instruction_analog_read import instruction_analog_read
 
 
 class RuntimeInitializer:
@@ -56,5 +60,8 @@ class RuntimeInitializer:
         runtime_instruction_set.register("PIN_MODE", instruction_pin_mode)
         runtime_instruction_set.register("DIGITAL_WRITE", instruction_digital_write)
         runtime_instruction_set.register("DIGITAL_READ", instruction_digital_read)
+
+        runtime_instruction_set.register("PWM_WRITE", instruction_pwm_write)
+        runtime_instruction_set.register("ANALOG_READ", instruction_analog_read)
 
         cls.initialized = True
