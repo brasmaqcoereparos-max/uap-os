@@ -32,6 +32,11 @@ from app.modules.simulator.programming.simulator.devices.bluetooth_device import
 from app.modules.simulator.programming.simulator.devices.mqtt_device import MQTTDevice
 from app.modules.simulator.programming.simulator.devices.http_client_device import HTTPClientDevice
 
+from app.modules.simulator.programming.simulator.devices.i2c_device import I2CDevice
+from app.modules.simulator.programming.simulator.devices.spi_device import SPIDevice
+from app.modules.simulator.programming.simulator.devices.uart_device import UARTDevice
+from app.modules.simulator.programming.simulator.devices.can_device import CANDevice
+
 
 class DeviceInitializer:
 
@@ -82,5 +87,11 @@ class DeviceInitializer:
         device_manager.add(BluetoothDevice("BLUETOOTH"))
         device_manager.add(MQTTDevice("MQTT"))
         device_manager.add(HTTPClientDevice("HTTP"))
+
+        # Barramentos
+        device_manager.add(I2CDevice("I2C"))
+        device_manager.add(SPIDevice("SPI"))
+        device_manager.add(UARTDevice("UART"))
+        device_manager.add(CANDevice("CAN"))
 
         cls.initialized = True
