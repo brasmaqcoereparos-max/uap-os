@@ -16,16 +16,21 @@ from app.modules.simulator.programming.simulator.devices.ultrasonic_sensor_devic
 from app.modules.simulator.programming.simulator.devices.humidity_sensor_device import HumiditySensorDevice
 from app.modules.simulator.programming.simulator.devices.pressure_sensor_device import PressureSensorDevice
 from app.modules.simulator.programming.simulator.devices.light_sensor_device import LightSensorDevice
+from app.modules.simulator.programming.simulator.devices.load_cell_device import LoadCellDevice
+
+from app.modules.simulator.programming.simulator.devices.rfid_reader_device import RFIDReaderDevice
+from app.modules.simulator.programming.simulator.devices.barcode_scanner_device import BarcodeScannerDevice
+from app.modules.simulator.programming.simulator.devices.qr_reader_device import QRReaderDevice
 
 from app.modules.simulator.programming.simulator.devices.dc_motor_device import DCMotorDevice
 from app.modules.simulator.programming.simulator.devices.stepper_motor_device import StepperMotorDevice
 from app.modules.simulator.programming.simulator.devices.conveyor_device import ConveyorDevice
 from app.modules.simulator.programming.simulator.devices.elevator_device import ElevatorDevice
 
-from app.modules.simulator.programming.simulator.devices.rfid_reader_device import RFIDReaderDevice
-from app.modules.simulator.programming.simulator.devices.barcode_scanner_device import BarcodeScannerDevice
-from app.modules.simulator.programming.simulator.devices.qr_reader_device import QRReaderDevice
-from app.modules.simulator.programming.simulator.devices.load_cell_device import LoadCellDevice
+from app.modules.simulator.programming.simulator.devices.wifi_device import WiFiDevice
+from app.modules.simulator.programming.simulator.devices.bluetooth_device import BluetoothDevice
+from app.modules.simulator.programming.simulator.devices.mqtt_device import MQTTDevice
+from app.modules.simulator.programming.simulator.devices.http_client_device import HTTPClientDevice
 
 
 class DeviceInitializer:
@@ -71,5 +76,11 @@ class DeviceInitializer:
         device_manager.add(StepperMotorDevice("STEPPER"))
         device_manager.add(ConveyorDevice("CONVEYOR"))
         device_manager.add(ElevatorDevice("ELEVATOR"))
+
+        # Comunicação
+        device_manager.add(WiFiDevice("WIFI"))
+        device_manager.add(BluetoothDevice("BLUETOOTH"))
+        device_manager.add(MQTTDevice("MQTT"))
+        device_manager.add(HTTPClientDevice("HTTP"))
 
         cls.initialized = True
