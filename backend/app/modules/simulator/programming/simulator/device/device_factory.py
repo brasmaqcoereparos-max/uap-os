@@ -1,1 +1,43 @@
+from app.modules.simulator.programming.simulator.devices.device_catalog import (
+    device_catalog,
+)
 
+
+class DeviceFactory:
+
+    def create(
+
+        self,
+
+        name,
+
+        *args,
+
+        **kwargs,
+
+    ):
+
+        device = device_catalog.get(
+
+            name,
+
+        )
+
+        if device is None:
+
+            raise ValueError(
+
+                f"Dispositivo '{name}' não registrado."
+
+            )
+
+        return device(
+
+            *args,
+
+            **kwargs,
+
+        )
+
+
+device_factory = DeviceFactory()
