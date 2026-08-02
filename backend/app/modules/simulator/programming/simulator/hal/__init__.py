@@ -1,1 +1,3 @@
-
+"""
+Hardware Abstraction Layer
+"""
