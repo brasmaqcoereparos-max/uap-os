@@ -10,6 +10,10 @@ from app.modules.simulator.programming.simulator.core.module_manager import (
     module_manager,
 )
 
+from app.modules.simulator.programming.simulator.hal.hal_loader import (
+    HALLoader,
+)
+
 
 class Kernel:
 
@@ -21,6 +25,8 @@ class Kernel:
         if cls.initialized:
 
             return
+
+        HALLoader.load()
 
         PluginLoader.load()
 
