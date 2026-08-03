@@ -1,4 +1,3 @@
-
 from app.modules.simulator.programming.simulator.devices.device_manager import (
     device_manager,
 )
