@@ -1,15 +1,19 @@
 import time
 
+from app.modules.simulator.programming.simulator.hardware_engine.fps_controller import (
+    fps_controller,
+)
+
 
 class Tick:
 
-    def __init__(self):
-
-        self.interval = 0.02
-
     def wait(self):
 
-        time.sleep(self.interval)
+        time.sleep(
+
+            fps_controller.interval,
+
+        )
 
 
 tick = Tick()
