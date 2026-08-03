@@ -26,6 +26,10 @@ from app.modules.simulator.programming.simulator.hardware_engine.event_processor
     event_processor,
 )
 
+from app.modules.simulator.programming.simulator.hardware_engine.timer_manager import (
+    timer_manager,
+)
+
 
 class HardwareLoop:
 
@@ -48,6 +52,8 @@ class HardwareLoop:
             simulation_clock.update()
 
             event_processor.process()
+
+            timer_manager.update()
 
             device_runner.update()
 
