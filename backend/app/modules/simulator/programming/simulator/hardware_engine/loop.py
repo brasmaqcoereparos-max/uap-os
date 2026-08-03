@@ -18,6 +18,14 @@ from app.modules.simulator.programming.simulator.hardware_engine.statistics impo
     statistics,
 )
 
+from app.modules.simulator.programming.simulator.hardware_engine.state_manager import (
+    state_manager,
+)
+
+from app.modules.simulator.programming.simulator.hardware_engine.event_processor import (
+    event_processor,
+)
+
 
 class HardwareLoop:
 
@@ -25,11 +33,21 @@ class HardwareLoop:
 
         hardware_engine.start()
 
+        state_manager.start()
+
         simulation_clock.reset()
 
         while hardware_engine.is_running():
 
+            if state_manager.is_paused():
+
+                tick.wait()
+
+                continue
+
             simulation_clock.update()
+
+            event_processor.process()
 
             device_runner.update()
 
