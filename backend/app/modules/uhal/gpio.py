@@ -1,39 +1,110 @@
-from app.modules.uhal.hal_manager import uhal_manager
+from app.modules.uhal.constants import (
+    INPUT,
+    OUTPUT,
+    INPUT_PULLUP,
+    INPUT_PULLDOWN,
+    HIGH,
+    LOW,
+    PWM,
+    ANALOG,
+)
+
+from app.modules.uhal.gpio_manager import (
+    gpio_manager,
+)
 
 
-def digital_write(pin, value):
-    driver = uhal_manager.get_driver()
-    if driver:
-        driver.digital_write(pin, value)
+class GPIO:
 
+    INPUT = INPUT
 
-def digital_read(pin):
-    driver = uhal_manager.get_driver()
-    if driver:
-        return driver.digital_read(pin)
-    return 0
+    OUTPUT = OUTPUT
 
+    INPUT_PULLUP = INPUT_PULLUP
 
-def analog_read(pin):
-    driver = uhal_manager.get_driver()
-    if driver:
-        return driver.analog_read(pin)
-    return 0
+    INPUT_PULLDOWN = INPUT_PULLDOWN
 
+    HIGH = HIGH
 
-def analog_write(pin, value):
-    driver = uhal_manager.get_driver()
-    if driver:
-        driver.analog_write(pin, value)
+    LOW = LOW
 
+    PWM = PWM
 
-def pwm_write(pin, duty):
-    driver = uhal_manager.get_driver()
-    if driver:
-        driver.pwm_write(pin, duty)
+    ANALOG = ANALOG
 
+    @staticmethod
+    def pin_mode(
 
-def pwm_frequency(pin, frequency):
-    driver = uhal_manager.get_driver()
-    if driver:
-        driver.pwm_frequency(pin, frequency)
+        pin,
+
+        mode,
+
+    ):
+
+        gpio_manager.pin_mode(
+
+            pin,
+
+            mode,
+
+        )
+
+    @staticmethod
+    def digital_write(
+
+        pin,
+
+        value,
+
+    ):
+
+        gpio_manager.digital_write(
+
+            pin,
+
+            value,
+
+        )
+
+    @staticmethod
+    def digital_read(
+
+        pin,
+
+    ):
+
+        return gpio_manager.digital_read(
+
+            pin,
+
+        )
+
+    @staticmethod
+    def analog_write(
+
+        pin,
+
+        value,
+
+    ):
+
+        gpio_manager.analog_write(
+
+            pin,
+
+            value,
+
+        )
+
+    @staticmethod
+    def analog_read(
+
+        pin,
+
+    ):
+
+        return gpio_manager.analog_read(
+
+            pin,
+
+        )
