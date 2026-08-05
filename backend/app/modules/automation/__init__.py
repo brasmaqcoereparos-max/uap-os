@@ -1,1 +1,3 @@
-# Automation module
+"""
+Universal Automation Engine (UAE)
+"""
