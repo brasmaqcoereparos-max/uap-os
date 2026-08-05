@@ -1,9 +1,19 @@
-from app.modules.uhal.hal_base import HALBase
+from app.modules.uhal.drivers.driver_base import (
+    DriverBase,
+)
 
 
-class SimulatorDriver(HALBase):
+class SimulatorDriver(DriverBase):
 
     def __init__(self):
+
+        super().__init__(
+
+            "Simulator",
+
+            "Universal Automation Platform",
+
+        )
 
         self.pins = {}
 
@@ -91,4 +101,4 @@ class SimulatorDriver(HALBase):
 
             pin,
 
-      )
+        )
