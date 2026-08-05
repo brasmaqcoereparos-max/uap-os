@@ -23,6 +23,12 @@ class MotorBase(Device):
 
         self.speed = 0
 
+        self.target_speed = 0
+
+        self.acceleration = 100
+
+        self.deceleration = 100
+
         self.direction = 1
 
         self.running = False
@@ -43,7 +49,7 @@ class MotorBase(Device):
 
     ):
 
-        self.speed = speed
+        self.target_speed = speed
 
     def set_direction(
 
@@ -54,3 +60,23 @@ class MotorBase(Device):
     ):
 
         self.direction = direction
+
+    def set_acceleration(
+
+        self,
+
+        value,
+
+    ):
+
+        self.acceleration = value
+
+    def set_deceleration(
+
+        self,
+
+        value,
+
+    ):
+
+        self.deceleration = value
