@@ -5,6 +5,26 @@ from app.modules.uhal.drivers.simulator import (
 
 class RaspberryPiDriver(SimulatorDriver):
 
-    BOARD_NAME = "Raspberry Pi"
+    def __init__(self):
 
-    GPIO_COUNT = 40
+        super().__init__()
+
+        self.board.name = "Raspberry Pi"
+
+        self.board.manufacturer = "Raspberry Pi Foundation"
+
+        self.board.capabilities.gpio = 40
+
+        self.board.capabilities.pwm = 4
+
+        self.board.capabilities.uart = 6
+
+        self.board.capabilities.i2c = 7
+
+        self.board.capabilities.spi = 6
+
+        self.board.capabilities.ethernet = True
+
+        self.board.capabilities.wifi = True
+
+        self.board.capabilities.bluetooth = True
