@@ -22,3 +22,33 @@ class DCMotor(MotorBase):
             name,
 
         )
+
+        self.pwm = 0
+
+    def set_pwm(
+
+        self,
+
+        pwm,
+
+    ):
+
+        self.pwm = max(
+
+            0,
+
+            min(
+
+                100,
+
+                pwm,
+
+            ),
+
+        )
+
+    def brake(self):
+
+        self.speed = 0
+
+        self.target_speed = 0
