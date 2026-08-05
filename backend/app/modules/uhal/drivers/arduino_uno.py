@@ -5,6 +5,22 @@ from app.modules.uhal.drivers.simulator import (
 
 class ArduinoUnoDriver(SimulatorDriver):
 
-    BOARD_NAME = "Arduino Uno"
+    def __init__(self):
 
-    GPIO_COUNT = 20
+        super().__init__()
+
+        self.board.name = "Arduino Uno"
+
+        self.board.manufacturer = "Arduino"
+
+        self.board.capabilities.gpio = 20
+
+        self.board.capabilities.pwm = 6
+
+        self.board.capabilities.adc = 6
+
+        self.board.capabilities.uart = 1
+
+        self.board.capabilities.i2c = 1
+
+        self.board.capabilities.spi = 1
