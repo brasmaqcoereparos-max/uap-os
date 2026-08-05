@@ -2,7 +2,7 @@ class HardwareRegistry:
 
     def __init__(self):
 
-        self.drivers = {}
+        self._drivers = {}
 
     def register(
 
@@ -14,7 +14,23 @@ class HardwareRegistry:
 
     ):
 
-        self.drivers[name] = driver
+        self._drivers[name.lower()] = driver
+
+    def unregister(
+
+        self,
+
+        name,
+
+    ):
+
+        self._drivers.pop(
+
+            name.lower(),
+
+            None,
+
+        )
 
     def get(
 
@@ -24,11 +40,19 @@ class HardwareRegistry:
 
     ):
 
-        return self.drivers.get(name)
+        return self._drivers.get(
+
+            name.lower(),
+
+        )
 
     def all(self):
 
-        return self.drivers.copy()
+        return dict(
+
+            self._drivers,
+
+        )
 
 
 hardware_registry = HardwareRegistry()
