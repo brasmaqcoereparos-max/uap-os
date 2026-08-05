@@ -25,6 +25,10 @@ class StepperMotor(MotorBase):
 
         self.position = 0
 
+        self.microstep = 1
+
+        self.rpm = 60
+
     def move_steps(
 
         self,
@@ -34,3 +38,27 @@ class StepperMotor(MotorBase):
     ):
 
         self.position += steps
+
+    def home(self):
+
+        self.position = 0
+
+    def set_microstep(
+
+        self,
+
+        value,
+
+    ):
+
+        self.microstep = value
+
+    def set_rpm(
+
+        self,
+
+        rpm,
+
+    ):
+
+        self.rpm = rpm
