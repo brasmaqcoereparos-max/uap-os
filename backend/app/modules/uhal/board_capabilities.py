@@ -23,3 +23,11 @@ class BoardCapabilities:
         self.wifi = False
 
         self.bluetooth = False
+
+        self.usb = False
+
+        self.sd_card = False
+
+        self.display = False
+
+        self.camera = False
