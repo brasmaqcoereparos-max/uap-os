@@ -19,3 +19,15 @@ class MotionStep:
         self.delay = 0
 
         self.tool = None
+
+        self.events = []
+
+    def add_event(
+
+        self,
+
+        event,
+
+    ):
+
+        self.events.append(event)
