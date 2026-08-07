@@ -1,3 +1,6 @@
+import time
+
+
 class MotionRecorder:
 
     def __init__(self):
@@ -6,11 +9,15 @@ class MotionRecorder:
 
         self.buffer = []
 
+        self.start_time = None
+
     def start(self):
 
         self.recording = True
 
         self.buffer.clear()
+
+        self.start_time = time.time()
 
     def stop(self):
 
@@ -24,9 +31,21 @@ class MotionRecorder:
 
     ):
 
-        if self.recording:
+        if not self.recording:
 
-            self.buffer.append(position.copy())
+            return
+
+        self.buffer.append(
+
+            {
+
+                "time": time.time() - self.start_time,
+
+                "position": position.copy(),
+
+            }
+
+        )
 
     def clear(self):
 
