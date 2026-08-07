@@ -1,13 +1,40 @@
-"""Gravador de movimentos para registrar e reproduzir."""
-
 class MotionRecorder:
-    """Registra comandos/estados durante a execução."""
 
     def __init__(self):
-        self.recorded = []
 
-    def record(self, state):
-        self.recorded.append(state)
+        self.recording = False
 
-    def export(self):
-        return list(self.recorded)
+        self.buffer = []
+
+    def start(self):
+
+        self.recording = True
+
+        self.buffer.clear()
+
+    def stop(self):
+
+        self.recording = False
+
+    def add(
+
+        self,
+
+        position,
+
+    ):
+
+        if self.recording:
+
+            self.buffer.append(position.copy())
+
+    def clear(self):
+
+        self.buffer.clear()
+
+    def positions(self):
+
+        return list(self.buffer)
+
+
+motion_recorder = MotionRecorder()
