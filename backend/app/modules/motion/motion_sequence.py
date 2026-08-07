@@ -1,14 +1,43 @@
-"""Representação de uma sequência de movimento."""
-
 class MotionSequence:
-    """Sequência composta por vários passos de movimento."""
 
-    def __init__(self, name=None):
-        self.name = name or "unnamed"
+    def __init__(
+
+        self,
+
+        name,
+
+    ):
+
+        self.name = name
+
         self.steps = []
 
-    def add_step(self, step):
+    def add_step(
+
+        self,
+
+        step,
+
+    ):
+
         self.steps.append(step)
 
-    def duration(self):
-        return sum(getattr(s, 'duration', 0) for s in self.steps)
+    def remove_step(
+
+        self,
+
+        index,
+
+    ):
+
+        if 0 <= index < len(self.steps):
+
+            self.steps.pop(index)
+
+    def clear(self):
+
+        self.steps.clear()
+
+    def count(self):
+
+        return len(self.steps)
