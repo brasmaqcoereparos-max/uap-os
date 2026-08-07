@@ -1,9 +1,37 @@
-"""Player para executar sequências de movimento."""
+import time
+
 
 class MotionPlayer:
-    """Executa MotionSequence no hardware/simulador (placeholder)."""
 
-    def play(self, sequence):
+    def __init__(self):
+
+        self.running = False
+
+    def play(
+
+        self,
+
+        sequence,
+
+        callback,
+
+    ):
+
+        self.running = True
+
         for step in sequence.steps:
-            # Placeholder: enviar step ao controlador
-            pass
+
+            if not self.running:
+
+                break
+
+            callback(step)
+
+            time.sleep(step.delay)
+
+    def stop(self):
+
+        self.running = False
+
+
+motion_player = MotionPlayer()
