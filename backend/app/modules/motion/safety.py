@@ -1,11 +1,26 @@
-"""Regras e verificações de segurança relacionadas ao movimento."""
-
-class Safety:
-    """Checagens de segurança e limites de operação."""
+class MotionSafety:
 
     def __init__(self):
+
         self.enabled = True
 
-    def check_emergency_stop(self):
-        # Placeholder
-        return False
+        self.emergency_stop = False
+
+    def enable(self):
+
+        self.enabled = True
+
+    def disable(self):
+
+        self.enabled = False
+
+    def stop(self):
+
+        self.emergency_stop = True
+
+    def reset(self):
+
+        self.emergency_stop = False
+
+
+motion_safety = MotionSafety()
