@@ -7,13 +7,15 @@ class MotionPlayer:
 
         self.running = False
 
+        self.on_step = None
+
+        self.on_event = None
+
     def play(
 
         self,
 
         sequence,
-
-        callback,
 
     ):
 
@@ -25,7 +27,15 @@ class MotionPlayer:
 
                 break
 
-            callback(step)
+            if self.on_step:
+
+                self.on_step(step)
+
+            for event in step.events:
+
+                if self.on_event:
+
+                    self.on_event(event)
 
             time.sleep(step.delay)
 
