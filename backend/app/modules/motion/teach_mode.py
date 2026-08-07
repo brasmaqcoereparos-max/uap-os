@@ -1,13 +1,51 @@
-"""Modo de ensino (teach mode) para suscitar movimentos manualmente."""
+from app.modules.motion.motion_step import MotionStep
+
 
 class TeachMode:
-    """Ferramentas auxiliares para ensinar posições/trajectórias."""
 
     def __init__(self):
+
         self.enabled = False
 
-    def enable(self):
+        self.current_sequence = None
+
+    def start(
+
+        self,
+
+        sequence,
+
+    ):
+
         self.enabled = True
 
-    def disable(self):
+        self.current_sequence = sequence
+
+    def stop(self):
+
         self.enabled = False
+
+    def record_position(
+
+        self,
+
+        position,
+
+        name="",
+
+    ):
+
+        if not self.enabled:
+
+            return None
+
+        step = MotionStep(name)
+
+        step.position = position.copy()
+
+        self.current_sequence.add_step(step)
+
+        return step
+
+
+teach_mode = TeachMode()
