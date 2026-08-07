@@ -1,11 +1,48 @@
-"""Workspace e limites de operação."""
-
 class Workspace:
-    """Define espaço de trabalho, limites e verificação de alcance."""
 
-    def __init__(self, bounds=None):
-        self.bounds = bounds
+    def __init__(self):
 
-    def is_within(self, position):
-        # Placeholder: implementar verificação de limites
-        return True
+        self.x_min = None
+
+        self.x_max = None
+
+        self.y_min = None
+
+        self.y_max = None
+
+        self.z_min = None
+
+        self.z_max = None
+
+    def set_limits(
+
+        self,
+
+        x_min,
+
+        x_max,
+
+        y_min,
+
+        y_max,
+
+        z_min,
+
+        z_max,
+
+    ):
+
+        self.x_min = x_min
+
+        self.x_max = x_max
+
+        self.y_min = y_min
+
+        self.y_max = y_max
+
+        self.z_min = z_min
+
+        self.z_max = z_max
+
+
+workspace = Workspace()
