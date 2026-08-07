@@ -1,8 +1,31 @@
-"""Detecção e processamento de colisões."""
+class CollisionDetector:
 
-class Collision:
-    """Lógica de detecção/ resposta a colisões."""
+    def __init__(self):
 
-    def detect(self, state):
-        # Placeholder
+        self.enabled = False
+
+    def enable(self):
+
+        self.enabled = True
+
+    def disable(self):
+
+        self.enabled = False
+
+    def check(
+
+        self,
+
+        position,
+
+    ):
+
+        """
+        Futuramente executará
+        detecção de colisão.
+        """
+
         return False
+
+
+collision_detector = CollisionDetector()
