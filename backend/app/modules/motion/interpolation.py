@@ -1,8 +1,40 @@
-"""Algoritmos de interpolação para movimentos."""
-
-def linear_interpolate(a, b, t):
-    """Interpolação linear entre a e b por fator t (0..1)."""
-    return a + (b - a) * t
+from enum import Enum
 
 
-# Outros métodos de interpolação podem ser adicionados aqui.
+class InterpolationMode(Enum):
+
+    NONE = "none"
+
+    JOINT = "joint"
+
+    LINEAR = "linear"
+
+    CIRCULAR = "circular"
+
+    SPLINE = "spline"
+
+    BEZIER = "bezier"
+
+
+class MotionInterpolation:
+
+    def __init__(self):
+
+        self.mode = InterpolationMode.JOINT
+
+    def set_mode(
+
+        self,
+
+        mode,
+
+    ):
+
+        self.mode = mode
+
+    def get_mode(self):
+
+        return self.mode
+
+
+motion_interpolation = MotionInterpolation()
