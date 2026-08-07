@@ -9,6 +9,10 @@ class TeachMode:
 
         self.current_sequence = None
 
+        self.current_tool = None
+
+        self.home_position = None
+
     def start(
 
         self,
@@ -24,6 +28,30 @@ class TeachMode:
     def stop(self):
 
         self.enabled = False
+
+    def set_home(
+
+        self,
+
+        position,
+
+    ):
+
+        self.home_position = position.copy()
+
+    def get_home(self):
+
+        return self.home_position
+
+    def select_tool(
+
+        self,
+
+        tool,
+
+    ):
+
+        self.current_tool = tool
 
     def record_position(
 
@@ -42,6 +70,8 @@ class TeachMode:
         step = MotionStep(name)
 
         step.position = position.copy()
+
+        step.tool = self.current_tool
 
         self.current_sequence.add_step(step)
 
