@@ -1,10 +1,44 @@
-"""Biblioteca de movimentos reutilizáveis."""
+class MotionLibrary:
 
-_motion_library = {}
+    def __init__(self):
 
-def register_motion(name, sequence):
-    _motion_library[name] = sequence
+        self.library = {}
+
+    def add(
+
+        self,
+
+        name,
+
+        sequence,
+
+    ):
+
+        self.library[name] = sequence
+
+    def get(
+
+        self,
+
+        name,
+
+    ):
+
+        return self.library.get(name)
+
+    def remove(
+
+        self,
+
+        name,
+
+    ):
+
+        self.library.pop(name, None)
+
+    def list(self):
+
+        return list(self.library.keys())
 
 
-def get_motion(name):
-    return _motion_library.get(name)
+motion_library = MotionLibrary()
