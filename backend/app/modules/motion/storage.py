@@ -1,13 +1,71 @@
-"""Armazenamento de sequências/ dados de movimento."""
+import json
 
-class Storage:
-    """Interface simples para persistência (placeholder)."""
 
-    def __init__(self):
-        self._store = {}
+class MotionStorage:
 
-    def save(self, key, value):
-        self._store[key] = value
+    def save(
 
-    def load(self, key):
-        return self._store.get(key)
+        self,
+
+        sequence,
+
+        filename,
+
+    ):
+
+        data = {
+
+            "name": sequence.name,
+
+            "steps": [
+
+                step.__dict__
+
+                for step in sequence.steps
+
+            ],
+
+        }
+
+        with open(
+
+            filename,
+
+            "w",
+
+            encoding="utf-8",
+
+        ) as file:
+
+            json.dump(
+
+                data,
+
+                file,
+
+                indent=4,
+
+            )
+
+    def load(
+
+        self,
+
+        filename,
+
+    ):
+
+        with open(
+
+            filename,
+
+            "r",
+
+            encoding="utf-8",
+
+        ) as file:
+
+            return json.load(file)
+
+
+motion_storage = MotionStorage()
