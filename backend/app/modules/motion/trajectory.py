@@ -1,10 +1,12 @@
-"""Representação de trajetórias."""
+from enum import Enum
 
-class Trajectory:
-    """Armazena uma sequência contínua de poses ou pontos."""
 
-    def __init__(self, points=None):
-        self.points = points or []
+class TrajectoryType(Enum):
 
-    def length(self):
-        return len(self.points)
+    JOINT = "joint"
+
+    LINEAR = "linear"
+
+    CIRCULAR = "circular"
+
+    SPLINE = "spline"
