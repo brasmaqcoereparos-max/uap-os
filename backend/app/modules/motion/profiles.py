@@ -1,9 +1,23 @@
-"""Perfis de movimento (velocidade/ aceleração etc.)."""
+class MotionProfile:
 
-class Profile:
-    """Perfil genérico de velocidade/ aceleração."""
+    def __init__(
 
-    def __init__(self, name=None, max_speed=None, max_accel=None):
-        self.name = name
-        self.max_speed = max_speed
-        self.max_accel = max_accel
+        self,
+
+        speed=100,
+
+        acceleration=100,
+
+        deceleration=100,
+
+        jerk=0,
+
+    ):
+
+        self.speed = speed
+
+        self.acceleration = acceleration
+
+        self.deceleration = deceleration
+
+        self.jerk = jerk
