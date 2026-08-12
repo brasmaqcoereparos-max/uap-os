@@ -1,4 +1,37 @@
-from enum import Enum
+class BlockTypes:
+
+    START = "start"
+
+    MOVE = "move"
+
+    POSITION = "position"
+
+    WAIT = "wait"
+
+    OUTPUT = "output"
+
+    INPUT = "input"
+
+    CONDITION = "condition"
+
+    LOOP = "loop"
+
+    END = "end"
+
+    @classmethod
+    def all(cls):
+
+        return [
+            cls.START,
+            cls.MOVE,
+            cls.POSITION,
+            cls.WAIT,
+            cls.OUTPUT,
+            cls.INPUT,
+            cls.CONDITION,
+            cls.LOOP,
+            cls.END,
+        ]from enum import Enum
 
 
 class BlockType(Enum):
