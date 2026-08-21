@@ -1,4 +1,8 @@
-from app.modules.simulator.programming.simulator.devices.device_base import (
+"""
+Sensor ultrassônico simulado do UAP.
+"""
+
+from app.modules.simulator.programming.simulator.device.device_base import (
     DeviceBase,
 )
 
@@ -10,19 +14,30 @@ class UltrasonicSensorDevice(DeviceBase):
         name,
     ):
         super().__init__(name)
-        self.distance = 100.0
+
+        self.distance = 0.0
 
     def set_distance(
         self,
         distance,
     ):
-        self.distance = float(distance)
+
+        self.distance = max(
+            0.0,
+            float(distance),
+        )
 
     def read(self):
+
+        return self.distance
+
+    def measure(self):
+
         return self.distance
 
     def update(self):
         pass
 
     def reset(self):
-        self.distance = 100.0
+
+        self.distance = 0.0
