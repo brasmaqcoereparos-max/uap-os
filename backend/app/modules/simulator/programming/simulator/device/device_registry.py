@@ -1,5 +1,5 @@
 """
-Registro central dos dispositivos do simulador UAP.
+Registro das instâncias de dispositivos do UAP.
 """
 
 
@@ -15,6 +15,11 @@ class DeviceRegistry:
         device,
     ):
 
+        if not name:
+            raise ValueError(
+                "O nome do dispositivo é obrigatório."
+            )
+
         self._devices[name] = device
 
         return device
@@ -24,7 +29,9 @@ class DeviceRegistry:
         name,
     ):
 
-        return self._devices.get(name)
+        return self._devices.get(
+            name
+        )
 
     def exists(
         self,
