@@ -1,47 +1,49 @@
+"""
+Sistema de parada de emergência do UAP.
+"""
+
+from datetime import datetime, timezone
+
+
 class EmergencyStop:
 
     def __init__(self):
-
         self.active = False
+        self.reason = ""
+        self.activated_at = None
 
-    def activate(self):
-
+    def activate(
+        self,
+        reason: str = "Emergency stop",
+    ):
         self.active = True
-
-    def reset(self):
-
-        self.active = False
-
-    def is_active(self):
-
-        return self.active
-
-    def check(self):
-
-        if self.active:
-
-            return False
+        self.reason = reason
+        self.activated_at = (
+            datetime.now(timezone.utc)
+        )
 
         return True
 
-
-emergency_stop = EmergencyStop()class RobotEmergencyStop:
-
-    def __init__(self):
-
+    def release(self):
         self.active = False
+        self.reason = ""
+        self.activated_at = None
 
-    def activate(self):
+        return True
 
-        self.active = True
+    def is_active(self):
+        return self.active
 
-    def reset(self):
+    def status(self):
+        return {
+            "active": self.active,
+            "reason": self.reason,
+            "activated_at": (
+                self.activated_at.isoformat()
+                if self.activated_at
+                else None
+            ),
+        }
 
-        self.active = False
 
-    def can_continue(self):
-
-        return not self.active
-
-
-robot_emergency_stop = RobotEmergencyStop()
+emergency_stop = EmergencyStop()
