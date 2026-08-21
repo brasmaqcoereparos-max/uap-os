@@ -1,64 +1,40 @@
-from app.modules.simulator.programming.simulator.devices.device_base import (
+"""
+Display OLED simulado do UAP.
+"""
+
+from app.modules.simulator.programming.simulator.device.device_base import (
     DeviceBase,
 )
 
 
 class OLEDDevice(DeviceBase):
 
-    def __init__(
-
-        self,
-
-        name,
-
-        width=128,
-
-        height=64,
-
-    ):
-
+    def __init__(self, name):
         super().__init__(name)
 
-        self.width = width
+        self.lines = []
+        self.text = ""
 
-        self.height = height
+    def write(self, text):
 
-        self.buffer = []
+        self.text = str(text)
 
     def clear(self):
 
-        self.buffer.clear()
+        self.text = ""
 
-    def draw_text(
+        self.lines.clear()
 
-        self,
+    def add_line(self, text):
 
-        x,
+        self.lines.append(str(text))
 
-        y,
+    def get_text(self):
 
-        text,
-
-    ):
-
-        self.buffer.append(
-
-            (
-
-                x,
-
-                y,
-
-                text,
-
-            )
-
-        )
+        return self.text
 
     def update(self):
-
         pass
 
     def reset(self):
-
         self.clear()
