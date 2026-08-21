@@ -1,4 +1,8 @@
-from app.modules.simulator.programming.simulator.devices.device_base import (
+"""
+Servo motor simulado do UAP.
+"""
+
+from app.modules.simulator.programming.simulator.device.device_base import (
     DeviceBase,
 )
 
@@ -10,35 +14,40 @@ from app.modules.simulator.programming.simulator.runtime.runtime_pwm import (
 class ServoDevice(DeviceBase):
 
     def __init__(
-
         self,
-
         name,
-
         pin,
-
     ):
-
         super().__init__(name)
 
         self.pin = pin
-
         self.angle = 0
 
-    def update(self):
+    def set_angle(
+        self,
+        angle,
+    ):
 
-        pwm = runtime_pwm.read(
+        self.angle = max(
+            0,
+            min(
+                180,
+                int(angle),
+            ),
+        )
 
+        runtime_pwm.write(
             self.pin,
-
+            self.angle,
         )
 
-        self.angle = int(
+    def get_angle(self):
 
-            pwm * 180 / 255,
+        return self.angle
 
-        )
+    def update(self):
+        pass
 
     def reset(self):
 
-        self.angle = 0
+        self.set_angle(0)
