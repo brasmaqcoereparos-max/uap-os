@@ -1,4 +1,8 @@
-from app.modules.simulator.programming.simulator.devices.device_base import (
+"""
+Relé simulado do UAP.
+"""
+
+from app.modules.simulator.programming.simulator.device.device_base import (
     DeviceBase,
 )
 
@@ -9,30 +13,40 @@ from app.modules.simulator.programming.simulator.runtime.runtime_gpio import (
 
 class RelayDevice(DeviceBase):
 
-    def __init__(
-
-        self,
-
-        name,
-
-        pin,
-
-    ):
-
+    def __init__(self, name, pin):
         super().__init__(name)
 
         self.pin = pin
+        self.state = False
+
+    def on(self):
+
+        self.state = True
+
+        runtime_gpio.write(
+            self.pin,
+            True,
+        )
+
+    def off(self):
 
         self.state = False
 
-    def update(self):
-
-        self.state = runtime_gpio.read(
-
+        runtime_gpio.write(
             self.pin,
-
+            False,
         )
+
+    def toggle(self):
+
+        if self.state:
+            self.off()
+        else:
+            self.on()
+
+    def update(self):
+        pass
 
     def reset(self):
 
-        self.state = False
+        self.off()
