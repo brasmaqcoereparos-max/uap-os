@@ -1,42 +1,67 @@
+"""
+Registro central dos dispositivos do simulador UAP.
+"""
+
+
 class DeviceRegistry:
 
     def __init__(self):
 
-        self.devices = {}
+        self._devices = {}
 
     def register(
-
         self,
-
         name,
-
         device,
-
     ):
 
-        self.devices[name] = device
+        self._devices[name] = device
+
+        return device
 
     def get(
-
         self,
-
         name,
-
     ):
 
-        return self.devices.get(
+        return self._devices.get(name)
 
+    def exists(
+        self,
+        name,
+    ):
+
+        return name in self._devices
+
+    def unregister(
+        self,
+        name,
+    ):
+
+        return self._devices.pop(
             name,
-
+            None,
         )
 
     def all(self):
 
-        return self.devices.copy()
+        return self._devices.copy()
+
+    def names(self):
+
+        return list(
+            self._devices.keys()
+        )
+
+    def count(self):
+
+        return len(
+            self._devices
+        )
 
     def clear(self):
 
-        self.devices.clear()
+        self._devices.clear()
 
 
 device_registry = DeviceRegistry()
