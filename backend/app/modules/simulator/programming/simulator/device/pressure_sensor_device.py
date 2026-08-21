@@ -1,28 +1,30 @@
-from app.modules.simulator.programming.simulator.devices.device_base import (
+"""
+Sensor de pressão simulado do UAP.
+"""
+
+from app.modules.simulator.programming.simulator.device.device_base import (
     DeviceBase,
 )
 
 
 class PressureSensorDevice(DeviceBase):
 
-    def __init__(
-        self,
-        name,
-    ):
+    def __init__(self, name):
         super().__init__(name)
-        self.pressure = 1013.25
 
-    def set_pressure(
-        self,
-        value,
-    ):
-        self.pressure = float(value)
+        self.pressure = 0.0
+
+    def set_pressure(self, pressure):
+
+        self.pressure = float(pressure)
 
     def read(self):
+
         return self.pressure
 
     def update(self):
         pass
 
     def reset(self):
-        self.pressure = 1013.25
+
+        self.pressure = 0.0
