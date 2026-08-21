@@ -10,6 +10,82 @@ class Actuator:
     name: str
     actuator_type: str
     device_id: str | None = None
+    state: Any = False
+    enabled: bool = True
+    metadata: dict[str, Any] = field(
+        default_factory=dict
+    )
+
+    def set_state(self, state: Any) -> None:
+        self.state = state
+
+
+class ActuatorManager:
+    def __init__(self) -> None:
+        self._actuators: dict[str, Actuator] = {}
+
+    def register(
+        self,
+        actuator_id: str,
+        name: str,
+        actuator_type: str,
+        device_id: str | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> Actuator:
+        actuator = Actuator(
+            actuator_id=actuator_id,
+            name=name,
+            actuator_type=actuator_type,
+            device_id=device_id,
+            metadata=metadata or {},
+        )
+
+        self._actuators[actuator_id] = actuator
+        return actuator
+
+    def get(
+        self,
+        actuator_id: str,
+    ) -> Actuator | None:
+        return self._actuators.get(actuator_id)
+
+    def list(self) -> list[Actuator]:
+        return list(self._actuators.values())
+
+    def set_state(
+        self,
+        actuator_id: str,
+        state: Any,
+    ) -> Actuator:
+        actuator = self.get(actuator_id)
+
+        if actuator is None:
+            raise KeyError(
+                f"Actuator '{actuator_id}' not found"
+            )
+
+        actuator.set_state(state)
+        return actuator
+
+    def remove(
+        self,
+        actuator_id: str,
+    ) -> bool:
+        return self._actuators.pop(
+            actuator_id,
+            None,
+        ) is not Nonefrom __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Any
+
+
+@dataclass
+class Actuator:
+    actuator_id: str
+    name: str
+    actuator_type: str
+    device_id: str | None = None
     value: Any = None
     active: bool = False
     metadata: dict[str, Any] = field(default_factory=dict)
