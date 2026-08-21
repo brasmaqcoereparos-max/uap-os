@@ -10,15 +10,20 @@ class Servo:
     name: str
     device_id: str | None = None
     angle: float = 90.0
-    minimum: float = 0.0
-    maximum: float = 180.0
+    minimum_angle: float = 0.0
+    maximum_angle: float = 180.0
     enabled: bool = True
-    metadata: dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(
+        default_factory=dict
+    )
 
     def set_angle(self, angle: float) -> None:
         self.angle = max(
-            self.minimum,
-            min(self.maximum, float(angle)),
+            self.minimum_angle,
+            min(
+                self.maximum_angle,
+                float(angle),
+            ),
         )
 
 
@@ -31,27 +36,26 @@ class ServoManager:
         servo_id: str,
         name: str,
         device_id: str | None = None,
-        minimum: float = 0.0,
-        maximum: float = 180.0,
+        minimum_angle: float = 0.0,
+        maximum_angle: float = 180.0,
         metadata: dict[str, Any] | None = None,
     ) -> Servo:
         servo = Servo(
             servo_id=servo_id,
             name=name,
             device_id=device_id,
-            minimum=minimum,
-            maximum=maximum,
+            minimum_angle=minimum_angle,
+            maximum_angle=maximum_angle,
             metadata=metadata or {},
-        )
-
-        servo.set_angle(
-            (minimum + maximum) / 2
         )
 
         self._servos[servo_id] = servo
         return servo
 
-    def get(self, servo_id: str) -> Servo | None:
+    def get(
+        self,
+        servo_id: str,
+    ) -> Servo | None:
         return self._servos.get(servo_id)
 
     def list(self) -> list[Servo]:
@@ -65,12 +69,17 @@ class ServoManager:
         servo = self.get(servo_id)
 
         if servo is None:
-            raise KeyError(f"Servo '{servo_id}' not found")
+            raise KeyError(
+                f"Servo '{servo_id}' not found"
+            )
 
         servo.set_angle(angle)
         return servo
 
-    def remove(self, servo_id: str) -> bool:
+    def remove(
+        self,
+        servo_id: str,
+    ) -> bool:
         return self._servos.pop(
             servo_id,
             None,
