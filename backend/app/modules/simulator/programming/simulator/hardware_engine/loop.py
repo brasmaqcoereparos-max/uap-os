@@ -1,65 +1,37 @@
-from app.modules.simulator.programming.simulator.hardware_engine.engine import (
-    hardware_engine,
-)
+"""
+Loop principal do motor de simulação UAP.
+"""
 
 from app.modules.simulator.programming.simulator.hardware_engine.device_runner import (
-    device_runner,
-)
-
-from app.modules.simulator.programming.simulator.hardware_engine.tick import (
-    tick,
-)
-
-from app.modules.simulator.programming.simulator.hardware_engine.simulation_clock import (
-    simulation_clock,
-)
-
-from app.modules.simulator.programming.simulator.hardware_engine.statistics import (
-    statistics,
-)
-
-from app.modules.simulator.programming.simulator.hardware_engine.state_manager import (
-    state_manager,
-)
-
-from app.modules.simulator.programming.simulator.hardware_engine.event_processor import (
-    event_processor,
-)
-
-from app.modules.simulator.programming.simulator.hardware_engine.timer_manager import (
-    timer_manager,
+    DeviceRunner,
 )
 
 
-class HardwareLoop:
+class SimulationLoop:
 
-    def run(self):
+    def __init__(self):
 
-        hardware_engine.start()
+        self.running = False
+        self.device_runner = DeviceRunner()
 
-        state_manager.start()
+    def start(self):
 
-        simulation_clock.reset()
+        self.running = True
+        self.device_runner.start()
 
-        while hardware_engine.is_running():
+    def stop(self):
 
-            if state_manager.is_paused():
+        self.running = False
+        self.device_runner.stop()
 
-                tick.wait()
+    def tick(self):
 
-                continue
+        if not self.running:
+            return
 
-            simulation_clock.update()
+        self.device_runner.update()
 
-            event_processor.process()
+    def reset(self):
 
-            timer_manager.update()
-
-            device_runner.update()
-
-            statistics.frame()
-
-            tick.wait()
-
-
-hardware_loop = HardwareLoop()
+        self.device_runner.reset()
+        self.running = False
