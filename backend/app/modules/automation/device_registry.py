@@ -1,89 +1,58 @@
+"""
+Registro de dispositivos da camada de automação.
+"""
+
+from typing import Any
+
+
 class AutomationDeviceRegistry:
 
     def __init__(self):
-
-        self.devices = {}
+        self._devices: dict[str, Any] = {}
 
     def register(
         self,
-        device,
+        device_id: str,
+        device: Any,
     ):
-
-        self.devices[
-            device.id
-        ] = device
+        self._devices[device_id] = device
+        return device
 
     def unregister(
         self,
-        device_id,
+        device_id: str,
     ):
-
-        self.devices.pop(
+        return self._devices.pop(
             device_id,
             None,
         )
 
     def get(
         self,
-        device_id,
+        device_id: str,
     ):
-
-        return self.devices.get(
+        return self._devices.get(
             device_id
         )
 
     def list(self):
-
         return list(
-            self.devices.values()
+            self._devices.values()
         )
 
-
-device_registry = AutomationDeviceRegistry()class DeviceRegistry:
-
-    def __init__(self):
-
-        self.devices = {}
-
-    def register(
-
-        self,
-
-        device,
-
-    ):
-
-        self.devices[device.id] = device
-
-    def get(
-
-        self,
-
-        device_id,
-
-    ):
-
-        return self.devices.get(device_id)
-
-    def remove(
-
-        self,
-
-        device_id,
-
-    ):
-
-        self.devices.pop(
-
-            device_id,
-
-            None,
-
+    def ids(self):
+        return list(
+            self._devices.keys()
         )
 
-    def all(self):
+    def exists(
+        self,
+        device_id: str,
+    ):
+        return device_id in self._devices
 
-        return list(self.devices.values())
+    def clear(self):
+        self._devices.clear()
 
 
-device_registry = DeviceRegistry()
+device_registry = AutomationDeviceRegistry()
