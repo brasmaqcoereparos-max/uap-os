@@ -1,3 +1,7 @@
+"""
+Carregador central dos dispositivos disponíveis no UAP.
+"""
+
 from app.modules.simulator.programming.simulator.device.device_catalog import (
     device_catalog,
 )
@@ -20,6 +24,24 @@ from app.modules.simulator.programming.simulator.device.servo_device import (
 from app.modules.simulator.programming.simulator.device.potentiometer_device import (
     PotentiometerDevice,
 )
+from app.modules.simulator.programming.simulator.device.lora_device import (
+    LoRaDevice,
+)
+from app.modules.simulator.programming.simulator.device.espnow_device import (
+    ESPNowDevice,
+)
+from app.modules.simulator.programming.simulator.device.wifi_device import (
+    WiFiDevice,
+)
+from app.modules.simulator.programming.simulator.device.bluetooth_device import (
+    BluetoothDevice,
+)
+from app.modules.simulator.programming.simulator.device.mqtt_device import (
+    MQTTDevice,
+)
+from app.modules.simulator.programming.simulator.device.can_device import (
+    CANDevice,
+)
 
 
 class DeviceLoader:
@@ -32,34 +54,26 @@ class DeviceLoader:
         if cls.loaded:
             return
 
-        device_catalog.register(
-            "LED",
-            LEDDevice,
-        )
+        devices = {
+            "LED": LEDDevice,
+            "BUTTON": ButtonDevice,
+            "RELAY": RelayDevice,
+            "BUZZER": BuzzerDevice,
+            "SERVO": ServoDevice,
+            "POT": PotentiometerDevice,
+            "LORA": LoRaDevice,
+            "ESPNOW": ESPNowDevice,
+            "WIFI": WiFiDevice,
+            "BLUETOOTH": BluetoothDevice,
+            "MQTT": MQTTDevice,
+            "CAN": CANDevice,
+        }
 
-        device_catalog.register(
-            "BUTTON",
-            ButtonDevice,
-        )
+        for name, device_class in devices.items():
 
-        device_catalog.register(
-            "RELAY",
-            RelayDevice,
-        )
-
-        device_catalog.register(
-            "BUZZER",
-            BuzzerDevice,
-        )
-
-        device_catalog.register(
-            "SERVO",
-            ServoDevice,
-        )
-
-        device_catalog.register(
-            "POT",
-            PotentiometerDevice,
-        )
+            device_catalog.register(
+                name,
+                device_class,
+            )
 
         cls.loaded = True
