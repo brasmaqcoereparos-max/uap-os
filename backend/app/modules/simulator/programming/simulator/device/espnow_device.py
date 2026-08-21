@@ -1,4 +1,8 @@
-from app.modules.simulator.programming.simulator.devices.device_base import (
+"""
+Dispositivo ESP-NOW para o simulador UAP.
+"""
+
+from app.modules.simulator.programming.simulator.device.device_base import (
     DeviceBase,
 )
 
@@ -11,18 +15,42 @@ class ESPNowDevice(DeviceBase):
     ):
         super().__init__(name)
 
-        self.peers = []
+        self.connected = False
+        self.peer = None
+        self.messages = []
 
-    def add_peer(
+    def connect(
         self,
         peer,
     ):
-        self.peers.append(peer)
+        self.peer = peer
+        self.connected = True
+
+    def disconnect(self):
+        self.peer = None
+        self.connected = False
+
+    def send(
+        self,
+        message,
+    ):
+        if not self.connected:
+            return False
+
+        self.messages.append(message)
+
+        return True
+
+    def receive(self):
+
+        if not self.messages:
+            return None
+
+        return self.messages.pop(0)
 
     def update(self):
-
         pass
 
     def reset(self):
-
-        self.peers.clear()
+        self.messages.clear()
+        self.disconnect()
