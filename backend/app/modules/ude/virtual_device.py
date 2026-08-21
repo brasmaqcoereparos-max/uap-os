@@ -1,38 +1,120 @@
-from app.modules.ude.device import Device
-from app.modules.ude.device_types import DeviceType
+"""
+Dispositivo virtual do UDE.
+
+Usado para simulação, testes e desenvolvimento
+sem necessidade de hardware físico.
+"""
+
+from uuid import uuid4
 
 
-class VirtualDevice(Device):
+class VirtualDevice:
 
     def __init__(
         self,
         name,
+        device_type="virtual",
+        device_id=None,
     ):
-
-        super().__init__(
-            name,
-            DeviceType.VIRTUAL.value,
+        self.id = (
+            device_id
+            or str(uuid4())
         )
 
-        self.state = {}
+        self.name = name
+        self.device_type = device_type
 
-    def set(
+        self.connected = False
+        self.enabled = True
+
+        self.inputs = {}
+        self.outputs = {}
+        self.properties = {}
+
+    def connect(self):
+        self.connected = True
+        return True
+
+    def disconnect(self):
+        self.connected = False
+        return True
+
+    def enable(self):
+        self.enabled = True
+        return True
+
+    def disable(self):
+        self.enabled = False
+        return True
+
+    def set_input(
         self,
         name,
         value,
     ):
+        self.inputs[name] = value
 
-        self.state[name] = value
-
-    def get(
+    def get_input(
         self,
         name,
         default=None,
     ):
-
-        return self.state.get(
+        return self.inputs.get(
             name,
             default,
-        )"""
-Universal Device Engine
-"""
+        )
+
+    def set_output(
+        self,
+        name,
+        value,
+    ):
+        self.outputs[name] = value
+
+    def get_output(
+        self,
+        name,
+        default=None,
+    ):
+        return self.outputs.get(
+            name,
+            default,
+        )
+
+    def set_property(
+        self,
+        name,
+        value,
+    ):
+        self.properties[name] = value
+
+    def get_property(
+        self,
+        name,
+        default=None,
+    ):
+        return self.properties.get(
+            name,
+            default,
+        )
+
+    def is_available(self):
+        return (
+            self.enabled
+            and self.connected
+        )
+
+    def status(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "device_type": self.device_type,
+            "connected": self.connected,
+            "enabled": self.enabled,
+            "available": self.is_available(),
+            "inputs": dict(self.inputs),
+            "outputs": dict(self.outputs),
+            "properties": dict(
+                self.properties
+            ),
+        }
