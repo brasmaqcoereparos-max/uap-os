@@ -1,35 +1,42 @@
-from app.modules.simulator.programming.simulator.devices.device_base import (
+"""
+Leitor RFID simulado do UAP.
+"""
+
+from app.modules.simulator.programming.simulator.device.device_base import (
     DeviceBase,
 )
 
 
 class RFIDReaderDevice(DeviceBase):
 
-    def __init__(
-        self,
-        name,
-    ):
+    def __init__(self, name):
         super().__init__(name)
 
-        self.tag = None
+        self.uid = None
+        self.data = {}
 
-    def set_tag(
-        self,
-        tag,
-    ):
+    def scan(self, uid):
 
-        self.tag = tag
+        self.uid = str(uid)
 
-    def read(self):
+    def read_uid(self):
 
-        return self.tag
+        return self.uid
+
+    def write_data(self, key, value):
+
+        self.data[key] = value
+
+    def read_data(self, key):
+
+        return self.data.get(key)
 
     def clear(self):
 
-        self.tag = None
+        self.uid = None
+        self.data.clear()
 
     def update(self):
-
         pass
 
     def reset(self):
