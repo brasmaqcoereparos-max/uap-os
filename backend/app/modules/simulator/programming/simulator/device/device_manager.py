@@ -1,4 +1,4 @@
-from app.modules.simulator.programming.simulator.devices.device_registry import (
+from app.modules.simulator.programming.simulator.device.device_registry import (
     device_registry,
 )
 
