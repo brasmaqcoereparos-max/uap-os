@@ -1,4 +1,8 @@
-from app.modules.simulator.programming.simulator.devices.device_base import (
+"""
+Sensor de luminosidade simulado do UAP.
+"""
+
+from app.modules.simulator.programming.simulator.device.device_base import (
     DeviceBase,
 )
 
@@ -10,19 +14,29 @@ class LightSensorDevice(DeviceBase):
         name,
     ):
         super().__init__(name)
-        self.lux = 500
 
-    def set_lux(
+        self.value = 0
+
+    def set_value(
         self,
         value,
     ):
-        self.lux = int(value)
+
+        self.value = max(
+            0,
+            min(
+                1023,
+                int(value),
+            ),
+        )
 
     def read(self):
-        return self.lux
+
+        return self.value
 
     def update(self):
         pass
 
     def reset(self):
-        self.lux = 500
+
+        self.value = 0
