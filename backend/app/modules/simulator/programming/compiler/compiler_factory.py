@@ -1,31 +1,61 @@
-from app.modules.simulator.programming.compiler.compiler_registry import (
-    compiler_registry,
-)
+"""
+Fábrica de compiladores do UAP.
+"""
 
 
 class CompilerFactory:
 
+    def __init__(self):
+        self._compilers = {}
+
     def register(
-
         self,
-
-        target,
-
+        name,
         compiler,
-
     ):
+        self._compilers[name] = compiler
+        return compiler
 
-        compiler_registry.register(
-
-            target,
-
-            compiler,
-
+    def unregister(
+        self,
+        name,
+    ):
+        return self._compilers.pop(
+            name,
+            None,
         )
 
-    def get(self, target):
+    def get(
+        self,
+        name,
+    ):
+        return self._compilers.get(name)
 
-        return compiler_registry.get(target)
+    def create(
+        self,
+        name,
+        *args,
+        **kwargs,
+    ):
+        compiler = self.get(name)
+
+        if compiler is None:
+            raise KeyError(
+                f"Compiler '{name}' not registered"
+            )
+
+        if callable(compiler):
+            return compiler(
+                *args,
+                **kwargs,
+            )
+
+        return compiler
+
+    def list(self):
+        return list(
+            self._compilers.keys()
+        )
 
 
 compiler_factory = CompilerFactory()
