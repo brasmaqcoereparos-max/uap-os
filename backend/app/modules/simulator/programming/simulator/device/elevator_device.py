@@ -1,4 +1,4 @@
-from app.modules.simulator.programming.simulator.devices.device_base import (
+from app.modules.simulator.programming.simulator.device.device_base import (
     DeviceBase,
 )
 
