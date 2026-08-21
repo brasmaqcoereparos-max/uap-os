@@ -1,3 +1,8 @@
+"""
+Universal Device Engine
+Classe base de dispositivo.
+"""
+
 from uuid import uuid4
 
 from app.modules.ude.device_configuration import (
@@ -17,15 +22,12 @@ class Device:
         name,
         device_type,
     ):
-
         self.id = str(uuid4())
 
         self.name = name
-
         self.device_type = device_type
 
         self.enabled = True
-
         self.connected = False
 
         self.properties = {}
@@ -39,39 +41,42 @@ class Device:
         )
 
     def connect(self):
-
         self.connected = True
 
         self.status.set(
             DeviceStatus.ONLINE
         )
 
-    def disconnect(self):
+        return True
 
+    def disconnect(self):
         self.connected = False
 
         self.status.set(
             DeviceStatus.OFFLINE
         )
 
-    def enable(self):
+        return True
 
+    def enable(self):
         self.enabled = True
 
-    def disable(self):
+        return True
 
+    def disable(self):
         self.enabled = False
 
         self.status.set(
             DeviceStatus.DISABLED
         )
 
+        return True
+
     def set_property(
         self,
         name,
         value,
     ):
-
         self.properties[name] = value
 
     def get_property(
@@ -79,51 +84,34 @@ class Device:
         name,
         default=None,
     ):
-
         return self.properties.get(
             name,
             default,
-        )from uuid import uuid4
+        )
 
-
-class Device:
-
-    def __init__(
-
+    def remove_property(
         self,
-
         name,
-
-        device_type,
-
     ):
+        return self.properties.pop(
+            name,
+            None,
+        )
 
-        self.id = str(uuid4())
+    def is_available(self):
+        return (
+            self.enabled
+            and self.connected
+        )
 
-        self.name = name
-
-        self.device_type = device_type
-
-        self.enabled = True
-
-        self.connected = False
-
-        self.properties = {}
-
-    def connect(self):
-
-        self.connected = True
-
-    def disconnect(self):
-
-        self.connected = False
-
-    def enable(self):
-
-        self.enabled = True
-
-    def disable(self):
-
-        self.enabled = False"""
-Universal Device Engine
-"""
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "device_type": self.device_type,
+            "enabled": self.enabled,
+            "connected": self.connected,
+            "properties": dict(
+                self.properties
+            ),
+        }
