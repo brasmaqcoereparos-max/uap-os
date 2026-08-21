@@ -1,17 +1,34 @@
-from app.modules.simulator.programming.simulator.devices.device_manager import (
+"""
+Executor central dos dispositivos do simulador UAP.
+"""
+
+from app.modules.simulator.programming.simulator.device.device_manager import (
     device_manager,
 )
 
 
 class DeviceRunner:
 
+    def __init__(self):
+
+        self.running = False
+
+    def start(self):
+
+        self.running = True
+
+    def stop(self):
+
+        self.running = False
+
     def update(self):
 
-        for device in device_manager.devices:
+        if not self.running:
+            return
 
-            if hasattr(device, "update"):
+        device_manager.update_all()
 
-                device.update()
+    def reset(self):
 
-
-device_runner = DeviceRunner()
+        device_manager.reset_all()
+        self.running = False
