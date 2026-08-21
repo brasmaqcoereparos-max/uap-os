@@ -1,51 +1,71 @@
+"""
+Descoberta de dispositivos do Universal Device Engine.
+"""
+
+from dataclasses import dataclass, field
+from typing import Any
+
+
+@dataclass
+class DiscoveryResult:
+    device_id: str
+    name: str
+    device_type: str
+    protocol: str | None = None
+    address: str | None = None
+    metadata: dict[str, Any] = field(
+        default_factory=dict
+    )
+
+
 class DeviceDiscovery:
 
     def __init__(self):
-
-        self.discovered = {}
+        self.devices = {}
 
     def add(
         self,
-        device,
+        device_id,
+        name,
+        device_type,
+        protocol=None,
+        address=None,
+        metadata=None,
     ):
+        result = DiscoveryResult(
+            device_id=device_id,
+            name=name,
+            device_type=device_type,
+            protocol=protocol,
+            address=address,
+            metadata=metadata or {},
+        )
 
-        self.discovered[device.id] = device
+        self.devices[device_id] = result
+
+        return result
+
+    def get(
+        self,
+        device_id,
+    ):
+        return self.devices.get(
+            device_id
+        )
 
     def remove(
         self,
         device_id,
     ):
-
-        self.discovered.pop(
+        return self.devices.pop(
             device_id,
             None,
         )
 
-    def find(
-        self,
-        device_type=None,
-    ):
-
-        devices = list(
-            self.discovered.values()
-        )
-
-        if device_type is None:
-            return devices
-
-        return [
-            device
-            for device in devices
-            if device.device_type == device_type
-        ]
-
-    def all(self):
-
+    def list(self):
         return list(
-            self.discovered.values()
+            self.devices.values()
         )
 
-
-device_discovery = DeviceDiscovery()"""
-Universal Device Engine
-"""
+    def clear(self):
+        self.devices.clear()
