@@ -1,15 +1,11 @@
 """
 Inicialização dos dispositivos do simulador UAP.
-
-Este módulo registra os dispositivos disponíveis no
-ambiente de simulação.
 """
 
 from app.modules.simulator.programming.simulator.device.device_manager import (
     device_manager,
 )
 
-# GPIO
 from app.modules.simulator.programming.simulator.device.led_device import (
     LEDDevice,
 )
@@ -29,7 +25,6 @@ from app.modules.simulator.programming.simulator.device.servo_device import (
     ServoDevice,
 )
 
-# Displays
 from app.modules.simulator.programming.simulator.device.lcd16x2_device import (
     LCD16x2Device,
 )
@@ -40,7 +35,6 @@ from app.modules.simulator.programming.simulator.device.seven_segment_device imp
     SevenSegmentDevice,
 )
 
-# Sensores
 from app.modules.simulator.programming.simulator.device.temperature_sensor_device import (
     TemperatureSensorDevice,
 )
@@ -60,7 +54,6 @@ from app.modules.simulator.programming.simulator.device.load_cell_device import 
     LoadCellDevice,
 )
 
-# Identificação
 from app.modules.simulator.programming.simulator.device.barcode_scanner_device import (
     BarcodeScannerDevice,
 )
@@ -71,7 +64,6 @@ from app.modules.simulator.programming.simulator.device.qr_reader_device import 
     QRReaderDevice,
 )
 
-# Atuadores
 from app.modules.simulator.programming.simulator.device.dc_motor_device import (
     DCMotorDevice,
 )
@@ -85,7 +77,6 @@ from app.modules.simulator.programming.simulator.device.elevator_device import (
     ElevatorDevice,
 )
 
-# Comunicação
 from app.modules.simulator.programming.simulator.device.wifi_device import (
     WiFiDevice,
 )
@@ -99,7 +90,6 @@ from app.modules.simulator.programming.simulator.device.http_client_device impor
     HTTPClientDevice,
 )
 
-# Barramentos
 from app.modules.simulator.programming.simulator.device.i2c_device import (
     I2CDevice,
 )
@@ -113,7 +103,6 @@ from app.modules.simulator.programming.simulator.device.can_device import (
     CANDevice,
 )
 
-# Protocolos
 from app.modules.simulator.programming.simulator.device.modbus_rtu_device import (
     ModbusRTUDevice,
 )
@@ -129,238 +118,149 @@ from app.modules.simulator.programming.simulator.device.espnow_device import (
 
 
 class DeviceInitializer:
-    """
-    Inicializador central dos dispositivos do simulador.
-    """
 
     initialized = False
 
     @classmethod
     def initialize(cls):
-        """
-        Registra todos os dispositivos disponíveis.
-        """
 
         if cls.initialized:
             return
 
-        # GPIO
         device_manager.add(
-            LEDDevice(
-                "LED",
-                13,
-            )
+            LEDDevice("LED", 13)
         )
 
         device_manager.add(
-            ButtonDevice(
-                "BUTTON",
-                2,
-            )
+            ButtonDevice("BUTTON", 2)
         )
 
         device_manager.add(
-            RelayDevice(
-                "RELAY",
-                5,
-            )
+            RelayDevice("RELAY", 5)
         )
 
         device_manager.add(
-            BuzzerDevice(
-                "BUZZER",
-                18,
-            )
+            BuzzerDevice("BUZZER", 18)
         )
 
         device_manager.add(
-            ServoDevice(
-                "SERVO",
-                19,
-            )
+            ServoDevice("SERVO", 19)
         )
 
         device_manager.add(
-            PotentiometerDevice(
-                "POT",
-                34,
-            )
-        )
-
-        # Displays
-        device_manager.add(
-            LCD16x2Device(
-                "LCD16X2"
-            )
+            PotentiometerDevice("POT", 34)
         )
 
         device_manager.add(
-            OLEDDevice(
-                "OLED"
-            )
+            LCD16x2Device("LCD16X2")
         )
 
         device_manager.add(
-            SevenSegmentDevice(
-                "DISPLAY7"
-            )
-        )
-
-        # Sensores
-        device_manager.add(
-            TemperatureSensorDevice(
-                "TEMP"
-            )
+            OLEDDevice("OLED")
         )
 
         device_manager.add(
-            UltrasonicSensorDevice(
-                "ULTRASONIC"
-            )
+            SevenSegmentDevice("DISPLAY7")
         )
 
         device_manager.add(
-            HumiditySensorDevice(
-                "HUMIDITY"
-            )
+            TemperatureSensorDevice("TEMP")
         )
 
         device_manager.add(
-            PressureSensorDevice(
-                "PRESSURE"
-            )
+            UltrasonicSensorDevice("ULTRASONIC")
         )
 
         device_manager.add(
-            LightSensorDevice(
-                "LIGHT"
-            )
+            HumiditySensorDevice("HUMIDITY")
         )
 
         device_manager.add(
-            LoadCellDevice(
-                "LOAD_CELL"
-            )
-        )
-
-        # Identificação
-        device_manager.add(
-            BarcodeScannerDevice(
-                "BARCODE"
-            )
+            PressureSensorDevice("PRESSURE")
         )
 
         device_manager.add(
-            RFIDReaderDevice(
-                "RFID"
-            )
+            LightSensorDevice("LIGHT")
         )
 
         device_manager.add(
-            QRReaderDevice(
-                "QR"
-            )
-        )
-
-        # Atuadores
-        device_manager.add(
-            DCMotorDevice(
-                "DC_MOTOR",
-                25,
-            )
+            LoadCellDevice("LOAD_CELL")
         )
 
         device_manager.add(
-            StepperMotorDevice(
-                "STEPPER"
-            )
+            BarcodeScannerDevice("BARCODE")
         )
 
         device_manager.add(
-            ConveyorDevice(
-                "CONVEYOR"
-            )
+            RFIDReaderDevice("RFID")
         )
 
         device_manager.add(
-            ElevatorDevice(
-                "ELEVATOR"
-            )
-        )
-
-        # Comunicação
-        device_manager.add(
-            WiFiDevice(
-                "WIFI"
-            )
+            QRReaderDevice("QR")
         )
 
         device_manager.add(
-            BluetoothDevice(
-                "BLUETOOTH"
-            )
+            DCMotorDevice("DC_MOTOR", 25)
         )
 
         device_manager.add(
-            MQTTDevice(
-                "MQTT"
-            )
+            StepperMotorDevice("STEPPER")
         )
 
         device_manager.add(
-            HTTPClientDevice(
-                "HTTP"
-            )
-        )
-
-        # Barramentos
-        device_manager.add(
-            I2CDevice(
-                "I2C"
-            )
+            ConveyorDevice("CONVEYOR")
         )
 
         device_manager.add(
-            SPIDevice(
-                "SPI"
-            )
+            ElevatorDevice("ELEVATOR")
         )
 
         device_manager.add(
-            UARTDevice(
-                "UART"
-            )
+            WiFiDevice("WIFI")
         )
 
         device_manager.add(
-            CANDevice(
-                "CAN"
-            )
-        )
-
-        # Protocolos
-        device_manager.add(
-            ModbusRTUDevice(
-                "MODBUS_RTU"
-            )
+            BluetoothDevice("BLUETOOTH")
         )
 
         device_manager.add(
-            ModbusTCPDevice(
-                "MODBUS_TCP"
-            )
+            MQTTDevice("MQTT")
         )
 
         device_manager.add(
-            LoRaDevice(
-                "LORA"
-            )
+            HTTPClientDevice("HTTP")
         )
 
         device_manager.add(
-            ESPNowDevice(
-                "ESPNOW"
-            )
+            I2CDevice("I2C")
+        )
+
+        device_manager.add(
+            SPIDevice("SPI")
+        )
+
+        device_manager.add(
+            UARTDevice("UART")
+        )
+
+        device_manager.add(
+            CANDevice("CAN")
+        )
+
+        device_manager.add(
+            ModbusRTUDevice("MODBUS_RTU")
+        )
+
+        device_manager.add(
+            ModbusTCPDevice("MODBUS_TCP")
+        )
+
+        device_manager.add(
+            LoRaDevice("LORA")
+        )
+
+        device_manager.add(
+            ESPNowDevice("ESPNOW")
         )
 
         cls.initialized = True
