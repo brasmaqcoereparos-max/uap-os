@@ -1,28 +1,48 @@
+"""
+Monitoramento de saúde do UDE.
+"""
+
+
 class DeviceHealth:
 
     def __init__(self):
+        self.healthy = True
+        self.message = ""
+        self.metrics = {}
 
-        self.online = False
-
-        self.last_error = None
-
-        self.last_check = None
-
-    def update(
+    def set_health(
         self,
-        online,
-        error=None,
+        healthy,
+        message="",
     ):
+        self.healthy = bool(healthy)
+        self.message = message
 
-        self.online = online
+    def set_metric(
+        self,
+        name,
+        value,
+    ):
+        self.metrics[name] = value
 
-        self.last_error = error
+    def get_metric(
+        self,
+        name,
+        default=None,
+    ):
+        return self.metrics.get(
+            name,
+            default,
+        )
 
     def is_healthy(self):
+        return self.healthy
 
-        return (
-            self.online
-            and self.last_error is None
-        )"""
-Universal Device Engine
-"""
+    def to_dict(self):
+        return {
+            "healthy": self.healthy,
+            "message": self.message,
+            "metrics": dict(
+                self.metrics
+            ),
+        }
