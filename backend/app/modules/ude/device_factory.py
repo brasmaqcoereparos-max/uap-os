@@ -1,5 +1,12 @@
+"""
+Universal Device Engine
+Fábrica de dispositivos.
+"""
+
 from app.modules.ude.device import Device
-from app.modules.ude.device_registry import device_registry
+from app.modules.ude.device_registry import (
+    device_registry,
+)
 
 
 class DeviceFactory:
@@ -9,7 +16,6 @@ class DeviceFactory:
         device_type,
         name,
     ):
-
         device = device_registry.create(
             device_type,
             name,
@@ -25,6 +31,4 @@ class DeviceFactory:
         )
 
 
-device_factory = DeviceFactory()"""
-Universal Device Engine
-"""
+device_factory = DeviceFactory()
