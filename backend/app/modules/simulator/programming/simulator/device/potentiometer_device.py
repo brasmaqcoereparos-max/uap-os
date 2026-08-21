@@ -1,66 +1,34 @@
-from app.modules.simulator.programming.simulator.devices.device_base import (
-    DeviceBase,
-)
+"""
+Potenciômetro simulado do UAP.
+"""
 
-from app.modules.simulator.programming.simulator.runtime.runtime_adc import (
-    runtime_adc,
+from app.modules.simulator.programming.simulator.device.device_base import (
+    DeviceBase,
 )
 
 
 class PotentiometerDevice(DeviceBase):
 
-    def __init__(
-
-        self,
-
-        name,
-
-        pin,
-
-    ):
-
+    def __init__(self, name, pin):
         super().__init__(name)
 
         self.pin = pin
-
         self.value = 0
 
-    def set_value(
+    def set_value(self, value):
 
-        self,
-
-        value,
-
-    ):
-
-        value = max(
-
+        self.value = max(
             0,
-
-            min(
-
-                4095,
-
-                int(value),
-
-            ),
-
+            min(1023, int(value)),
         )
 
-        self.value = value
+    def read(self):
 
-        runtime_adc.set(
-
-            self.pin,
-
-            value,
-
-        )
+        return self.value
 
     def update(self):
-
         pass
 
     def reset(self):
 
-        self.set_value(0)
+        self.value = 0
