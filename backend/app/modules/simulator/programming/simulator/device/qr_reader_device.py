@@ -1,24 +1,22 @@
-from app.modules.simulator.programming.simulator.devices.device_base import (
+"""
+Leitor QR simulado do UAP.
+"""
+
+from app.modules.simulator.programming.simulator.device.device_base import (
     DeviceBase,
 )
 
 
 class QRReaderDevice(DeviceBase):
 
-    def __init__(
-        self,
-        name,
-    ):
+    def __init__(self, name):
         super().__init__(name)
 
         self.code = None
 
-    def scan(
-        self,
-        code,
-    ):
+    def scan(self, code):
 
-        self.code = code
+        self.code = str(code)
 
     def read(self):
 
@@ -29,7 +27,6 @@ class QRReaderDevice(DeviceBase):
         self.code = None
 
     def update(self):
-
         pass
 
     def reset(self):
