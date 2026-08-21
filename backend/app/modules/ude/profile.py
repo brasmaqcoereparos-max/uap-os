@@ -1,3 +1,9 @@
+"""
+Universal Device Engine
+Perfis de dispositivos.
+"""
+
+
 class DeviceProfile:
 
     def __init__(
@@ -5,7 +11,6 @@ class DeviceProfile:
         name,
         device_type,
     ):
-
         self.name = name
         self.device_type = device_type
 
@@ -20,7 +25,6 @@ class DeviceProfile:
         name,
         value,
     ):
-
         self.parameters[name] = value
 
     def get_parameter(
@@ -28,10 +32,28 @@ class DeviceProfile:
         name,
         default=None,
     ):
-
         return self.parameters.get(
             name,
             default,
-        )"""
-Universal Device Engine
-"""
+        )
+
+    def remove_parameter(
+        self,
+        name,
+    ):
+        return self.parameters.pop(
+            name,
+            None,
+        )
+
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "device_type": self.device_type,
+            "manufacturer": self.manufacturer,
+            "model": self.model,
+            "version": self.version,
+            "parameters": dict(
+                self.parameters
+            ),
+        }
