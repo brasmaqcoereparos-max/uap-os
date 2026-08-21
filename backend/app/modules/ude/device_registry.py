@@ -1,48 +1,60 @@
+"""
+Universal Device Engine
+Registro central de classes de dispositivos.
+"""
+
+
 class DeviceRegistry:
 
     def __init__(self):
-
         self.registry = {}
 
     def register(
-
         self,
-
         device_type,
-
         device_class,
-
     ):
-
         self.registry[device_type] = device_class
 
-    def create(
-
+    def unregister(
         self,
-
         device_type,
-
-        *args,
-
-        **kwargs,
-
     ):
+        return self.registry.pop(
+            device_type,
+            None,
+        )
 
-        cls = self.registry.get(device_type)
+    def get(
+        self,
+        device_type,
+    ):
+        return self.registry.get(
+            device_type
+        )
 
-        if cls:
+    def create(
+        self,
+        device_type,
+        *args,
+        **kwargs,
+    ):
+        device_class = self.registry.get(
+            device_type
+        )
 
-            return cls(
+        if device_class is None:
+            return None
 
-                *args,
+        return device_class(
+            *args,
+            **kwargs,
+        )
 
-                **kwargs,
+    def list_types(self):
+        return list(
+            self.registry.keys()
+        )
 
-            )
 
-        return None
-
-
-device_registry = DeviceRegistry()"""
-Universal Device Engine
-"""
+device_registry = DeviceRegistry()
