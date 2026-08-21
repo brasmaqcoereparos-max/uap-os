@@ -1,19 +1,35 @@
-from app.modules.simulator.programming.simulator.hardware_engine.event_queue import (
-    event_queue,
-)
+"""
+Processador de eventos do simulador UAP.
+"""
 
 
 class EventProcessor:
 
-    def process(self):
+    def __init__(self):
 
-        while True:
+        self.processed = 0
 
-            event = event_queue.pop()
+    def process(
+        self,
+        event,
+    ):
 
-            if event is None:
+        if event is None:
+            return False
 
-                break
+        self.processed += 1
 
+        handler = getattr(
+            event,
+            "handle",
+            None,
+        )
 
-event_processor = EventProcessor()
+        if callable(handler):
+            handler()
+
+        return True
+
+    def reset(self):
+
+        self.processed = 0
