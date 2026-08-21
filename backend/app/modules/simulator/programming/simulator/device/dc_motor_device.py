@@ -17,19 +17,24 @@ class DCMotorDevice(DeviceBase):
         super().__init__(name)
 
         self.pin = pin
-
         self.speed = 0
 
-    def update(self):
+    def set_speed(self, speed):
+        self.speed = max(
+            0,
+            min(100, int(speed)),
+        )
 
-        self.speed = runtime_pwm.read(
+        runtime_pwm.write(
             self.pin,
+            self.speed,
         )
 
     def stop(self):
+        self.set_speed(0)
 
-        self.speed = 0
+    def update(self):
+        pass
 
     def reset(self):
-
         self.stop()
