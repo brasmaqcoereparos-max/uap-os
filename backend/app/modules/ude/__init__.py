@@ -1,18 +1,83 @@
-from app.modules.ude.device import Device
-from app.modules.ude.device_manager import device_manager
-from app.modules.ude.device_registry import device_registry
-from app.modules.ude.device_factory import device_factory
-from app.modules.ude.discovery import device_discovery
-from app.modules.ude.simulator import device_simulator
+"""
+Universal Device Engine (UDE).
+
+Núcleo universal para gerenciamento,
+simulação e integração de dispositivos.
+"""
+
+from .device import Device
+from .device_factory import (
+    DeviceFactory,
+    device_factory,
+)
+from .device_registry import (
+    DeviceRegistry,
+    device_registry,
+)
+from .device_status import (
+    DeviceStatus,
+    DeviceStatusInfo,
+)
+from .device_manager import (
+    DeviceManager,
+)
+from .device_events import (
+    DeviceEvent,
+    DeviceEventManager,
+    device_events,
+)
+from .profile import (
+    DeviceProfile,
+)
+from .capabilities import (
+    DeviceCapabilities,
+)
+from .connection import (
+    DeviceConnection,
+)
+from .diagnostics import (
+    DiagnosticResult,
+    DeviceDiagnostics,
+)
+from .health import (
+    DeviceHealth,
+)
+from .discovery import (
+    DiscoveryResult,
+    DeviceDiscovery,
+)
+from .simulator import (
+    SimulatedDevice,
+    DeviceSimulator,
+    simulator,
+)
+from .virtual_device import (
+    VirtualDevice,
+)
 
 
 __all__ = [
     "Device",
-    "device_manager",
-    "device_registry",
+    "DeviceFactory",
     "device_factory",
-    "device_discovery",
-    "device_simulator",
-]"""
-Universal Device Engine
-"""
+    "DeviceRegistry",
+    "device_registry",
+    "DeviceStatus",
+    "DeviceStatusInfo",
+    "DeviceManager",
+    "DeviceEvent",
+    "DeviceEventManager",
+    "device_events",
+    "DeviceProfile",
+    "DeviceCapabilities",
+    "DeviceConnection",
+    "DiagnosticResult",
+    "DeviceDiagnostics",
+    "DeviceHealth",
+    "DiscoveryResult",
+    "DeviceDiscovery",
+    "SimulatedDevice",
+    "DeviceSimulator",
+    "simulator",
+    "VirtualDevice",
+]
