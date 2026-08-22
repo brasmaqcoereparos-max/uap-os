@@ -1,11 +1,25 @@
-from collections import deque
+"""
+Compilador principal dos blocos visuais do UAP.
 
-from app.modules.simulator.programming.canvas.canvas import canvas
+Converte o Canvas em uma ordem de execução determinística
+e fornece uma representação serializável do programa.
+"""
+
+from collections import deque
 
 
 class BlockCompiler:
 
-    def build_graph(self):
+    def __init__(self):
+        self.last_graph = {}
+        self.last_order = []
+
+    def build_graph(self, canvas):
+
+        if canvas is None:
+            raise ValueError(
+                "Canvas é obrigatório."
+            )
 
         graph = {}
 
@@ -19,33 +33,42 @@ class BlockCompiler:
 
         for connection in canvas.all_connections():
 
-            if connection.source in graph and connection.target in graph:
+            source = connection.source
+            target = connection.target
 
-                graph[connection.source]["next"].append(
-                    connection.target
+            if source not in graph:
+                continue
+
+            if target not in graph:
+                continue
+
+            if target not in graph[source]["next"]:
+                graph[source]["next"].append(
+                    target
                 )
 
-                graph[connection.target]["previous"].append(
-                    connection.source
+            if source not in graph[target]["previous"]:
+                graph[target]["previous"].append(
+                    source
                 )
+
+        self.last_graph = graph
 
         return graph
 
-    def execution_order(self):
+    def execution_order(self, canvas):
 
-        graph = self.build_graph()
+        graph = self.build_graph(canvas)
 
         indegree = {
-            node: len(data["previous"])
-            for node, data in graph.items()
+            node_id: len(data["previous"])
+            for node_id, data in graph.items()
         }
 
         queue = deque(
-            [
-                node
-                for node, value in indegree.items()
-                if value == 0
-            ]
+            node_id
+            for node_id, degree in indegree.items()
+            if degree == 0
         )
 
         order = []
@@ -54,7 +77,9 @@ class BlockCompiler:
 
             current = queue.popleft()
 
-            order.append(graph[current]["node"])
+            order.append(
+                graph[current]["node"]
+            )
 
             for nxt in graph[current]["next"]:
 
@@ -63,11 +88,31 @@ class BlockCompiler:
                 if indegree[nxt] == 0:
                     queue.append(nxt)
 
+        if len(order) != len(graph):
+
+            remaining = [
+                node_id
+                for node_id, degree in indegree.items()
+                if degree > 0
+            ]
+
+            raise ValueError(
+                "O grafo do programa contém um ciclo "
+                "ou conexões inválidas: "
+                + ", ".join(
+                    remaining
+                )
+            )
+
+        self.last_order = order
+
         return order
 
-    def compile(self):
+    def compile(self, canvas):
 
-        order = self.execution_order()
+        order = self.execution_order(
+            canvas
+        )
 
         return {
             "compiled": True,
