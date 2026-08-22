@@ -1,8 +1,31 @@
-from app.modules.simulator.programming.simulator.runtime.runtime_stack import (
-    runtime_stack,
-)
+"""
+Instrução RETURN do UAP.
+
+Solicita o retorno da rotina atualmente executada.
+"""
 
 
-def instruction_return():
+class RuntimeReturn(Exception):
 
-    return runtime_stack.pop()
+    def __init__(
+        self,
+        value=None,
+    ):
+
+        self.value = value
+
+        super().__init__(
+            "RETURN"
+        )
+
+
+def instruction_return(
+    value=None,
+):
+    """
+    RETURN [valor]
+    """
+
+    raise RuntimeReturn(
+        value
+    )
