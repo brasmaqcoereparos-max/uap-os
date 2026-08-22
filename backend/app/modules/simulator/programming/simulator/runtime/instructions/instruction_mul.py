@@ -1,28 +1,16 @@
-from app.modules.simulator.programming.simulator.runtime.runtime_registers import (
-    runtime_registers,
-)
+"""
+Instrução MUL do UAP.
+
+Multiplica dois valores.
+"""
 
 
 def instruction_mul(
-
-    register,
-
-    value,
-
+    a,
+    b,
 ):
+    """
+    MUL a, b
+    """
 
-    current = runtime_registers.get(
-
-        register,
-
-        0,
-
-    )
-
-    runtime_registers.set(
-
-        register,
-
-        current * value,
-
-    )
+    return a * b
