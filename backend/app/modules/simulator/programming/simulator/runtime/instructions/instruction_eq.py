@@ -1,23 +1,16 @@
+"""
+Instrução EQ do UAP.
 
-from app.modules.simulator.programming.simulator.runtime.runtime_registers import (
-    runtime_registers,
-)
+Compara dois valores para igualdade.
+"""
 
 
 def instruction_eq(
-
-    register,
-
-    value,
-
+    a,
+    b,
 ):
+    """
+    EQ a, b
+    """
 
-    current = runtime_registers.get(
-
-        register,
-
-        None,
-
-    )
-
-    return current == value
+    return a == b
