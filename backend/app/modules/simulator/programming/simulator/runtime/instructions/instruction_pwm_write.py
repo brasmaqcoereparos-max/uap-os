@@ -1,20 +1,31 @@
-from app.modules.simulator.programming.simulator.runtime.runtime_pwm import (
-    runtime_pwm,
+"""
+Instrução PWM_WRITE do UAP.
+
+Define o duty cycle de um canal PWM.
+"""
+
+from app.modules.simulator.programming.simulator.runtime.runtime_context import (
+    runtime_context,
 )
 
 
 def instruction_pwm_write(
-
     pin,
-
-    value,
-
+    duty,
 ):
+    """
+    PWM_WRITE pino, duty
+    """
 
-    runtime_pwm.write(
+    duty = max(
+        0.0,
+        min(
+            100.0,
+            float(duty),
+        ),
+    )
 
-        pin,
-
-        value,
-
+    return runtime_context.pwm.write(
+        int(pin),
+        duty,
     )
