@@ -7,3 +7,15 @@ from app.models.event import Event
 from app.models.flow import Flow
 from app.models.runtime import Runtime
 from app.models.dashboard import Dashboard
+
+__all__ = [
+    "Project",
+    "Device",
+    "User",
+    "Plugin",
+    "Automation",
+    "Event",
+    "Flow",
+    "Runtime",
+    "Dashboard",
+]
