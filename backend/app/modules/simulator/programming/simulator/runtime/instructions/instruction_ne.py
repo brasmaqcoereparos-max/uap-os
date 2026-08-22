@@ -1,22 +1,16 @@
-from app.modules.simulator.programming.simulator.runtime.runtime_registers import (
-    runtime_registers,
-)
+"""
+Instrução NE do UAP.
+
+Compara dois valores para diferença.
+"""
 
 
 def instruction_ne(
-
-    register,
-
-    value,
-
+    a,
+    b,
 ):
+    """
+    NE a, b
+    """
 
-    current = runtime_registers.get(
-
-        register,
-
-        None,
-
-    )
-
-    return current != value
+    return a != b
