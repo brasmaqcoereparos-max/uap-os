@@ -1,28 +1,44 @@
-from app.modules.simulator.programming.simulator.runtime.runtime_stack import (
-    runtime_stack,
-)
+"""
+Instrução CALL do UAP.
 
-from app.modules.simulator.programming.simulator.runtime.instructions.instruction_goto import (
-    RuntimeGoto,
-)
+Solicita a execução de uma rotina identificada por nome.
+"""
+
+
+class RuntimeCall(Exception):
+
+    def __init__(
+        self,
+        routine,
+        arguments=None,
+    ):
+
+        self.routine = str(routine)
+        self.arguments = (
+            list(arguments)
+            if arguments is not None
+            else []
+        )
+
+        super().__init__(
+            f"CALL: {self.routine}"
+        )
 
 
 def instruction_call(
-
-    current,
-
-    label,
-
+    routine,
+    *arguments,
 ):
+    """
+    CALL rotina, argumentos...
+    """
 
-    runtime_stack.push(
+    if routine is None:
+        raise ValueError(
+            "O nome da rotina é obrigatório."
+        )
 
-        current,
-
-    )
-
-    raise RuntimeGoto(
-
-        label,
-
+    raise RuntimeCall(
+        routine,
+        arguments,
     )
