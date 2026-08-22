@@ -1,33 +1,21 @@
+"""
+Instrução DIV do UAP.
 
-from app.modules.simulator.programming.simulator.runtime.runtime_registers import (
-    runtime_registers,
-)
+Divide o primeiro valor pelo segundo.
+"""
 
 
 def instruction_div(
-
-    register,
-
-    value,
-
+    a,
+    b,
 ):
+    """
+    DIV a, b
+    """
 
-    if value == 0:
+    if b == 0:
+        raise ZeroDivisionError(
+            "Não é possível dividir por zero."
+        )
 
-        return
-
-    current = runtime_registers.get(
-
-        register,
-
-        0,
-
-    )
-
-    runtime_registers.set(
-
-        register,
-
-        current / value,
-
-    )
+    return a / b
