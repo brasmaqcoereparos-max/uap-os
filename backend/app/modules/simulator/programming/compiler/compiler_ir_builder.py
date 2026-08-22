@@ -1,43 +1,18 @@
 """
-Construtor intermediário de IR do compilador UAP.
-
-Converte uma sequência de instruções de alto nível
-para uma representação intermediária simples.
+Construtor da representação intermediária do UAP.
 """
 
-
-class IRInstruction:
-
-    def __init__(
-        self,
-        opcode,
-        operands=None,
-        metadata=None,
-    ):
-        self.opcode = opcode
-        self.operands = list(
-            operands or []
-        )
-        self.metadata = dict(
-            metadata or {}
-        )
-
-    def to_dict(self):
-        return {
-            "opcode": self.opcode,
-            "operands": list(
-                self.operands
-            ),
-            "metadata": dict(
-                self.metadata
-            ),
-        }
+from app.modules.simulator.programming.compiler.compiler_ir import (
+    CompilerIR,
+    IRInstruction,
+)
 
 
 class IRBuilder:
 
     def __init__(self):
-        self.instructions = []
+
+        self.ir = CompilerIR()
 
     def emit(
         self,
@@ -45,60 +20,43 @@ class IRBuilder:
         *operands,
         metadata=None,
     ):
-        instruction = IRInstruction(
-            opcode=opcode,
-            operands=operands,
+
+        return self.ir.emit(
+            opcode,
+            *operands,
             metadata=metadata,
         )
-
-        self.instructions.append(
-            instruction
-        )
-
-        return instruction
 
     def extend(
         self,
         instructions,
     ):
-        for instruction in instructions:
-            if isinstance(
-                instruction,
-                IRInstruction,
-            ):
-                self.instructions.append(
-                    instruction
-                )
-            elif isinstance(
-                instruction,
-                dict,
-            ):
-                self.instructions.append(
-                    IRInstruction(
-                        opcode=instruction.get(
-                            "opcode"
-                        ),
-                        operands=instruction.get(
-                            "operands",
-                            [],
-                        ),
-                        metadata=instruction.get(
-                            "metadata",
-                            {},
-                        ),
-                    )
-                )
+
+        self.ir.extend(
+            instructions
+        )
+
+        return self
 
     def clear(self):
-        self.instructions.clear()
+
+        self.ir.clear()
 
     def build(self):
-        return [
-            instruction.to_dict()
-            for instruction in self.instructions
-        ]
+
+        return self.ir.all()
+
+    def instructions(self):
+
+        return list(
+            self.ir.instructions
+        )
 
     def __len__(self):
+
         return len(
-            self.instructions
+            self.ir
         )
+
+
+compiler_ir_builder = IRBuilder()
