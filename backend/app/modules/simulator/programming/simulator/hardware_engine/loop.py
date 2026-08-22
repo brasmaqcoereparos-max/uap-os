@@ -1,9 +1,19 @@
 """
-Loop principal do motor de simulação UAP.
+Loop principal do motor UAP.
+
+Integra:
+    Runtime
+    Devices
+    Timers
+    Hardware Engine
 """
 
 from app.modules.simulator.programming.simulator.hardware_engine.device_runner import (
     DeviceRunner,
+)
+
+from app.modules.simulator.programming.simulator.runtime.runtime_engine import (
+    runtime_engine,
 )
 
 
@@ -16,13 +26,20 @@ class SimulationLoop:
 
     def start(self):
 
-        self.running = True
+        if self.running:
+            return
+
         self.device_runner.start()
+        runtime_engine.start()
+
+        self.running = True
 
     def stop(self):
 
-        self.running = False
+        runtime_engine.stop()
         self.device_runner.stop()
+
+        self.running = False
 
     def tick(self):
 
@@ -30,8 +47,11 @@ class SimulationLoop:
             return
 
         self.device_runner.update()
+        runtime_engine.update()
 
     def reset(self):
 
+        runtime_engine.reset()
         self.device_runner.reset()
+
         self.running = False
