@@ -1,28 +1,16 @@
-from app.modules.simulator.programming.simulator.runtime.runtime_registers import (
-    runtime_registers,
-)
+"""
+Instrução SUB do UAP.
+
+Subtrai o segundo valor do primeiro.
+"""
 
 
 def instruction_sub(
-
-    register,
-
-    value,
-
+    a,
+    b,
 ):
+    """
+    SUB a, b
+    """
 
-    current = runtime_registers.get(
-
-        register,
-
-        0,
-
-    )
-
-    runtime_registers.set(
-
-        register,
-
-        current - value,
-
-    )
+    return a - b
