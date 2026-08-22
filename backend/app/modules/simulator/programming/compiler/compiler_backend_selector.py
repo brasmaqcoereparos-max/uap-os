@@ -1,5 +1,5 @@
 """
-Seleção do backend de compilação do UAP.
+Seletor de backend de compilação do UAP.
 """
 
 from app.modules.simulator.programming.compiler.compiler_backend_factory import (
@@ -9,19 +9,13 @@ from app.modules.simulator.programming.compiler.compiler_backend_factory import 
 
 class CompilerBackendSelector:
 
-    def select(
-        self,
-        target,
-    ):
+    def select(self, target):
 
         return compiler_backend_factory.create(
             target
         )
 
-    def exists(
-        self,
-        target,
-    ):
+    def exists(self, target):
 
         return compiler_backend_factory.exists(
             target
@@ -32,6 +26,4 @@ class CompilerBackendSelector:
         return compiler_backend_factory.list()
 
 
-compiler_backend_selector = (
-    CompilerBackendSelector()
-        )
+compiler_backend_selector = CompilerBackendSelector()
