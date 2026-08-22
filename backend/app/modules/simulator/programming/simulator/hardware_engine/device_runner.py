@@ -1,9 +1,13 @@
 """
-Executor central dos dispositivos do simulador UAP.
+Executor dos dispositivos físicos/virtuais do UAP.
 """
 
 from app.modules.simulator.programming.simulator.device.device_manager import (
     device_manager,
+)
+
+from app.modules.simulator.programming.simulator.device.device_initializer import (
+    DeviceInitializer,
 )
 
 
@@ -13,7 +17,13 @@ class DeviceRunner:
 
         self.running = False
 
+    def initialize(self):
+
+        DeviceInitializer.initialize()
+
     def start(self):
+
+        self.initialize()
 
         self.running = True
 
@@ -31,4 +41,13 @@ class DeviceRunner:
     def reset(self):
 
         device_manager.reset_all()
+
         self.running = False
+
+    def device_count(self):
+
+        return device_manager.count()
+
+    def devices(self):
+
+        return device_manager.all()
