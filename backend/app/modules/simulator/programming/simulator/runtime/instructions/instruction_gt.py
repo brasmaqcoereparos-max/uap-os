@@ -1,22 +1,16 @@
-from app.modules.simulator.programming.simulator.runtime.runtime_registers import (
-    runtime_registers,
-)
+"""
+Instrução GT do UAP.
+
+Verifica se o primeiro valor é maior que o segundo.
+"""
 
 
 def instruction_gt(
-
-    register,
-
-    value,
-
+    a,
+    b,
 ):
+    """
+    GT a, b
+    """
 
-    current = runtime_registers.get(
-
-        register,
-
-        0,
-
-    )
-
-    return current > value
+    return a > b
