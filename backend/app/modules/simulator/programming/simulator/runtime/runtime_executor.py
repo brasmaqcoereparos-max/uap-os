@@ -1,12 +1,9 @@
 """
-Executor de automações do UAP.
-
-Executa funções Python previamente preparadas pelo sistema,
-sem exigir que o usuário final escreva código.
+Executor central de automações do UAP.
 """
 
-from app.modules.simulator.programming.simulator.runtime.runtime_manager import (
-    runtime_manager,
+from app.modules.simulator.programming.simulator.runtime.runtime_engine import (
+    runtime_engine,
 )
 
 
@@ -25,9 +22,9 @@ class RuntimeExecutor:
         **kwargs,
     ):
 
-        self.last_error = None
-        self.last_result = None
         self.current_task = task
+        self.last_result = None
+        self.last_error = None
 
         if not callable(task):
 
@@ -35,11 +32,13 @@ class RuntimeExecutor:
                 "A tarefa fornecida não é executável."
             )
 
+            self.current_task = None
+
             return None
 
         try:
 
-            runtime_manager.start()
+            runtime_engine.start()
 
             self.last_result = task(
                 *args,
@@ -56,15 +55,24 @@ class RuntimeExecutor:
 
         finally:
 
+            runtime_engine.stop()
             self.current_task = None
 
     def update(self):
 
-        runtime_manager.update()
+        runtime_engine.update()
 
     def stop(self):
 
-        runtime_manager.stop()
+        runtime_engine.stop()
+
+    def pause(self):
+
+        runtime_engine.pause()
+
+    def resume(self):
+
+        runtime_engine.resume()
 
     def reset(self):
 
@@ -72,7 +80,7 @@ class RuntimeExecutor:
         self.last_result = None
         self.last_error = None
 
-        runtime_manager.reset()
+        runtime_engine.reset()
 
     def has_error(self):
 
