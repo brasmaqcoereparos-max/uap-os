@@ -1,5 +1,8 @@
 """
-Inicialização dos dispositivos do simulador UAP.
+Inicialização central dos dispositivos do simulador UAP.
+
+Este módulo garante que todos os dispositivos disponíveis sejam
+criados uma única vez e registrados no DeviceManager.
 """
 
 from app.modules.simulator.programming.simulator.device.device_manager import (
@@ -24,7 +27,6 @@ from app.modules.simulator.programming.simulator.device.buzzer_device import (
 from app.modules.simulator.programming.simulator.device.servo_device import (
     ServoDevice,
 )
-
 from app.modules.simulator.programming.simulator.device.lcd16x2_device import (
     LCD16x2Device,
 )
@@ -34,7 +36,6 @@ from app.modules.simulator.programming.simulator.device.oled_device import (
 from app.modules.simulator.programming.simulator.device.seven_segment_device import (
     SevenSegmentDevice,
 )
-
 from app.modules.simulator.programming.simulator.device.temperature_sensor_device import (
     TemperatureSensorDevice,
 )
@@ -53,7 +54,6 @@ from app.modules.simulator.programming.simulator.device.light_sensor_device impo
 from app.modules.simulator.programming.simulator.device.load_cell_device import (
     LoadCellDevice,
 )
-
 from app.modules.simulator.programming.simulator.device.barcode_scanner_device import (
     BarcodeScannerDevice,
 )
@@ -63,7 +63,6 @@ from app.modules.simulator.programming.simulator.device.rfid_reader_device impor
 from app.modules.simulator.programming.simulator.device.qr_reader_device import (
     QRReaderDevice,
 )
-
 from app.modules.simulator.programming.simulator.device.dc_motor_device import (
     DCMotorDevice,
 )
@@ -76,7 +75,6 @@ from app.modules.simulator.programming.simulator.device.conveyor_device import (
 from app.modules.simulator.programming.simulator.device.elevator_device import (
     ElevatorDevice,
 )
-
 from app.modules.simulator.programming.simulator.device.wifi_device import (
     WiFiDevice,
 )
@@ -89,7 +87,6 @@ from app.modules.simulator.programming.simulator.device.mqtt_device import (
 from app.modules.simulator.programming.simulator.device.http_client_device import (
     HTTPClientDevice,
 )
-
 from app.modules.simulator.programming.simulator.device.i2c_device import (
     I2CDevice,
 )
@@ -102,7 +99,6 @@ from app.modules.simulator.programming.simulator.device.uart_device import (
 from app.modules.simulator.programming.simulator.device.can_device import (
     CANDevice,
 )
-
 from app.modules.simulator.programming.simulator.device.modbus_rtu_device import (
     ModbusRTUDevice,
 )
@@ -127,140 +123,51 @@ class DeviceInitializer:
         if cls.initialized:
             return
 
-        device_manager.add(
-            LEDDevice("LED", 13)
-        )
+        devices = [
+            LEDDevice("LED", 13),
+            ButtonDevice("BUTTON", 2),
+            RelayDevice("RELAY", 5),
+            BuzzerDevice("BUZZER", 18),
+            ServoDevice("SERVO", 19),
+            PotentiometerDevice("POT", 34),
+            LCD16x2Device("LCD16X2"),
+            OLEDDevice("OLED"),
+            SevenSegmentDevice("DISPLAY7"),
+            TemperatureSensorDevice("TEMP"),
+            UltrasonicSensorDevice("ULTRASONIC"),
+            HumiditySensorDevice("HUMIDITY"),
+            PressureSensorDevice("PRESSURE"),
+            LightSensorDevice("LIGHT"),
+            LoadCellDevice("LOAD_CELL"),
+            BarcodeScannerDevice("BARCODE"),
+            RFIDReaderDevice("RFID"),
+            QRReaderDevice("QR"),
+            DCMotorDevice("DC_MOTOR", 25),
+            StepperMotorDevice("STEPPER"),
+            ConveyorDevice("CONVEYOR"),
+            ElevatorDevice("ELEVATOR"),
+            WiFiDevice("WIFI"),
+            BluetoothDevice("BLUETOOTH"),
+            MQTTDevice("MQTT"),
+            HTTPClientDevice("HTTP"),
+            I2CDevice("I2C"),
+            SPIDevice("SPI"),
+            UARTDevice("UART"),
+            CANDevice("CAN"),
+            ModbusRTUDevice("MODBUS_RTU"),
+            ModbusTCPDevice("MODBUS_TCP"),
+            LoRaDevice("LORA"),
+            ESPNowDevice("ESPNOW"),
+        ]
 
-        device_manager.add(
-            ButtonDevice("BUTTON", 2)
-        )
-
-        device_manager.add(
-            RelayDevice("RELAY", 5)
-        )
-
-        device_manager.add(
-            BuzzerDevice("BUZZER", 18)
-        )
-
-        device_manager.add(
-            ServoDevice("SERVO", 19)
-        )
-
-        device_manager.add(
-            PotentiometerDevice("POT", 34)
-        )
-
-        device_manager.add(
-            LCD16x2Device("LCD16X2")
-        )
-
-        device_manager.add(
-            OLEDDevice("OLED")
-        )
-
-        device_manager.add(
-            SevenSegmentDevice("DISPLAY7")
-        )
-
-        device_manager.add(
-            TemperatureSensorDevice("TEMP")
-        )
-
-        device_manager.add(
-            UltrasonicSensorDevice("ULTRASONIC")
-        )
-
-        device_manager.add(
-            HumiditySensorDevice("HUMIDITY")
-        )
-
-        device_manager.add(
-            PressureSensorDevice("PRESSURE")
-        )
-
-        device_manager.add(
-            LightSensorDevice("LIGHT")
-        )
-
-        device_manager.add(
-            LoadCellDevice("LOAD_CELL")
-        )
-
-        device_manager.add(
-            BarcodeScannerDevice("BARCODE")
-        )
-
-        device_manager.add(
-            RFIDReaderDevice("RFID")
-        )
-
-        device_manager.add(
-            QRReaderDevice("QR")
-        )
-
-        device_manager.add(
-            DCMotorDevice("DC_MOTOR", 25)
-        )
-
-        device_manager.add(
-            StepperMotorDevice("STEPPER")
-        )
-
-        device_manager.add(
-            ConveyorDevice("CONVEYOR")
-        )
-
-        device_manager.add(
-            ElevatorDevice("ELEVATOR")
-        )
-
-        device_manager.add(
-            WiFiDevice("WIFI")
-        )
-
-        device_manager.add(
-            BluetoothDevice("BLUETOOTH")
-        )
-
-        device_manager.add(
-            MQTTDevice("MQTT")
-        )
-
-        device_manager.add(
-            HTTPClientDevice("HTTP")
-        )
-
-        device_manager.add(
-            I2CDevice("I2C")
-        )
-
-        device_manager.add(
-            SPIDevice("SPI")
-        )
-
-        device_manager.add(
-            UARTDevice("UART")
-        )
-
-        device_manager.add(
-            CANDevice("CAN")
-        )
-
-        device_manager.add(
-            ModbusRTUDevice("MODBUS_RTU")
-        )
-
-        device_manager.add(
-            ModbusTCPDevice("MODBUS_TCP")
-        )
-
-        device_manager.add(
-            LoRaDevice("LORA")
-        )
-
-        device_manager.add(
-            ESPNowDevice("ESPNOW")
-        )
+        for device in devices:
+            device_manager.add(device)
 
         cls.initialized = True
+
+    @classmethod
+    def reset(cls):
+
+        device_manager.reset_all()
+        device_manager.clear()
+        cls.initialized = False
