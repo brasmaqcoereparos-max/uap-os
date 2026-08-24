@@ -1,61 +1,122 @@
+"""
+Contexto compartilhado durante a compilação UAP.
+"""
+
+
 class CompilerContext:
 
     def __init__(self):
 
+        self.reset()
+
+    def reset(self):
+
         self.variables = {}
-
         self.includes = set()
-
         self.definitions = set()
-
         self.globals = []
-
         self.setup = []
-
         self.loop = []
 
-    def add_include(self, include):
+    def add_include(
+        self,
+        include,
+    ):
 
-        self.includes.add(include)
+        if include:
+            self.includes.add(
+                str(include)
+            )
 
-    def add_definition(self, definition):
+    def add_definition(
+        self,
+        definition,
+    ):
 
-        self.definitions.add(definition)
+        if definition:
+            self.definitions.add(
+                str(definition)
+            )
 
-    def add_global(self, code):
+    def add_global(
+        self,
+        code,
+    ):
 
-        self.globals.append(code)
+        if code:
+            self.globals.append(
+                str(code)
+            )
 
-    def add_setup(self, code):
+    def add_setup(
+        self,
+        code,
+    ):
 
-        self.setup.append(code)
+        if code:
+            self.setup.append(
+                str(code)
+            )
 
-    def add_loop(self, code):
+    def add_loop(
+        self,
+        code,
+    ):
 
-        self.loop.append(code)
+        if code:
+            self.loop.append(
+                str(code)
+            )
 
-    def set_variable(self, name, value):
+    def set_variable(
+        self,
+        name,
+        value,
+    ):
 
-        self.variables[name] = value
+        if not name:
+            raise ValueError(
+                "Nome da variável é obrigatório."
+            )
 
-    def get_variable(self, name, default=None):
+        self.variables[
+            str(name)
+        ] = value
 
-        return self.variables.get(name, default)
+        return value
+
+    def get_variable(
+        self,
+        name,
+        default=None,
+    ):
+
+        return self.variables.get(
+            str(name),
+            default,
+        )
 
     def build(self):
 
         return {
-
-            "includes": sorted(self.includes),
-
-            "definitions": sorted(self.definitions),
-
-            "globals": self.globals,
-
-            "setup": self.setup,
-
-            "loop": self.loop,
-
+            "variables": dict(
+                self.variables
+            ),
+            "includes": sorted(
+                self.includes
+            ),
+            "definitions": sorted(
+                self.definitions
+            ),
+            "globals": list(
+                self.globals
+            ),
+            "setup": list(
+                self.setup
+            ),
+            "loop": list(
+                self.loop
+            ),
         }
 
 
