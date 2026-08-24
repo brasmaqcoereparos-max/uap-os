@@ -4,10 +4,7 @@ from datetime import datetime
 class RuntimeMetrics:
 
     def __init__(self):
-        self.started_at = datetime.now()
-        self.cycles = 0
-        self.errors = 0
-        self.commands = 0
+        self.reset()
 
     def cycle(self):
         self.cycles += 1
@@ -25,12 +22,17 @@ class RuntimeMetrics:
         self.commands = 0
 
     def status(self):
+
         uptime = (
-            datetime.now() - self.started_at
+            datetime.now()
+            - self.started_at
         ).total_seconds()
 
         return {
-            "uptime_seconds": uptime,
+            "uptime_seconds": max(
+                0.0,
+                uptime,
+            ),
             "cycles": self.cycles,
             "errors": self.errors,
             "commands": self.commands,
