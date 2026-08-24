@@ -11,7 +11,7 @@ from app.modules.automation.trajectory_checker import (
 )
 
 from app.modules.automation.emergency_stop import (
-    robot_emergency_stop,
+    emergency_stop,
 )
 
 
@@ -27,7 +27,7 @@ class RobotController:
         limits,
     ):
 
-        if robot_emergency_stop.active:
+        if emergency_stop.active:
 
             return {
                 "success": False,
@@ -58,7 +58,7 @@ class RobotController:
 
     def start(self):
 
-        if robot_emergency_stop.active:
+        if emergency_stop.active:
             return False
 
         self.execution.start()
@@ -71,7 +71,7 @@ class RobotController:
 
     def resume(self):
 
-        if robot_emergency_stop.active:
+        if emergency_stop.active:
             return False
 
         self.execution.resume()
