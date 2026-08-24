@@ -2,7 +2,7 @@ from app.models.project import Project
 from app.models.device import Device
 from app.models.user import User
 from app.models.plugin import Plugin
-from app.models.automation import Automation
+from app.models.automatico import Automation
 from app.models.event import Event
 from app.models.flow import Flow
 from app.models.runtime import Runtime
