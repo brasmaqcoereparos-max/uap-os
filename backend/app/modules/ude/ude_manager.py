@@ -24,18 +24,44 @@ class UDEManager:
             name,
         )
 
-        device_manager.add(device)
-
-        return device
+        return self.register(
+            device
+        )
 
     def register(
         self,
         device,
     ):
 
-        device_manager.add(device)
+        if device is None:
+            raise ValueError(
+                "Dispositivo não informado."
+            )
 
-        device_discovery.add(device)
+        device_manager.add(
+            device
+        )
+
+        device_discovery.add(
+            device_id=device.id,
+            name=device.name,
+            device_type=device.device_type,
+            protocol=getattr(
+                device,
+                "protocol",
+                None,
+            ),
+            address=getattr(
+                device,
+                "address",
+                None,
+            ),
+            metadata=getattr(
+                device,
+                "metadata",
+                {},
+            ),
+        )
 
         return device
 
