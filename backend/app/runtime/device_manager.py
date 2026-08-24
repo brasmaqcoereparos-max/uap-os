@@ -1,35 +1,139 @@
+
+"""
+Gerenciador de dispositivos do Runtime UAP.
+"""
+
+
 class DeviceManager:
 
     def __init__(self):
         self.devices = {}
 
     def register(self, device):
-        self.devices[device.id] = device
+        if device is None:
+            raise ValueError(
+                "Dispositivo não informado."
+            )
+
+        device_id = getattr(
+            device,
+            "id",
+            None,
+        )
+
+        if device_id is None:
+            raise ValueError(
+                "Dispositivo sem id."
+            )
+
+        self.devices[device_id] = device
+
+        return device
 
     def unregister(self, device_id):
-        if device_id in self.devices:
-            del self.devices[device_id]
+        return self.devices.pop(
+            device_id,
+            None,
+        )
 
     def get(self, device_id):
-        return self.devices.get(device_id)
+        return self.devices.get(
+            device_id
+        )
 
     def list(self):
-        return list(self.devices.values())
+        return list(
+            self.devices.values()
+        )
 
     def connect_all(self):
-        for device in self.devices.values():
-            if hasattr(device, "connect"):
-                device.connect()
+
+        results = {}
+
+        for device_id, device in list(
+            self.devices.items()
+        ):
+
+            connect = getattr(
+                device,
+                "connect",
+                None,
+            )
+
+            if callable(connect):
+
+                try:
+                    results[device_id] = connect()
+
+                except Exception as exc:
+                    results[device_id] = {
+                        "success": False,
+                        "error": str(exc),
+                    }
+
+        return results
 
     def disconnect_all(self):
-        for device in self.devices.values():
-            if hasattr(device, "disconnect"):
-                device.disconnect()
+
+        results = {}
+
+        for device_id, device in list(
+            self.devices.items()
+        ):
+
+            disconnect = getattr(
+                device,
+                "disconnect",
+                None,
+            )
+
+            if callable(disconnect):
+
+                try:
+                    results[device_id] = disconnect()
+
+                except Exception as exc:
+                    results[device_id] = {
+                        "success": False,
+                        "error": str(exc),
+                    }
+
+        return results
 
     def update(self):
-        for device in self.devices.values():
-            if hasattr(device, "update"):
-                device.update()
+
+        results = {}
+
+        for device_id, device in list(
+            self.devices.items()
+        ):
+
+            update = getattr(
+                device,
+                "update",
+                None,
+            )
+
+            if callable(update):
+
+                try:
+                    results[device_id] = update()
+
+                except Exception as exc:
+                    results[device_id] = {
+                        "success": False,
+                        "error": str(exc),
+                    }
+
+        return results
+
+    def clear(self):
+        self.devices.clear()
+
+    def count(self):
+        return len(
+            self.devices
+        )
 
 
 device_manager = DeviceManager()
