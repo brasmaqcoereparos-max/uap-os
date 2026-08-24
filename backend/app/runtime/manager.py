@@ -1,31 +1,63 @@
-from app.runtime.engine import engine
-from app.runtime.lifecycle import runtime_lifecycle
-from app.runtime.logger import runtime_logger
+"""
+Gerenciador principal do Runtime UAP.
+"""
+
+from app.runtime.engine import (
+    engine,
+)
+
+from app.runtime.lifecycle import (
+    runtime_lifecycle,
+)
+
+from app.runtime.logger import (
+    runtime_logger,
+)
 
 
 class RuntimeManager:
 
-    @staticmethod
-    def start():
-        runtime_logger.info("Starting Runtime Manager")
+    def start(self):
 
-        runtime_lifecycle.startup()
+        runtime_logger.info(
+            "Starting Runtime Manager"
+        )
 
-        engine.start()
+        if not runtime_lifecycle.startup():
+            return False
 
-    @staticmethod
-    def stop():
-        runtime_logger.info("Stopping Runtime Manager")
+        return engine.start()
+
+    def stop(self):
+
+        runtime_logger.info(
+            "Stopping Runtime Manager"
+        )
 
         engine.stop()
 
-        runtime_lifecycle.shutdown()
+        return runtime_lifecycle.shutdown()
 
-    @staticmethod
-    def restart():
-        RuntimeManager.stop()
-        RuntimeManager.start()
+    def restart(self):
 
-    @staticmethod
-    def status():
+        self.stop()
+
+        return self.start()
+
+    def status(self):
+
         return engine.status()
+
+    def is_running(self):
+
+        status = self.status()
+
+        return bool(
+            status.get(
+                "running",
+                False,
+            )
+        )
+
+
+runtime_manager = RuntimeManager()
