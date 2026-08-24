@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.models.automation import Automation
+from app.models.automatico import Automation
 from app.repositories.automation_repository import AutomationRepository
 
 
@@ -11,8 +11,14 @@ class AutomationService:
         return AutomationRepository.list(db)
 
     @staticmethod
-    def get(db: Session, automation_id: str):
-        return AutomationRepository.get(db, automation_id)
+    def get(
+        db: Session,
+        automation_id: str,
+    ):
+        return AutomationRepository.get(
+            db,
+            automation_id,
+        )
 
     @staticmethod
     def create(
@@ -20,23 +26,34 @@ class AutomationService:
         name: str,
         description: str,
     ):
+
         automation = Automation(
             name=name,
             description=description,
         )
 
-        return AutomationRepository.create(db, automation)
+        return AutomationRepository.create(
+            db,
+            automation,
+        )
 
     @staticmethod
     def delete(
         db: Session,
         automation_id: str,
     ):
-        automation = AutomationRepository.get(db, automation_id)
+
+        automation = AutomationRepository.get(
+            db,
+            automation_id,
+        )
 
         if not automation:
             return False
 
-        AutomationRepository.delete(db, automation)
+        AutomationRepository.delete(
+            db,
+            automation,
+        )
 
         return True
