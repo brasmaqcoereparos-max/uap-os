@@ -1,25 +1,58 @@
-class UHALBase:
+from abc import ABC, abstractmethod
 
+
+class UHALBase(ABC):
+
+    @abstractmethod
     def initialize(self):
-        pass
+        raise NotImplementedError
 
+    @abstractmethod
     def shutdown(self):
-        pass
+        raise NotImplementedError
 
-    def digital_write(self, pin, value):
-        pass
+    @abstractmethod
+    def digital_write(
+        self,
+        pin,
+        value,
+    ):
+        raise NotImplementedError
 
-    def digital_read(self, pin):
-        return 0
+    @abstractmethod
+    def digital_read(
+        self,
+        pin,
+    ):
+        raise NotImplementedError
 
-    def analog_read(self, pin):
-        return 0
+    @abstractmethod
+    def analog_read(
+        self,
+        pin,
+    ):
+        raise NotImplementedError
 
-    def analog_write(self, pin, value):
-        pass
+    @abstractmethod
+    def analog_write(
+        self,
+        pin,
+        value,
+    ):
+        raise NotImplementedError
 
-    def pwm_write(self, pin, duty):
-        pass
+    @abstractmethod
+    def pwm_write(
+        self,
+        pin,
+        duty,
+    ):
+        raise NotImplementedError
 
-    def pwm_frequency(self, pin, frequency):
-        pass
+    @abstractmethod
+    def pwm_frequency(
+        self,
+        pin,
+        frequency,
+    ):
+        raise NotImplementedError
