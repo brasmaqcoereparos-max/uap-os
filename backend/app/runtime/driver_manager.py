@@ -6,44 +6,65 @@ Gerenciador de drivers do Runtime UAP.
 class DriverManager:
 
     def __init__(self):
+
         self.drivers = {}
 
-    def register(self, driver):
+    def register(
+        self,
+        driver_id,
+        driver,
+    ):
+
+        if not driver_id:
+            raise ValueError(
+                "driver_id obrigatório."
+            )
+
         if driver is None:
             raise ValueError(
                 "Driver não informado."
             )
 
-        driver_id = getattr(
-            driver,
-            "id",
-            None,
-        )
-
-        if driver_id is None:
-            raise ValueError(
-                "Driver sem id."
-            )
-
-        self.drivers[driver_id] = driver
+        self.drivers[
+            str(driver_id)
+        ] = driver
 
         return driver
 
-    def unregister(self, driver_id):
+    def unregister(
+        self,
+        driver_id,
+    ):
+
         return self.drivers.pop(
-            driver_id,
+            str(driver_id),
             None,
         )
 
-    def get(self, driver_id):
+    def get(
+        self,
+        driver_id,
+    ):
+
         return self.drivers.get(
-            driver_id
+            str(driver_id)
         )
 
     def list(self):
+
         return list(
             self.drivers.values()
         )
+
+    def count(self):
+
+        return len(
+            self.drivers
+        )
+
+    def clear(self):
+
+        self.drivers.clear()
 
     def connect_all(self):
 
@@ -59,16 +80,23 @@ class DriverManager:
                 None,
             )
 
-            if callable(connect):
+            if not callable(connect):
+                continue
 
-                try:
-                    results[driver_id] = connect()
+            try:
 
-                except Exception as exc:
-                    results[driver_id] = {
-                        "success": False,
-                        "error": str(exc),
-                    }
+                results[
+                    driver_id
+                ] = connect()
+
+            except Exception as exc:
+
+                results[
+                    driver_id
+                ] = {
+                    "success": False,
+                    "error": str(exc),
+                }
 
         return results
 
@@ -86,53 +114,25 @@ class DriverManager:
                 None,
             )
 
-            if callable(disconnect):
+            if not callable(disconnect):
+                continue
 
-                try:
-                    results[driver_id] = disconnect()
+            try:
 
-                except Exception as exc:
-                    results[driver_id] = {
-                        "success": False,
-                        "error": str(exc),
-                    }
+                results[
+                    driver_id
+                ] = disconnect()
 
-        return results
+            except Exception as exc:
 
-    def update(self):
-
-        results = {}
-
-        for driver_id, driver in list(
-            self.drivers.items()
-        ):
-
-            update = getattr(
-                driver,
-                "update",
-                None,
-            )
-
-            if callable(update):
-
-                try:
-                    results[driver_id] = update()
-
-                except Exception as exc:
-                    results[driver_id] = {
-                        "success": False,
-                        "error": str(exc),
-                    }
+                results[
+                    driver_id
+                ] = {
+                    "success": False,
+                    "error": str(exc),
+                }
 
         return results
-
-    def clear(self):
-        self.drivers.clear()
-
-    def count(self):
-        return len(
-            self.drivers
-        )
 
 
 driver_manager = DriverManager()
