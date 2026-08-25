@@ -13,7 +13,7 @@ def initialize_hardware():
 
     driver = auto_loader.load()
 
-    if driver:
+    if driver is not None:
 
         driver.initialize()
 
