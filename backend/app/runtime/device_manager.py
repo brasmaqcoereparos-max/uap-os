@@ -1,6 +1,9 @@
-
 """
 Gerenciador de dispositivos do Runtime UAP.
+
+Responsável por registrar, localizar, conectar,
+desconectar, atualizar e executar comandos nos
+dispositivos registrados no Runtime.
 """
 
 
@@ -126,6 +129,116 @@ class DeviceManager:
                     }
 
         return results
+
+    def execute_command(
+        self,
+        command,
+    ):
+        """
+        Executa uma operação sobre um dispositivo.
+
+        Formato esperado:
+
+        {
+            "action": "device.write",
+            "device_id": "device-01",
+            "data": {...}
+        }
+
+        Operações suportadas:
+
+        device.connect
+        device.disconnect
+        device.read
+        device.write
+        device.update
+        device.status
+        """
+
+        if not isinstance(
+            command,
+            dict,
+        ):
+            raise TypeError(
+                "Comando de dispositivo inválido."
+            )
+
+        action = str(
+            command.get(
+                "action",
+                "",
+            )
+        ).strip().lower()
+
+        device_id = command.get(
+            "device_id"
+        )
+
+        if not device_id:
+            raise ValueError(
+                "Comando de dispositivo sem device_id."
+            )
+
+        device = self.get(
+            device_id
+        )
+
+        if device is None:
+            raise KeyError(
+                f"Dispositivo '{device_id}' não encontrado."
+            )
+
+        operations = {
+            "device.connect": "connect",
+            "device.disconnect": "disconnect",
+            "device.read": "read",
+            "device.write": "write",
+            "device.update": "update",
+            "device.status": "status",
+        }
+
+        method_name = operations.get(
+            action
+        )
+
+        if method_name is None:
+            raise ValueError(
+                f"Ação de dispositivo desconhecida: {action}"
+            )
+
+        method = getattr(
+            device,
+            method_name,
+            None,
+        )
+
+        if not callable(method):
+            raise AttributeError(
+                f"Dispositivo '{device_id}' "
+                f"não implementa '{method_name}'."
+            )
+
+        if action == "device.write":
+
+            if "data" not in command:
+                raise ValueError(
+                    "device.write exige o campo 'data'."
+                )
+
+            result = method(
+                command["data"]
+            )
+
+        else:
+
+            result = method()
+
+        return {
+            "success": True,
+            "action": action,
+            "device_id": device_id,
+            "result": result,
+        }
 
     def clear(self):
         self.devices.clear()
