@@ -37,6 +37,16 @@ class CommandProcessor:
             str(action).strip().lower()
         ] = handler
 
+    def unregister(
+        self,
+        action,
+    ):
+
+        return self.handlers.pop(
+            str(action).strip().lower(),
+            None,
+        )
+
     def process(self):
 
         processed = 0
@@ -96,23 +106,23 @@ class CommandProcessor:
             action
         )
 
-        if handler is not None:
+        if handler is None:
 
-            result = handler(
-                command
+            runtime_logger.warning(
+                f"Unknown command: {action}"
             )
 
-            runtime_logger.info(
-                f"Command executed: {action}"
-            )
+            return None
 
-            return result
-
-        runtime_logger.warning(
-            f"Unknown command: {action}"
+        result = handler(
+            command
         )
 
-        return None
+        runtime_logger.info(
+            f"Command executed: {action}"
+        )
+
+        return result
 
 
 command_processor = CommandProcessor()
