@@ -21,34 +21,22 @@ from app.modules.uhal.drivers.raspberry_pi import (
 
 def register_builtin_drivers():
 
-    hardware_registry.register(
+    drivers = {
+        "simulator": SimulatorDriver(),
+        "esp32": ESP32Driver(),
+        "arduino_uno": ArduinoUnoDriver(),
+        "raspberry_pi": RaspberryPiDriver(),
+    }
 
-        "simulator",
+    for name, driver in drivers.items():
 
-        SimulatorDriver(),
+        if hardware_registry.get(
+            name
+        ) is None:
 
-    )
+            hardware_registry.register(
+                name,
+                driver,
+            )
 
-    hardware_registry.register(
-
-        "esp32",
-
-        ESP32Driver(),
-
-    )
-
-    hardware_registry.register(
-
-        "arduino_uno",
-
-        ArduinoUnoDriver(),
-
-    )
-
-    hardware_registry.register(
-
-        "raspberry_pi",
-
-        RaspberryPiDriver(),
-
-  )
+    return hardware_registry.all()
