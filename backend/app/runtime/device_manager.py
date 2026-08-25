@@ -1,10 +1,10 @@
 """
 Gerenciador de dispositivos do Runtime UAP.
-
-Responsável por registrar, localizar, conectar,
-desconectar, atualizar e executar comandos nos
-dispositivos registrados no Runtime.
 """
+
+from app.runtime.driver_manager import (
+    driver_manager,
+)
 
 
 class DeviceManager:
@@ -13,6 +13,7 @@ class DeviceManager:
         self.devices = {}
 
     def register(self, device):
+
         if device is None:
             raise ValueError(
                 "Dispositivo não informado."
@@ -34,126 +35,258 @@ class DeviceManager:
         return device
 
     def unregister(self, device_id):
+
         return self.devices.pop(
             device_id,
             None,
         )
 
     def get(self, device_id):
+
         return self.devices.get(
             device_id
         )
 
     def list(self):
+
         return list(
             self.devices.values()
         )
 
-    def connect_all(self):
+    def count(self):
 
-        results = {}
+        return len(
+            self.devices
+        )
 
-        for device_id, device in list(
-            self.devices.items()
+    def clear(self):
+
+        self.devices.clear()
+
+    def _get_driver(self, device):
+
+        driver_id = getattr(
+            device,
+            "driver_id",
+            None,
+        )
+
+        if driver_id is not None:
+
+            driver = driver_manager.get(
+                driver_id
+            )
+
+            if driver is not None:
+                return driver
+
+        driver_name = getattr(
+            device,
+            "driver",
+            None,
+        )
+
+        if isinstance(
+            driver_name,
+            str,
         ):
 
+            driver = driver_manager.get(
+                driver_name
+            )
+
+            if driver is not None:
+                return driver
+
+        return None
+
+    def connect(self, device_id):
+
+        device = self.get(
+            device_id
+        )
+
+        if device is None:
+            raise KeyError(
+                f"Dispositivo '{device_id}' não encontrado."
+            )
+
+        driver = self._get_driver(
+            device
+        )
+
+        if driver is not None:
+
             connect = getattr(
-                device,
+                driver,
                 "connect",
                 None,
             )
 
             if callable(connect):
 
-                try:
-                    results[device_id] = connect()
+                result = connect(
+                    device
+                )
 
-                except Exception as exc:
-                    results[device_id] = {
-                        "success": False,
-                        "error": str(exc),
-                    }
+                if result is False:
+                    return False
 
-        return results
+        connect = getattr(
+            device,
+            "connect",
+            None,
+        )
 
-    def disconnect_all(self):
+        if callable(connect):
+            return connect()
 
-        results = {}
+        return True
 
-        for device_id, device in list(
-            self.devices.items()
-        ):
+    def disconnect(self, device_id):
 
-            disconnect = getattr(
-                device,
-                "disconnect",
+        device = self.get(
+            device_id
+        )
+
+        if device is None:
+            raise KeyError(
+                f"Dispositivo '{device_id}' não encontrado."
+            )
+
+        disconnect = getattr(
+            device,
+            "disconnect",
+            None,
+        )
+
+        if callable(disconnect):
+            return disconnect()
+
+        return True
+
+    def read(
+        self,
+        device_id,
+    ):
+
+        device = self.get(
+            device_id
+        )
+
+        if device is None:
+            raise KeyError(
+                f"Dispositivo '{device_id}' não encontrado."
+            )
+
+        driver = self._get_driver(
+            device
+        )
+
+        if driver is not None:
+
+            read = getattr(
+                driver,
+                "read",
                 None,
             )
 
-            if callable(disconnect):
+            if callable(read):
+                return read(
+                    device
+                )
 
-                try:
-                    results[device_id] = disconnect()
+        read = getattr(
+            device,
+            "read",
+            None,
+        )
 
-                except Exception as exc:
-                    results[device_id] = {
-                        "success": False,
-                        "error": str(exc),
-                    }
+        if callable(read):
+            return read()
 
-        return results
+        raise AttributeError(
+            f"Dispositivo '{device_id}' não implementa read()."
+        )
 
-    def update(self):
+    def write(
+        self,
+        device_id,
+        data,
+    ):
 
-        results = {}
+        device = self.get(
+            device_id
+        )
 
-        for device_id, device in list(
-            self.devices.items()
-        ):
+        if device is None:
+            raise KeyError(
+                f"Dispositivo '{device_id}' não encontrado."
+            )
 
-            update = getattr(
-                device,
-                "update",
+        driver = self._get_driver(
+            device
+        )
+
+        if driver is not None:
+
+            write = getattr(
+                driver,
+                "write",
                 None,
             )
 
-            if callable(update):
+            if callable(write):
 
-                try:
-                    results[device_id] = update()
+                return write(
+                    device,
+                    data,
+                )
 
-                except Exception as exc:
-                    results[device_id] = {
-                        "success": False,
-                        "error": str(exc),
-                    }
+        write = getattr(
+            device,
+            "write",
+            None,
+        )
 
-        return results
+        if callable(write):
+            return write(
+                data
+            )
+
+        raise AttributeError(
+            f"Dispositivo '{device_id}' não implementa write()."
+        )
+
+    def update(
+        self,
+        device_id,
+    ):
+
+        device = self.get(
+            device_id
+        )
+
+        if device is None:
+            raise KeyError(
+                f"Dispositivo '{device_id}' não encontrado."
+            )
+
+        update = getattr(
+            device,
+            "update",
+            None,
+        )
+
+        if callable(update):
+            return update()
+
+        return None
 
     def execute_command(
         self,
         command,
     ):
-        """
-        Executa uma operação sobre um dispositivo.
-
-        Formato esperado:
-
-        {
-            "action": "device.write",
-            "device_id": "device-01",
-            "data": {...}
-        }
-
-        Operações suportadas:
-
-        device.connect
-        device.disconnect
-        device.read
-        device.write
-        device.update
-        device.status
-        """
 
         if not isinstance(
             command,
@@ -176,62 +309,65 @@ class DeviceManager:
 
         if not device_id:
             raise ValueError(
-                "Comando de dispositivo sem device_id."
+                "Comando sem device_id."
             )
 
-        device = self.get(
-            device_id
-        )
+        if action == "device.connect":
 
-        if device is None:
-            raise KeyError(
-                f"Dispositivo '{device_id}' não encontrado."
+            result = self.connect(
+                device_id
             )
 
-        operations = {
-            "device.connect": "connect",
-            "device.disconnect": "disconnect",
-            "device.read": "read",
-            "device.write": "write",
-            "device.update": "update",
-            "device.status": "status",
-        }
+        elif action == "device.disconnect":
 
-        method_name = operations.get(
-            action
-        )
-
-        if method_name is None:
-            raise ValueError(
-                f"Ação de dispositivo desconhecida: {action}"
+            result = self.disconnect(
+                device_id
             )
 
-        method = getattr(
-            device,
-            method_name,
-            None,
-        )
+        elif action == "device.read":
 
-        if not callable(method):
-            raise AttributeError(
-                f"Dispositivo '{device_id}' "
-                f"não implementa '{method_name}'."
+            result = self.read(
+                device_id
             )
 
-        if action == "device.write":
+        elif action == "device.write":
 
-            if "data" not in command:
-                raise ValueError(
-                    "device.write exige o campo 'data'."
-                )
+            result = self.write(
+                device_id,
+                command.get(
+                    "data"
+                ),
+            )
 
-            result = method(
-                command["data"]
+        elif action == "device.update":
+
+            result = self.update(
+                device_id
+            )
+
+        elif action == "device.status":
+
+            device = self.get(
+                device_id
+            )
+
+            status = getattr(
+                device,
+                "status",
+                None,
+            )
+
+            result = (
+                status()
+                if callable(status)
+                else status
             )
 
         else:
 
-            result = method()
+            raise ValueError(
+                f"Ação desconhecida: {action}"
+            )
 
         return {
             "success": True,
@@ -239,14 +375,6 @@ class DeviceManager:
             "device_id": device_id,
             "result": result,
         }
-
-    def clear(self):
-        self.devices.clear()
-
-    def count(self):
-        return len(
-            self.devices
-        )
 
 
 device_manager = DeviceManager()
