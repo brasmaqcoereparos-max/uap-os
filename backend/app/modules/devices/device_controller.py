@@ -5,67 +5,15 @@ from app.modules.devices.device_service import (
 
 class DeviceController:
 
-    def list(self):
-        return [
-            self._status(device)
-            for device in device_service.list()
-        ]
-
-    def count(self):
-        return {
-            "count": device_service.count()
-        }
-
-    def connect(self, device_id):
-        return device_service.connect(
-            device_id
-        )
-
-    def disconnect(self, device_id):
-        return device_service.disconnect(
-            device_id
-        )
-
-    def read(self, device_id):
-        return device_service.read(
-            device_id
-        )
-
-    def write(
-        self,
-        device_id,
-        value,
-    ):
-        return device_service.write(
-            device_id,
-            value,
-        )
-
-    def update(self, device_id):
-        return device_service.update(
-            device_id
-        )
-
-    def status(self, device_id):
-        return device_service.status(
-            device_id
-        )
-
     def execute(self, command):
 
-        if not isinstance(
-            command,
-            dict,
-        ):
+        if not isinstance(command, dict):
             raise TypeError(
                 "Comando de dispositivo inválido."
             )
 
         action = str(
-            command.get(
-                "action",
-                "",
-            )
+            command.get("action", "")
         ).strip().lower()
 
         device_id = command.get(
@@ -73,10 +21,17 @@ class DeviceController:
         )
 
         if action == "device.list":
-            return self.list()
+            return [
+                self.status(
+                    device.id
+                )
+                for device in device_service.list()
+            ]
 
         if action == "device.count":
-            return self.count()
+            return {
+                "count": device_service.count()
+            }
 
         if not device_id:
             raise ValueError(
@@ -118,25 +73,36 @@ class DeviceController:
             f"Ação desconhecida: {action}"
         )
 
-    @staticmethod
-    def _status(device):
-
-        method = getattr(
-            device,
-            "status",
-            None,
+    def connect(self, device_id):
+        return device_service.connect(
+            device_id
         )
 
-        if callable(method):
-            return method()
+    def disconnect(self, device_id):
+        return device_service.disconnect(
+            device_id
+        )
 
-        return {
-            "id": getattr(
-                device,
-                "id",
-                None,
-            )
-        }
+    def read(self, device_id):
+        return device_service.read(
+            device_id
+        )
+
+    def write(self, device_id, value):
+        return device_service.write(
+            device_id,
+            value,
+        )
+
+    def update(self, device_id):
+        return device_service.update(
+            device_id
+        )
+
+    def status(self, device_id):
+        return device_service.status(
+            device_id
+        )
 
 
 device_controller = DeviceController()
