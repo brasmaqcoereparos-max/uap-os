@@ -6,14 +6,16 @@ from app.modules.uhal.hal_manager import (
 class HardwareService:
 
     def load(self, board):
-        return hal_manager.load(
-            board
-        )
+        return hal_manager.load(board)
 
     def unload(self):
         return hal_manager.unload()
 
+    def available(self):
+        return hal_manager.available()
+
     def status(self):
+
         driver = hal_manager.current()
 
         if driver is None:
@@ -28,16 +30,16 @@ class HardwareService:
             None,
         )
 
-        if callable(method):
-            result = method()
-
-        else:
-            result = {}
+        driver_status = (
+            method()
+            if callable(method)
+            else {}
+        )
 
         return {
             "loaded": True,
             "board": hal_manager.current_board(),
-            "driver": result,
+            "driver": driver_status,
         }
 
     def write(
@@ -53,6 +55,16 @@ class HardwareService:
     def read(self, pin):
         return hal_manager.digital_read(
             pin
+        )
+
+    def pwm(
+        self,
+        pin,
+        duty,
+    ):
+        return hal_manager.pwm_write(
+            pin,
+            duty,
         )
 
 
