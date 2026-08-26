@@ -11,7 +11,7 @@ class RuntimeAPI:
         )
 
     def start(self):
-        return runtime_router.route(
+        return self.execute(
             {
                 "domain": "runtime",
                 "action": "runtime.start",
@@ -19,7 +19,7 @@ class RuntimeAPI:
         )
 
     def stop(self):
-        return runtime_router.route(
+        return self.execute(
             {
                 "domain": "runtime",
                 "action": "runtime.stop",
@@ -27,7 +27,7 @@ class RuntimeAPI:
         )
 
     def health(self):
-        return runtime_router.route(
+        return self.execute(
             {
                 "domain": "runtime",
                 "action": "runtime.health",
@@ -35,7 +35,7 @@ class RuntimeAPI:
         )
 
     def diagnostics(self):
-        return runtime_router.route(
+        return self.execute(
             {
                 "domain": "runtime",
                 "action": "runtime.diagnostics",
