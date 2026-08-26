@@ -1,5 +1,9 @@
-from app.modules.vision.vision_service import (
-    vision_service,
+from app.modules.vision.vision_pipeline import (
+    vision_pipeline,
+)
+
+from app.modules.vision.vision_rules import (
+    vision_rules,
 )
 
 from app.runtime.runtime_events import (
@@ -9,34 +13,75 @@ from app.runtime.runtime_events import (
 
 class VisionRuntimeBridge:
 
-    def execute(self, command):
+    def analyze(self, camera_id):
 
-        result = vision_service.execute(
-            command
+        result = vision_pipeline.process(
+            camera_id
         )
+
+        decisions = vision_rules.evaluate(
+            result
+        )
+
+        payload = {
+            "camera_id": camera_id,
+            "analysis": result,
+            "decisions": decisions,
+        }
 
         runtime_events.emit(
-            "vision.result",
+            "vision.analysis",
             "vision_runtime_bridge",
-            result,
+            payload,
         )
 
-        return result
+        for decision in decisions:
 
-    def analyze(self, camera_id):
-        return self.execute(
-            {
-                "action": "vision.analyze",
-                "camera_id": camera_id,
-            }
+            runtime_events.emit(
+                "vision.decision",
+                "vision_runtime_bridge",
+                {
+                    "camera_id": camera_id,
+                    "decision": decision,
+                },
+            )
+
+        return payload
+
+    def execute(self, command):
+
+        if not isinstance(
+            command,
+            dict,
+        ):
+            raise TypeError(
+                "Comando Vision inválido."
+            )
+
+        action = str(
+            command.get(
+                "action",
+                "",
+            )
+        ).strip().lower()
+
+        camera_id = command.get(
+            "camera_id"
         )
 
-    def capture(self, camera_id):
-        return self.execute(
-            {
-                "action": "vision.camera.capture",
-                "camera_id": camera_id,
-            }
+        if action == "vision.analyze":
+
+            if not camera_id:
+                raise ValueError(
+                    "camera_id obrigatório."
+                )
+
+            return self.analyze(
+                camera_id
+            )
+
+        raise ValueError(
+            f"Ação Vision desconhecida: {action}"
         )
 
 
