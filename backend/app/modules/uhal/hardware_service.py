@@ -6,7 +6,9 @@ from app.modules.uhal.hal_manager import (
 class HardwareService:
 
     def load(self, board):
-        return hal_manager.load(board)
+        return hal_manager.load(
+            board
+        )
 
     def unload(self):
         return hal_manager.unload()
@@ -30,23 +32,17 @@ class HardwareService:
             None,
         )
 
-        driver_status = (
-            method()
-            if callable(method)
-            else {}
-        )
-
         return {
             "loaded": True,
             "board": hal_manager.current_board(),
-            "driver": driver_status,
+            "driver": (
+                method()
+                if callable(method)
+                else {}
+            ),
         }
 
-    def write(
-        self,
-        pin,
-        value,
-    ):
+    def write(self, pin, value):
         return hal_manager.digital_write(
             pin,
             value,
@@ -57,11 +53,7 @@ class HardwareService:
             pin
         )
 
-    def pwm(
-        self,
-        pin,
-        duty,
-    ):
+    def pwm(self, pin, duty):
         return hal_manager.pwm_write(
             pin,
             duty,
