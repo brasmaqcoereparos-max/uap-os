@@ -1,53 +1,26 @@
-from app.runtime.runtime_service import runtime_service
-from app.runtime.runtime_hardware_bridge import (
-    runtime_hardware_bridge,
+from app.runtime.runtime_api import (
+    runtime_api,
 )
 
 
 class RuntimeGateway:
 
+    def execute(self, command):
+        return runtime_api.execute(
+            command
+        )
+
     def start(self):
-        return runtime_service.start()
+        return runtime_api.start()
 
     def stop(self):
-        return runtime_service.stop()
+        return runtime_api.stop()
 
-    def status(self):
-        return {
-            "runtime": runtime_service.status(),
-            "hardware": runtime_hardware_bridge.status(),
-        }
+    def health(self):
+        return runtime_api.health()
 
-    def device(self, command):
-        return runtime_service.execute(command)
-
-    def hardware(self, command):
-        return runtime_hardware_bridge.execute(command)
-
-    def execute(self, command):
-
-        if not isinstance(command, dict):
-            raise TypeError(
-                "Comando inválido."
-            )
-
-        domain = str(
-            command.get("domain", "")
-        ).strip().lower()
-
-        if domain == "device":
-            return self.device(command)
-
-        if domain in {
-            "hardware",
-            "gpio",
-            "uhal",
-        }:
-            return self.hardware(command)
-
-        raise ValueError(
-            f"Domínio desconhecido: {domain}"
-        )
+    def diagnostics(self):
+        return runtime_api.diagnostics()
 
 
 runtime_gateway = RuntimeGateway()
