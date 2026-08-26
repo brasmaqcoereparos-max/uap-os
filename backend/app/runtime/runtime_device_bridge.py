@@ -5,11 +5,7 @@ from app.modules.devices.device_registry import (
 
 class RuntimeDeviceBridge:
 
-    def resolve(
-        self,
-        device_id,
-    ):
-
+    def resolve(self, device_id):
         device = device_registry.get(
             device_id
         )
@@ -21,70 +17,59 @@ class RuntimeDeviceBridge:
 
         return device
 
-    def connect(
-        self,
-        device_id,
-    ):
-
-        device = self.resolve(
+    def connect(self, device_id):
+        return self.resolve(
             device_id
-        )
+        ).connect()
 
-        return device.connect()
-
-    def disconnect(
-        self,
-        device_id,
-    ):
-
-        device = self.resolve(
+    def disconnect(self, device_id):
+        return self.resolve(
             device_id
-        )
+        ).disconnect()
 
-        return device.disconnect()
-
-    def read(
-        self,
-        device_id,
-    ):
-
-        device = self.resolve(
+    def read(self, device_id):
+        return self.resolve(
             device_id
-        )
-
-        return device.read()
+        ).read()
 
     def write(
         self,
         device_id,
         value,
     ):
+        return self.resolve(
+            device_id
+        ).write(value)
 
+    def update(self, device_id):
         device = self.resolve(
             device_id
         )
 
-        return device.write(
-            value
+        method = getattr(
+            device,
+            "update",
+            None,
         )
 
-    def status(
-        self,
-        device_id,
-    ):
+        if callable(method):
+            return method()
 
+        return True
+
+    def status(self, device_id):
         device = self.resolve(
             device_id
         )
 
-        status = getattr(
+        method = getattr(
             device,
             "status",
             None,
         )
 
-        if callable(status):
-            return status()
+        if callable(method):
+            return method()
 
         return {
             "id": device_id,
@@ -93,4 +78,4 @@ class RuntimeDeviceBridge:
 
 runtime_device_bridge = (
     RuntimeDeviceBridge()
-      )
+)
