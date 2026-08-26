@@ -27,40 +27,24 @@ class DeviceService:
         return device_registry.count()
 
     def connect(self, device_id):
-
-        device = self._require(
+        return self._require(
             device_id
-        )
-
-        return device.connect()
+        ).connect()
 
     def disconnect(self, device_id):
-
-        device = self._require(
+        return self._require(
             device_id
-        )
-
-        return device.disconnect()
+        ).disconnect()
 
     def read(self, device_id):
-
-        device = self._require(
+        return self._require(
             device_id
-        )
+        ).read()
 
-        return device.read()
-
-    def write(
-        self,
-        device_id,
-        value,
-    ):
-
-        device = self._require(
+    def write(self, device_id, value):
+        return self._require(
             device_id
-        )
-
-        return device.write(value)
+        ).write(value)
 
     def update(self, device_id):
 
@@ -95,7 +79,7 @@ class DeviceService:
             return method()
 
         return {
-            "id": device_id,
+            "id": device_id
         }
 
     def _require(self, device_id):
