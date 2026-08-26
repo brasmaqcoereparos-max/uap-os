@@ -2,74 +2,58 @@ from app.modules.vision.camera_manager import (
     camera_manager,
 )
 
-from app.modules.vision.vision_detector import (
-    vision_detector,
+from app.modules.vision.vision_analyzer import (
+    vision_analyzer,
 )
 
-from app.modules.vision.motion_detector import (
-    motion_detector,
+from app.modules.vision.vision_event_processor import (
+    vision_event_processor,
 )
 
 from app.modules.vision.vision_events import (
     vision_events,
 )
 
+from app.modules.vision.vision_state_manager import (
+    vision_state_manager,
+)
+
 
 class VisionPipeline:
 
-    def process(
-        self,
-        camera_id,
-    ):
+    def process(self, camera_id):
 
         frame = camera_manager.capture(
             camera_id
         )
 
+        vision_state_manager.record_frame()
+
         if frame is None:
-            return {
+            result = {
                 "success": False,
                 "camera_id": camera_id,
                 "error": "Frame não disponível.",
             }
 
-        motion = motion_detector.detect(
+            vision_events.emit(
+                "vision.frame.error",
+                camera_id,
+                result,
+            )
+
+            return result
+
+        analysis = vision_analyzer.analyze(
             frame
         )
 
-        detections = vision_detector.detect(
-            frame
+        result = vision_event_processor.process(
+            camera_id,
+            analysis,
         )
 
-        result = {
-            "success": True,
-            "camera_id": camera_id,
-            "motion": motion,
-            "detections": detections,
-            "persons": len(
-                [
-                    item
-                    for item in detections
-                    if item.get("class") == "person"
-                ]
-            ),
-        }
-
-        if motion.get("motion"):
-            vision_events.emit(
-                "vision.motion.detected",
-                camera_id,
-                motion,
-            )
-
-        if result["persons"] > 0:
-            vision_events.emit(
-                "vision.person.detected",
-                camera_id,
-                {
-                    "count": result["persons"],
-                },
-            )
+        result["camera_id"] = camera_id
 
         vision_events.emit(
             "vision.analysis.completed",
