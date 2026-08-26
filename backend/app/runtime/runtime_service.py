@@ -1,27 +1,26 @@
-from app.runtime.runtime_boot import runtime_boot
-from app.runtime.runtime_executor import runtime_executor
-from app.runtime.runtime_health import runtime_health
+from app.runtime.runtime_gateway import (
+    runtime_gateway,
+)
 
 
 class RuntimeService:
 
+    def execute(self, command):
+        return runtime_gateway.execute(
+            command
+        )
+
     def start(self):
-        return runtime_boot.start()
+        return runtime_gateway.start()
 
     def stop(self):
-        return runtime_boot.stop()
+        return runtime_gateway.stop()
 
-    def status(self):
-        return runtime_health.check()
+    def health(self):
+        return runtime_gateway.health()
 
     def diagnostics(self):
-        return runtime_health.diagnostics()
-
-    def execute(self, command):
-        return runtime_executor.execute(command)
-
-    def execute_many(self, commands):
-        return runtime_executor.execute_many(commands)
+        return runtime_gateway.diagnostics()
 
 
 runtime_service = RuntimeService()
