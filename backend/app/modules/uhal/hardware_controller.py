@@ -5,62 +5,15 @@ from app.modules.uhal.hardware_service import (
 
 class HardwareController:
 
-    def initialize(self, board):
-        hardware_service.load(board)
-
-        return hardware_service.status()
-
-    def shutdown(self):
-        hardware_service.unload()
-
-        return {
-            "success": True
-        }
-
-    def available(self):
-        return hardware_service.available()
-
-    def status(self):
-        return hardware_service.status()
-
-    def write(
-        self,
-        pin,
-        value,
-    ):
-        return hardware_service.write(
-            pin,
-            value,
-        )
-
-    def read(self, pin):
-        return hardware_service.read(pin)
-
-    def pwm(
-        self,
-        pin,
-        duty,
-    ):
-        return hardware_service.pwm(
-            pin,
-            duty,
-        )
-
     def execute(self, command):
 
-        if not isinstance(
-            command,
-            dict,
-        ):
+        if not isinstance(command, dict):
             raise TypeError(
                 "Comando de hardware inválido."
             )
 
         action = str(
-            command.get(
-                "action",
-                "",
-            )
+            command.get("action", "")
         ).strip().lower()
 
         if action == "hardware.initialize":
@@ -99,6 +52,43 @@ class HardwareController:
 
         raise ValueError(
             f"Ação desconhecida: {action}"
+        )
+
+    def initialize(self, board):
+        hardware_service.load(
+            board
+        )
+
+        return hardware_service.status()
+
+    def shutdown(self):
+        hardware_service.unload()
+
+        return {
+            "success": True
+        }
+
+    def available(self):
+        return hardware_service.available()
+
+    def status(self):
+        return hardware_service.status()
+
+    def write(self, pin, value):
+        return hardware_service.write(
+            pin,
+            value,
+        )
+
+    def read(self, pin):
+        return hardware_service.read(
+            pin
+        )
+
+    def pwm(self, pin, duty):
+        return hardware_service.pwm(
+            pin,
+            duty,
         )
 
 
