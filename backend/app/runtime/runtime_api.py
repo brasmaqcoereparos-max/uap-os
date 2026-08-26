@@ -1,44 +1,45 @@
-from app.runtime.runtime_boot import (
-    runtime_boot,
-)
-
-from app.runtime.runtime_executor import (
-    runtime_executor,
-)
-
-from app.runtime.runtime_health import (
-    runtime_health,
+from app.runtime.runtime_router import (
+    runtime_router,
 )
 
 
 class RuntimeAPI:
 
-    def start(self):
-        return runtime_boot.start()
-
-    def stop(self):
-        return runtime_boot.stop()
-
-    def health(self):
-        return runtime_health.check()
-
-    def diagnostics(self):
-        return runtime_health.diagnostics()
-
-    def execute(
-        self,
-        command,
-    ):
-        return runtime_executor.execute(
+    def execute(self, command):
+        return runtime_router.route(
             command
         )
 
-    def execute_many(
-        self,
-        commands,
-    ):
-        return runtime_executor.execute_many(
-            commands
+    def start(self):
+        return runtime_router.route(
+            {
+                "domain": "runtime",
+                "action": "runtime.start",
+            }
+        )
+
+    def stop(self):
+        return runtime_router.route(
+            {
+                "domain": "runtime",
+                "action": "runtime.stop",
+            }
+        )
+
+    def health(self):
+        return runtime_router.route(
+            {
+                "domain": "runtime",
+                "action": "runtime.health",
+            }
+        )
+
+    def diagnostics(self):
+        return runtime_router.route(
+            {
+                "domain": "runtime",
+                "action": "runtime.diagnostics",
+            }
         )
 
 
