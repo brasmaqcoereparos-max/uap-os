@@ -1,33 +1,135 @@
 class GraphValidator:
 
-    def validate(self, graph):
-
+    def validate(
+        self,
+        graph,
+    ):
         errors = []
 
-        if not graph.nodes:
+        if graph is None:
+            return [
+                "Automation graph is missing"
+            ]
+
+        blocks = getattr(
+            graph,
+            "blocks",
+            None,
+        )
+
+        if blocks is None:
+            blocks = getattr(
+                graph,
+                "nodes",
+                {},
+            )
+
+        connections = getattr(
+            graph,
+            "connections",
+            [],
+        )
+
+        if not blocks:
             errors.append(
                 "Automation graph is empty"
             )
 
-        for connection in graph.connections:
+            return errors
 
-            if connection.source_node.node_id not in graph.nodes:
+        for index, connection in enumerate(
+            connections
+        ):
+            if not isinstance(
+                connection,
+                dict,
+            ):
                 errors.append(
-                    "Source node not found"
+                    f"Connection {index} "
+                    "has invalid format"
+                )
+                continue
+
+            source = connection.get(
+                "source"
+            )
+
+            target = connection.get(
+                "target"
+            )
+
+            if not source:
+                errors.append(
+                    f"Connection {index} "
+                    "has no source"
                 )
 
-            if connection.target_node.node_id not in graph.nodes:
+            elif source not in blocks:
                 errors.append(
-                    "Target node not found"
+                    f"Source block "
+                    f"'{source}' not found"
                 )
+
+            if not target:
+                errors.append(
+                    f"Connection {index} "
+                    "has no target"
+                )
+
+            elif target not in blocks:
+                errors.append(
+                    f"Target block "
+                    f"'{target}' not found"
+                )
+
+            if (
+                source
+                and target
+                and source == target
+            ):
+                errors.append(
+                    f"Block '{source}' "
+                    "cannot connect to itself"
+                )
+
+        cycle_checker = getattr(
+            graph,
+            "has_cycle",
+            None,
+        )
+
+        if (
+            callable(cycle_checker)
+            and cycle_checker()
+        ):
+            errors.append(
+                "Automation graph contains "
+                "a cycle"
+            )
 
         return errors
 
-    def is_valid(self, graph):
+    def is_valid(
+        self,
+        graph,
+    ):
+        return not self.validate(
+            graph
+        )
 
-        return len(
-            self.validate(graph)
-        ) == 0
+    def report(
+        self,
+        graph,
+    ):
+        errors = self.validate(
+            graph
+        )
+
+        return {
+            "valid": not errors,
+            "errors": errors,
+            "error_count": len(errors),
+        }
 
 
 graph_validator = GraphValidator()
