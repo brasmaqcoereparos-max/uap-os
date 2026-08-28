@@ -20,36 +20,58 @@ from app.modules.automation.ai_explanation import (
 
 
 class AISolutionBuilder:
-
     def build(self, text):
+        if not str(
+            text or ""
+        ).strip():
+            return {
+                "success": False,
+                "errors": [
+                    "Automation request "
+                    "is empty"
+                ],
+            }
 
         intent = automation_parser.parse(
             text
         )
 
-        plan = automation_planner.create_plan(
-            intent
+        plan = (
+            automation_planner.create_plan(
+                intent
+            )
         )
 
-        errors = ai_plan_validator.validate(
-            intent,
-            plan,
+        validation = (
+            ai_plan_validator.report(
+                intent,
+                plan,
+            )
         )
 
-        if errors:
-
+        if not validation["valid"]:
             return {
                 "success": False,
-                "errors": errors,
+                "errors": validation[
+                    "errors"
+                ],
+                "intent": intent,
+                "plan": plan,
             }
 
         graph = ai_graph_builder.build(
             plan
         )
 
-        explanation = ai_explanation.explain(
-            intent,
-            plan,
+        explanation = (
+            ai_explanation.explain(
+                intent,
+                plan,
+            )
+        )
+
+        plan.set_explanation(
+            explanation["text"]
         )
 
         return {
@@ -57,8 +79,12 @@ class AISolutionBuilder:
             "intent": intent,
             "plan": plan,
             "graph": graph,
-            "explanation": explanation,
+            "explanation": (
+                explanation
+            ),
         }
 
 
-ai_solution_builder = AISolutionBuilder()
+ai_solution_builder = (
+    AISolutionBuilder()
+        )
