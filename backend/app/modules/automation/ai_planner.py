@@ -4,99 +4,143 @@ from app.modules.automation.ai_plan import (
 
 
 class AutomationPlanner:
+    TEMPLATES = {
+        "stock": [
+            "Identificar produto",
+            "Obter quantidade atual",
+            "Comparar com estoque mínimo",
+            "Gerar resultado",
+        ],
+        "motor": [
+            "Verificar condição de início",
+            "Preparar acionamento",
+            "Executar movimento",
+            "Finalizar acionamento",
+        ],
+        "sensor": [
+            "Inicializar sensor",
+            "Obter leitura",
+            "Validar leitura",
+            "Gerar resultado",
+        ],
+        "measurement": [
+            "Obter medida",
+            "Validar medida",
+            "Registrar resultado",
+        ],
+        "vision": [
+            "Preparar câmera",
+            "Capturar imagem",
+            "Analisar imagem",
+            "Gerar resultado",
+        ],
+        "robot": [
+            "Preparar robô",
+            "Validar condições",
+            "Executar movimento",
+            "Verificar posição",
+        ],
+        "timer": [
+            "Configurar temporizador",
+            "Iniciar contagem",
+            "Aguardar término",
+            "Gerar evento",
+        ],
+        "output": [
+            "Validar saída",
+            "Preparar acionamento",
+            "Executar saída",
+            "Confirmar estado",
+        ],
+        "general": [
+            "Analisar solicitação",
+            "Preparar automação",
+            "Executar operação",
+            "Validar resultado",
+        ],
+    }
 
-    def create_plan(
-        self,
-        intent,
-    ):
-
-        plan = AutomationPlan()
-
-        if intent.goal == "stock":
-
-            plan.add_step(
-                "Identificar produto"
+    def create_plan(self, intent):
+        if intent is None:
+            raise ValueError(
+                "Intent não informado."
             )
 
-            plan.add_step(
-                "Obter quantidade atual"
+        goal = str(
+            getattr(
+                intent,
+                "goal",
+                "general",
             )
+            or "general"
+        )
 
-            plan.add_step(
-                "Comparar com estoque mínimo"
+        plan = AutomationPlan(
+            goal=goal
+        )
+
+        template = (
+            self.TEMPLATES.get(
+                goal,
+                self.TEMPLATES[
+                    "general"
+                ],
             )
+        )
 
-            plan.add_step(
-                "Gerar alerta"
+        for index, description in (
+            enumerate(
+                template,
+                start=1,
             )
-
-        elif intent.goal == "motor":
-
-            plan.add_step(
-                "Verificar condição"
-            )
-
-            plan.add_step(
-                "Ligar motor"
-            )
-
-            plan.add_step(
-                "Executar movimento"
-            )
-
-            plan.add_step(
-                "Parar motor"
-            )
-
-        elif intent.goal == "measurement":
-
-            plan.add_step(
-                "Obter medida"
-            )
-
-            plan.add_step(
-                "Validar medida"
-            )
-
-            plan.add_step(
-                "Registrar resultado"
-            )
-
-        elif intent.goal == "vision":
-
-            plan.add_step(
-                "Capturar imagem"
-            )
-
-            plan.add_step(
-                "Analisar imagem"
-            )
-
-            plan.add_step(
-                "Gerar resultado"
-            )
-
-        elif intent.goal == "robot":
-
-            plan.add_step(
-                "Preparar robô"
-            )
-
-            plan.add_step(
-                "Executar movimento"
-            )
-
-            plan.add_step(
-                "Verificar posição"
-            )
-
-        else:
-
-            plan.add_step(
-                "Analisar solicitação"
-            )
+        ):
+            plan.add_step({
+                "id": (
+                    f"{goal}_{index}"
+                ),
+                "name": description,
+                "description": (
+                    description
+                ),
+                "type": self._step_type(
+                    goal,
+                    index,
+                    len(template),
+                ),
+                "metadata": {},
+            })
 
         return plan
 
+    @staticmethod
+    def _step_type(
+        goal,
+        index,
+        total,
+    ):
+        if index == 1:
+            return "start"
 
-automation_planner = AutomationPlanner()
+        if index == total:
+            return "end"
+
+        if goal in {
+            "sensor",
+            "measurement",
+            "vision",
+        }:
+            return "input"
+
+        if goal in {
+            "motor",
+            "robot",
+            "output",
+        }:
+            return "action"
+
+        return "process"
+
+
+automation_planner = (
+    AutomationPlanner()
+        )
