@@ -1,125 +1,294 @@
 """
-Runtime de execução do grafo de automação UAP.
+Runtime de execução do grafo visual UAP.
 """
 
-from __future__ import annotations
+from app.modules.automation.graph_validator import (
+    graph_validator,
+)
 
 
 class GraphRuntime:
 
     def __init__(self):
-
         self.active = False
+        self.paused = False
+
         self.graph = None
+
         self.current_node = None
+        self.current_node_id = None
+
         self.execution_count = 0
+
+        self.context = {}
+
+        self.history = []
+
+        self.last_result = None
 
     def load(
         self,
         graph,
+        context=None,
     ):
-
         if graph is None:
             raise ValueError(
-                "Grafo de automação não informado."
+                "Grafo de automação "
+                "não informado."
+            )
+
+        validation = (
+            graph_validator.report(
+                graph
+            )
+        )
+
+        if not validation["valid"]:
+            raise ValueError(
+                "Grafo inválido: "
+                + "; ".join(
+                    validation[
+                        "errors"
+                    ]
+                )
             )
 
         self.graph = graph
+
         self.active = False
+        self.paused = False
+
         self.current_node = None
+        self.current_node_id = None
+
         self.execution_count = 0
 
-    def start(self):
+        self.context = dict(
+            context or {}
+        )
 
+        self.history.clear()
+
+        self.last_result = None
+
+        return True
+
+    def start(self):
         if self.graph is None:
             return False
 
-        if not getattr(
-            self.graph,
-            "nodes",
-            None,
-        ):
+        nodes = self._nodes()
 
+        if not nodes:
+            return False
+
+        start_id = (
+            self._find_start_node_id()
+        )
+
+        if start_id is None:
             return False
 
         self.active = True
+        self.paused = False
+
+        self.current_node_id = (
+            start_id
+        )
 
         self.current_node = (
-            self._find_start_node()
+            nodes.get(
+                start_id
+            )
         )
 
         return True
 
     def stop(self):
-
         self.active = False
+        self.paused = False
+
         self.current_node = None
+        self.current_node_id = None
+
+        return True
 
     def pause(self):
-
-        if self.active:
-            self.active = False
-
-    def resume(self):
-
-        if self.graph is None:
+        if not self.active:
             return False
 
-        self.active = True
+        self.paused = True
 
-        if self.current_node is None:
-            self.current_node = (
-                self._find_start_node()
-            )
+        return True
+
+    def resume(self):
+        if (
+            self.graph is None
+            or not self.active
+        ):
+            return False
+
+        self.paused = False
+
+        return True
+
+    def reset(self):
+        graph = self.graph
+
+        self.active = False
+        self.paused = False
+
+        self.current_node = None
+        self.current_node_id = None
+
+        self.execution_count = 0
+
+        self.context = {}
+
+        self.history.clear()
+
+        self.last_result = None
+
+        self.graph = graph
 
         return True
 
     def execute_cycle(self):
-
         if not self.active:
             return None
 
+        if self.paused:
+            return None
+
         if self.current_node is None:
-
             self.stop()
-
             return None
 
         node = self.current_node
 
-        self.execution_count += 1
-
-        self.current_node = (
-            self._next_node(
-                node
-            )
+        node_id = (
+            self.current_node_id
         )
 
-        if self.current_node is None:
-            self.active = False
+        result = self._execute_node(
+            node
+        )
 
-        return node
+        self.execution_count += 1
+
+        history_item = {
+            "index": (
+                self.execution_count
+            ),
+            "node_id": node_id,
+            "result": result,
+        }
+
+        self.history.append(
+            history_item
+        )
+
+        self.last_result = result
+
+        self.context[
+            "last_node"
+        ] = node_id
+
+        self.context[
+            "last_result"
+        ] = result
+
+        next_id = self._next_node_id(
+            node_id
+        )
+
+        if next_id is None:
+            self.stop()
+
+        else:
+            self.current_node_id = (
+                next_id
+            )
+
+            self.current_node = (
+                self._nodes().get(
+                    next_id
+                )
+            )
+
+        return history_item
+
+    def execute_all(
+        self,
+        max_cycles=10000,
+    ):
+        if not self.active:
+            if not self.start():
+                return {
+                    "success": False,
+                    "history": [],
+                }
+
+        cycles = 0
+
+        while (
+            self.active
+            and not self.paused
+            and cycles
+            < int(max_cycles)
+        ):
+            self.execute_cycle()
+            cycles += 1
+
+        return {
+            "success": (
+                not self.active
+            ),
+            "cycles": cycles,
+            "history": list(
+                self.history
+            ),
+            "context": dict(
+                self.context
+            ),
+        }
 
     def is_active(self):
-
         return self.active
 
     def status(self):
-
         return {
             "active": self.active,
-            "has_graph": self.graph is not None,
+            "paused": self.paused,
+            "has_graph": (
+                self.graph is not None
+            ),
             "current_node": (
-                self._node_id(
-                    self.current_node
-                )
+                self.current_node_id
             ),
             "execution_count": (
                 self.execution_count
             ),
+            "last_result": (
+                self.last_result
+            ),
         }
 
-    def _find_start_node(self):
+    def _nodes(self):
+        if self.graph is None:
+            return {}
+
+        blocks = getattr(
+            self.graph,
+            "blocks",
+            None,
+        )
+
+        if isinstance(
+            blocks,
+            dict,
+        ):
+            return blocks
 
         nodes = getattr(
             self.graph,
@@ -127,8 +296,32 @@ class GraphRuntime:
             {},
         )
 
-        for node in nodes.values():
+        if isinstance(
+            nodes,
+            dict,
+        ):
+            return nodes
 
+        return {}
+
+    def _connections(self):
+        if self.graph is None:
+            return []
+
+        return list(
+            getattr(
+                self.graph,
+                "connections",
+                [],
+            )
+        )
+
+    def _find_start_node_id(self):
+        nodes = self._nodes()
+
+        for node_id, node in (
+            nodes.items()
+        ):
             node_type = (
                 getattr(
                     node,
@@ -148,80 +341,147 @@ class GraphRuntime:
                 or ""
             )
 
-            if str(
-                node_type
-            ).lower() == "start":
+            if (
+                str(node_type)
+                .strip()
+                .lower()
+                == "start"
+            ):
+                return str(
+                    node_id
+                )
 
-                return node
-
-        return next(
-            iter(
-                nodes.values()
-            ),
+        entry_method = getattr(
+            self.graph,
+            "entry_blocks",
             None,
         )
 
-    def _next_node(
+        if callable(
+            entry_method
+        ):
+            entries = (
+                entry_method()
+            )
+
+            if entries:
+                return str(
+                    entries[0]
+                )
+
+        return next(
+            iter(nodes.keys()),
+            None,
+        )
+
+    def _next_node_id(
         self,
-        node,
+        node_id,
     ):
-
-        connections = getattr(
-            self.graph,
-            "connections",
-            [],
+        expected = str(
+            node_id
         )
 
-        node_id = self._node_id(
-            node
-        )
-
-        for connection in connections:
-
-            source = getattr(
+        for connection in (
+            self._connections()
+        ):
+            if isinstance(
                 connection,
-                "source_node",
-                None,
-            )
+                dict,
+            ):
+                source = (
+                    connection.get(
+                        "source"
+                    )
+                )
 
-            source_id = self._node_id(
-                source
-            )
+                target = (
+                    connection.get(
+                        "target"
+                    )
+                )
 
-            if source_id != node_id:
+                enabled = (
+                    connection.get(
+                        "enabled",
+                        True,
+                    )
+                )
+
+            else:
+                source = getattr(
+                    connection,
+                    "source",
+                    None,
+                )
+
+                target = getattr(
+                    connection,
+                    "target",
+                    None,
+                )
+
+                enabled = getattr(
+                    connection,
+                    "enabled",
+                    True,
+                )
+
+            if not enabled:
                 continue
 
-            target = getattr(
-                connection,
-                "target_node",
-                None,
-            )
-
-            if target is not None:
-                return target
+            if str(source) == expected:
+                return str(
+                    target
+                )
 
         return None
 
-    @staticmethod
-    def _node_id(
+    def _execute_node(
+        self,
         node,
     ):
+        if not getattr(
+            node,
+            "enabled",
+            True,
+        ):
+            return {
+                "executed": False,
+                "reason": "disabled",
+            }
 
-        if node is None:
-            return None
-
-        return (
-            getattr(
-                node,
-                "node_id",
-                None,
-            )
-            or getattr(
-                node,
-                "id",
-                None,
-            )
+        execute = getattr(
+            node,
+            "execute",
+            None,
         )
+
+        if callable(execute):
+            try:
+                return execute(
+                    self.context
+                )
+
+            except TypeError:
+                return execute()
+
+        run = getattr(
+            node,
+            "run",
+            None,
+        )
+
+        if callable(run):
+            try:
+                return run(
+                    self.context
+                )
+
+            except TypeError:
+                return run()
+
+        return None
 
 
 graph_runtime = GraphRuntime()
