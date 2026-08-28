@@ -1,41 +1,130 @@
+import unicodedata
+
 from app.modules.automation.ai_intent import (
     AutomationIntent,
 )
 
 
 class AutomationParser:
+    GOALS = {
+        "stock": (
+            "estoque",
+            "produto",
+            "inventario",
+            "inventário",
+        ),
+        "motor": (
+            "motor",
+            "acionamento",
+            "movimento",
+        ),
+        "sensor": (
+            "sensor",
+            "detectar",
+            "detecção",
+        ),
+        "robot": (
+            "robo",
+            "robô",
+            "robot",
+        ),
+        "measurement": (
+            "medir",
+            "medida",
+            "medicao",
+            "medição",
+        ),
+        "vision": (
+            "camera",
+            "câmera",
+            "imagem",
+            "visao",
+            "visão",
+        ),
+        "timer": (
+            "tempo",
+            "timer",
+            "temporizador",
+            "atraso",
+        ),
+        "output": (
+            "saida",
+            "saída",
+            "rele",
+            "relé",
+            "valvula",
+            "válvula",
+        ),
+    }
 
-    def parse(
-        self,
-        text,
-    ):
+    @staticmethod
+    def _normalize(text):
+        text = str(
+            text or ""
+        ).strip().lower()
 
-        intent = AutomationIntent(text)
+        normalized = unicodedata.normalize(
+            "NFKD",
+            text,
+        )
 
-        normalized = text.lower()
+        return "".join(
+            char
+            for char in normalized
+            if not unicodedata.combining(
+                char
+            )
+        )
 
-        if "estoque" in normalized:
-            intent.set_goal("stock")
+    def detect_goal(self, text):
+        normalized = self._normalize(
+            text
+        )
 
-        elif "motor" in normalized:
-            intent.set_goal("motor")
+        best_goal = "general"
+        best_position = None
 
-        elif "sensor" in normalized:
-            intent.set_goal("sensor")
+        for goal, keywords in (
+            self.GOALS.items()
+        ):
+            for keyword in keywords:
+                keyword = self._normalize(
+                    keyword
+                )
 
-        elif "robô" in normalized:
-            intent.set_goal("robot")
+                position = (
+                    normalized.find(
+                        keyword
+                    )
+                )
 
-        elif "medir" in normalized:
-            intent.set_goal("measurement")
+                if position < 0:
+                    continue
 
-        elif "câmera" in normalized:
-            intent.set_goal("vision")
+                if (
+                    best_position is None
+                    or position
+                    < best_position
+                ):
+                    best_goal = goal
+                    best_position = (
+                        position
+                    )
 
-        else:
-            intent.set_goal("general")
+        return best_goal
+
+    def parse(self, text):
+        intent = AutomationIntent(
+            text=text
+        )
+
+        intent.set_goal(
+            self.detect_goal(text)
+        )
 
         return intent
 
 
-automation_parser = AutomationParser()
+automation_parser = (
+    AutomationParser()
+        )
