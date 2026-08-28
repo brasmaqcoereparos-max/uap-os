@@ -123,4 +123,4 @@ class AIPlanValidator:
 
 ai_plan_validator = (
     AIPlanValidator()
-                )
+        )
