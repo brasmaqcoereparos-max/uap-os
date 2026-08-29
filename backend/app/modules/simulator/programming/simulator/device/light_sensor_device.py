@@ -1,42 +1,92 @@
-"""
-Sensor de luminosidade simulado do UAP.
-"""
-
 from app.modules.simulator.programming.simulator.device.device_base import (
     DeviceBase,
 )
 
 
-class LightSensorDevice(DeviceBase):
+class LightSensorDevice(
+    DeviceBase
+):
 
     def __init__(
         self,
         name,
+        value=0,
+        minimum=0,
+        maximum=1023,
     ):
-        super().__init__(name)
+        super().__init__(
+            name=name,
+            category="sensor",
+            description=(
+                "Sensor de luminosidade"
+            ),
+            icon="sun",
+        )
 
-        self.value = 0
+        self.minimum = int(minimum)
+        self.maximum = int(maximum)
 
-    def set_value(
-        self,
-        value,
-    ):
+        if self.minimum >= self.maximum:
+            raise ValueError(
+                "Faixa de luminosidade inválida."
+            )
 
+        self.value = self.minimum
+
+        self.set_value(value)
+
+    def set_value(self, value):
         self.value = max(
-            0,
+            self.minimum,
             min(
-                1023,
+                self.maximum,
                 int(value),
             ),
         )
 
-    def read(self):
-
         return self.value
 
+    def read(self):
+        return self.value
+
+    def percentage(self):
+        span = (
+            self.maximum
+            - self.minimum
+        )
+
+        if span <= 0:
+            return 0.0
+
+        return round(
+            (
+                (
+                    self.value
+                    - self.minimum
+                )
+                / span
+            )
+            * 100,
+            2,
+        )
+
     def update(self):
-        pass
+        return self.value
 
     def reset(self):
+        self.value = self.minimum
+        return self.value
 
-        self.value = 0
+    def to_dict(self):
+        data = super().to_dict()
+
+        data.update({
+            "value": self.value,
+            "minimum": self.minimum,
+            "maximum": self.maximum,
+            "percentage": (
+                self.percentage()
+            ),
+        })
+
+        return data
