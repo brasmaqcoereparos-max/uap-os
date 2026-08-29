@@ -8,90 +8,145 @@ from app.modules.simulator.programming.simulator.device.device_registry import (
 
 
 class DeviceManager:
-
     def add(
         self,
         device,
+        replace=True,
     ):
-
         if device is None:
             raise ValueError(
-                "O dispositivo não pode ser None."
+                "Dispositivo não pode "
+                "ser None."
+            )
+
+        name = getattr(
+            device,
+            "name",
+            None,
+        )
+
+        if not name:
+            raise ValueError(
+                "Dispositivo sem nome."
             )
 
         return device_registry.register(
-            device.name,
+            name,
             device,
+            replace=replace,
         )
 
-    def get(
-        self,
-        name,
-    ):
-
+    def get(self, name):
         return device_registry.get(
             name
         )
 
-    def remove(
-        self,
-        name,
-    ):
-
+    def remove(self, name):
         return device_registry.unregister(
             name
         )
 
-    def exists(
-        self,
-        name,
-    ):
-
+    def exists(self, name):
         return device_registry.exists(
             name
         )
 
     def all(self):
-
         return device_registry.all()
 
-    def names(self):
+    def values(self):
+        return device_registry.values()
 
+    def names(self):
         return device_registry.names()
 
     def count(self):
-
         return device_registry.count()
 
-    def update_all(self):
+    def initialize_all(self):
+        results = {}
 
-        for device in (
-            device_registry.all().values()
+        for name, device in (
+            self.all().items()
         ):
+            initialize = getattr(
+                device,
+                "initialize",
+                None,
+            )
 
-            if hasattr(
+            if callable(initialize):
+                try:
+                    results[name] = (
+                        initialize()
+                    )
+                except Exception as exc:
+                    results[name] = {
+                        "success": False,
+                        "error": str(exc),
+                    }
+
+        return results
+
+    def update_all(self):
+        results = {}
+
+        for name, device in (
+            self.all().items()
+        ):
+            if not getattr(
+                device,
+                "enabled",
+                True,
+            ):
+                continue
+
+            update = getattr(
                 device,
                 "update",
-            ):
+                None,
+            )
 
-                device.update()
+            if callable(update):
+                try:
+                    results[name] = (
+                        update()
+                    )
+                except Exception as exc:
+                    results[name] = {
+                        "success": False,
+                        "error": str(exc),
+                    }
+
+        return results
 
     def reset_all(self):
+        results = {}
 
-        for device in (
-            device_registry.all().values()
+        for name, device in (
+            self.all().items()
         ):
-
-            if hasattr(
+            reset = getattr(
                 device,
                 "reset",
-            ):
+                None,
+            )
 
-                device.reset()
+            if callable(reset):
+                try:
+                    results[name] = (
+                        reset()
+                    )
+                except Exception as exc:
+                    results[name] = {
+                        "success": False,
+                        "error": str(exc),
+                    }
+
+        return results
 
     def clear(self):
-
-        device_registry.clear()
+        return device_registry.clear()
 
 
 device_manager = DeviceManager()
