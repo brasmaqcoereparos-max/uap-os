@@ -12,18 +12,24 @@ from app.modules.simulator.programming.simulator.runtime.runtime_gpio import (
 
 
 class LEDDevice(DeviceBase):
-
     def __init__(
         self,
         name,
         pin,
     ):
-        super().__init__(name)
+        super().__init__(
+            name=name,
+            category="output",
+            description="LED digital",
+            icon="lightbulb",
+        )
 
         self.pin = pin
         self.state = False
 
     def on(self):
+        if not self.enabled:
+            return False
 
         self.state = True
 
@@ -32,8 +38,9 @@ class LEDDevice(DeviceBase):
             True,
         )
 
-    def off(self):
+        return True
 
+    def off(self):
         self.state = False
 
         runtime_gpio.write(
@@ -41,16 +48,42 @@ class LEDDevice(DeviceBase):
             False,
         )
 
-    def toggle(self):
+        return True
 
+    def toggle(self):
         if self.state:
-            self.off()
-        else:
-            self.on()
+            return self.off()
+
+        return self.on()
 
     def update(self):
-        pass
+        reader = getattr(
+            runtime_gpio,
+            "read",
+            None,
+        )
+
+        if callable(reader):
+            value = reader(
+                self.pin
+            )
+
+            if value is not None:
+                self.state = bool(
+                    value
+                )
+
+        return self.state
 
     def reset(self):
+        return self.off()
 
-        self.off()
+    def to_dict(self):
+        data = super().to_dict()
+
+        data.update({
+            "pin": self.pin,
+            "state": self.state,
+        })
+
+        return data
