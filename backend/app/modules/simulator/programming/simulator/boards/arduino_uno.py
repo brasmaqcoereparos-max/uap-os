@@ -1,50 +1,27 @@
 """
-Modelo virtual Arduino Uno.
+Arduino UNO virtual utilizado pelo SimulatorService.
 """
 
-from app.modules.simulator.programming.simulator.boards.board_base import (
-    BoardBase,
+from app.modules.simulator.boards.virtual_board import (
+    VirtualBoard,
 )
 
 
-class ArduinoUNO(BoardBase):
+class ArduinoUNO(VirtualBoard):
 
-    name = "Arduino Uno"
+    BOARD_TYPE = "Arduino UNO"
 
-    manufacturer = "Arduino"
+    MANUFACTURER = "Arduino"
 
-    gpio_count = 20
-    pwm_count = 6
-    adc_count = 6
+    CPU = "ATmega328P"
 
-    flash_size = 32768
-    ram_size = 2048
+    FREQUENCY_HZ = 16_000_000
 
-    cpu = "ATmega328P"
+    FLASH_SIZE = 32_768
 
-    frequency = 16000000
+    RAM_SIZE = 2_048
 
-    architecture = "AVR"
-
-    voltage = 5.0
-
-    digital_pins = tuple(
-        range(
-            0,
-            14,
-        )
-    )
-
-    analog_pins = (
-        "A0",
-        "A1",
-        "A2",
-        "A3",
-        "A4",
-        "A5",
-    )
-
-    pwm_pins = (
+    PWM_PINS = (
         3,
         5,
         6,
@@ -53,45 +30,73 @@ class ArduinoUNO(BoardBase):
         11,
     )
 
-    uart_pins = {
-        "rx": 0,
-        "tx": 1,
-    }
-
-    i2c_pins = {
-        "sda": "A4",
-        "scl": "A5",
-    }
-
-    spi_pins = {
-        "ss": 10,
-        "mosi": 11,
-        "miso": 12,
-        "sck": 13,
-    }
+    def __init__(
+        self,
+        board_id: str,
+        name: str,
+    ):
+        super().__init__(
+            board_id=board_id,
+            name=name,
+            board_type=self.BOARD_TYPE,
+            digital_pins=14,
+            analog_pins=6,
+            pwm_pins=self.PWM_PINS,
+            metadata={
+                "manufacturer": (
+                    self.MANUFACTURER
+                ),
+                "cpu": self.CPU,
+                "frequency_hz": (
+                    self.FREQUENCY_HZ
+                ),
+                "flash_size": (
+                    self.FLASH_SIZE
+                ),
+                "ram_size": (
+                    self.RAM_SIZE
+                ),
+            },
+            capabilities={
+                "uart": 1,
+                "spi": 1,
+                "i2c": 1,
+                "adc_resolution_bits": 10,
+                "logic_voltage": 5.0,
+            },
+        )
 
     def capabilities(self):
         data = super().capabilities()
 
         data.update({
-            "digital_pins": list(
-                self.digital_pins
+            "manufacturer": (
+                self.MANUFACTURER
             ),
-            "analog_pins": list(
-                self.analog_pins
+            "cpu": self.CPU,
+            "frequency_hz": (
+                self.FREQUENCY_HZ
             ),
-            "pwm_pins": list(
-                self.pwm_pins
+            "flash_size": (
+                self.FLASH_SIZE
             ),
-            "uart": dict(
-                self.uart_pins
+            "ram_size": (
+                self.RAM_SIZE
             ),
-            "i2c": dict(
-                self.i2c_pins
-            ),
-            "spi": dict(
-                self.spi_pins
-            ),
+            "uart_pins": {
+                "rx": 0,
+                "tx": 1,
+            },
+            "i2c_pins": {
+                "sda": "A4",
+                "scl": "A5",
+            },
+            "spi_pins": {
+                "ss": 10,
+                "mosi": 11,
+                "miso": 12,
+                "sck": 13,
+            },
         })
 
         return data
