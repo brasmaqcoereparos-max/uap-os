@@ -1,7 +1,14 @@
+"""
+Biblioteca de componentes visuais do UAP.
+"""
+
+
 class ComponentLibrary:
+
     def __init__(self):
         self.components = {}
         self.metadata = {}
+        self.aliases = {}
 
     def register(
         self,
@@ -11,6 +18,9 @@ class ComponentLibrary:
         description="",
         icon="",
         replace=True,
+        aliases=None,
+        tags=None,
+        version="1.0",
     ):
         if not callable(
             component_class
@@ -38,41 +48,138 @@ class ComponentLibrary:
             key
         ] = component_class
 
+        alias_list = [
+            str(alias)
+            for alias
+            in (
+                aliases or []
+            )
+        ]
+
+        tag_list = [
+            str(tag)
+            for tag
+            in (
+                tags or []
+            )
+        ]
+
         self.metadata[
             key
         ] = {
             "name": key,
-            "category": str(category),
+            "category": str(
+                category
+            ),
             "description": str(
                 description
             ),
             "icon": str(icon),
+            "aliases": alias_list,
+            "tags": tag_list,
+            "version": str(
+                version
+            ),
         }
+
+        for alias in alias_list:
+            self.aliases[
+                alias
+            ] = key
 
         return component_class
 
-    def unregister(self, name):
-        key = str(name)
+    def unregister(
+        self,
+        name,
+    ):
+        key = self.resolve_name(
+            name
+        )
 
-        self.metadata.pop(
+        if key is None:
+            return None
+
+        metadata = self.metadata.pop(
             key,
             None,
         )
+
+        if metadata:
+            for alias in metadata.get(
+                "aliases",
+                [],
+            ):
+                self.aliases.pop(
+                    alias,
+                    None,
+                )
 
         return self.components.pop(
             key,
             None,
         )
 
-    def get(self, name):
-        return self.components.get(
-            str(name)
+    def resolve_name(
+        self,
+        name,
+    ):
+        key = str(name)
+
+        if key in self.components:
+            return key
+
+        alias = self.aliases.get(
+            key
         )
 
-    def exists(self, name):
+        if alias is not None:
+            return alias
+
+        lowered = key.lower()
+
+        for registered in (
+            self.components
+        ):
+            if (
+                registered.lower()
+                == lowered
+            ):
+                return registered
+
+        for alias_name, target in (
+            self.aliases.items()
+        ):
+            if (
+                alias_name.lower()
+                == lowered
+            ):
+                return target
+
+        return None
+
+    def get(
+        self,
+        name,
+    ):
+        key = self.resolve_name(
+            name
+        )
+
+        if key is None:
+            return None
+
+        return self.components.get(
+            key
+        )
+
+    def exists(
+        self,
+        name,
+    ):
         return (
-            str(name)
-            in self.components
+            self.resolve_name(name)
+            is not None
         )
 
     def create(
@@ -111,7 +218,58 @@ class ComponentLibrary:
             in self.metadata.values()
         })
 
-    def search(self, text):
+    def by_category(
+        self,
+        category,
+    ):
+        expected = str(
+            category
+        ).lower()
+
+        return [
+            name
+            for name, data
+            in self.metadata.items()
+            if (
+                data.get(
+                    "category",
+                    "",
+                ).lower()
+                == expected
+            )
+        ]
+
+    def by_tag(
+        self,
+        tag,
+    ):
+        expected = str(
+            tag
+        ).lower()
+
+        result = []
+
+        for name, data in (
+            self.metadata.items()
+        ):
+            tags = [
+                str(item).lower()
+                for item
+                in data.get(
+                    "tags",
+                    [],
+                )
+            ]
+
+            if expected in tags:
+                result.append(name)
+
+        return result
+
+    def search(
+        self,
+        text,
+    ):
         query = str(
             text or ""
         ).strip().lower()
@@ -126,8 +284,22 @@ class ComponentLibrary:
         ):
             searchable = " ".join([
                 name,
-                data["category"],
-                data["description"],
+                data.get(
+                    "category",
+                    "",
+                ),
+                data.get(
+                    "description",
+                    "",
+                ),
+                *data.get(
+                    "aliases",
+                    [],
+                ),
+                *data.get(
+                    "tags",
+                    [],
+                ),
             ]).lower()
 
             if query in searchable:
@@ -135,9 +307,19 @@ class ComponentLibrary:
 
         return result
 
-    def info(self, name):
+    def info(
+        self,
+        name,
+    ):
+        key = self.resolve_name(
+            name
+        )
+
+        if key is None:
+            return None
+
         data = self.metadata.get(
-            str(name)
+            key
         )
 
         return (
@@ -147,13 +329,29 @@ class ComponentLibrary:
         )
 
     def count(self):
-        return len(self.components)
+        return len(
+            self.components
+        )
 
     def clear(self):
         self.components.clear()
         self.metadata.clear()
+        self.aliases.clear()
+
+    def to_dict(self):
+        return {
+            "count": self.count(),
+            "categories": (
+                self.categories()
+            ),
+            "components": {
+                name: dict(data)
+                for name, data
+                in self.metadata.items()
+            },
+        }
 
 
 component_library = (
     ComponentLibrary()
-)
+        )
