@@ -1,4 +1,10 @@
+"""
+Gerenciador dos componentes do circuito visual UAP.
+"""
+
+
 class ComponentManager:
+
     def __init__(self):
         self.components = {}
 
@@ -43,18 +49,27 @@ class ComponentManager:
 
         return component
 
-    def get(self, component_id):
+    def get(
+        self,
+        component_id,
+    ):
         return self.components.get(
             str(component_id)
         )
 
-    def exists(self, component_id):
+    def exists(
+        self,
+        component_id,
+    ):
         return (
             str(component_id)
             in self.components
         )
 
-    def remove(self, component_id):
+    def remove(
+        self,
+        component_id,
+    ):
         return self.components.pop(
             str(component_id),
             None,
@@ -70,6 +85,62 @@ class ComponentManager:
             self.components.keys()
         )
 
+    def find_by_name(
+        self,
+        name,
+    ):
+        expected = str(
+            name
+        ).lower()
+
+        return [
+            component
+            for component
+            in self.components.values()
+            if str(
+                getattr(
+                    component,
+                    "name",
+                    "",
+                )
+            ).lower()
+            == expected
+        ]
+
+    def find_by_type(
+        self,
+        component_type,
+    ):
+        expected = str(
+            component_type
+        ).lower()
+
+        return [
+            component
+            for component
+            in self.components.values()
+            if str(
+                getattr(
+                    component,
+                    "component_type",
+                    "",
+                )
+            ).lower()
+            == expected
+        ]
+
+    def enabled(self):
+        return [
+            component
+            for component
+            in self.components.values()
+            if getattr(
+                component,
+                "enabled",
+                True,
+            )
+        ]
+
     def selected(self):
         return [
             component
@@ -81,6 +152,58 @@ class ComponentManager:
                 False,
             )
         ]
+
+    def select(
+        self,
+        component_id,
+        exclusive=False,
+    ):
+        component = self.get(
+            component_id
+        )
+
+        if component is None:
+            return False
+
+        if exclusive:
+            self.clear_selection()
+
+        selector = getattr(
+            component,
+            "select",
+            None,
+        )
+
+        if callable(selector):
+            selector()
+        else:
+            component.selected = True
+
+        return True
+
+    def deselect(
+        self,
+        component_id,
+    ):
+        component = self.get(
+            component_id
+        )
+
+        if component is None:
+            return False
+
+        deselector = getattr(
+            component,
+            "deselect",
+            None,
+        )
+
+        if callable(deselector):
+            deselector()
+        else:
+            component.selected = False
+
+        return True
 
     def move(
         self,
@@ -102,12 +225,124 @@ class ComponentManager:
         )
 
         if callable(move):
-            move(x, y)
+            move(
+                x,
+                y,
+            )
         else:
             component.x = float(x)
             component.y = float(y)
 
         return True
+
+    def move_by(
+        self,
+        component_id,
+        dx,
+        dy,
+    ):
+        component = self.get(
+            component_id
+        )
+
+        if component is None:
+            return False
+
+        move = getattr(
+            component,
+            "move_by",
+            None,
+        )
+
+        if callable(move):
+            move(
+                dx,
+                dy,
+            )
+        else:
+            component.x += float(dx)
+            component.y += float(dy)
+
+        return True
+
+    def rotate(
+        self,
+        component_id,
+        angle,
+    ):
+        component = self.get(
+            component_id
+        )
+
+        if component is None:
+            return False
+
+        method = getattr(
+            component,
+            "rotate",
+            None,
+        )
+
+        if callable(method):
+            method(angle)
+
+        else:
+            component.rotation = (
+                float(
+                    getattr(
+                        component,
+                        "rotation",
+                        0,
+                    )
+                )
+                + float(angle)
+            ) % 360
+
+        return True
+
+    def bind_device(
+        self,
+        component_id,
+        device,
+    ):
+        component = self.get(
+            component_id
+        )
+
+        if component is None:
+            return False
+
+        binder = getattr(
+            component,
+            "bind_device",
+            None,
+        )
+
+        if callable(binder):
+            binder(device)
+        else:
+            component.device = device
+
+        return True
+
+    def update_devices(self):
+        result = {}
+
+        for component_id, component in (
+            self.components.items()
+        ):
+            updater = getattr(
+                component,
+                "update_device",
+                None,
+            )
+
+            if callable(updater):
+                result[
+                    component_id
+                ] = updater()
+
+        return result
 
     def clear_selection(self):
         for component in (
@@ -122,6 +357,14 @@ class ComponentManager:
             if callable(deselect):
                 deselect()
 
+            elif hasattr(
+                component,
+                "selected",
+            ):
+                component.selected = (
+                    False
+                )
+
     def clear(self):
         count = len(
             self.components
@@ -132,7 +375,9 @@ class ComponentManager:
         return count
 
     def count(self):
-        return len(self.components)
+        return len(
+            self.components
+        )
 
     def to_dict(self):
         return {
@@ -151,4 +396,4 @@ class ComponentManager:
 
 component_manager = (
     ComponentManager()
-            )
+    )
