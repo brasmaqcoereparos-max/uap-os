@@ -13,15 +13,24 @@ class SevenSegmentDevice(DeviceBase):
         self,
         name,
     ):
-        super().__init__(name)
+        super().__init__(
+            name=name,
+            category="display",
+            description=(
+                "Display de sete segmentos"
+            ),
+            icon="display",
+        )
 
         self.value = 0
-        self.enabled = True
+        self.decimal_point = False
 
     def display(
         self,
         value,
     ):
+        if not self.enabled:
+            return False
 
         self.value = max(
             0,
@@ -31,22 +40,50 @@ class SevenSegmentDevice(DeviceBase):
             ),
         )
 
-    def clear(self):
+        return self.value
 
+    def clear(self):
         self.value = 0
+        self.decimal_point = False
+
+        return True
+
+    def set_decimal_point(
+        self,
+        enabled,
+    ):
+        self.decimal_point = bool(
+            enabled
+        )
+
+        return self.decimal_point
 
     def enable(self):
-
-        self.enabled = True
+        super().enable()
+        return self
 
     def disable(self):
-
-        self.enabled = False
+        super().disable()
+        return self
 
     def update(self):
-        pass
+        return self.value
 
     def reset(self):
-
         self.value = 0
+        self.decimal_point = False
         self.enabled = True
+
+        return True
+
+    def to_dict(self):
+        data = super().to_dict()
+
+        data.update({
+            "value": self.value,
+            "decimal_point": (
+                self.decimal_point
+            ),
+        })
+
+        return data
