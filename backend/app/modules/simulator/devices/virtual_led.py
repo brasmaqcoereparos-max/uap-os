@@ -1,5 +1,5 @@
 """
-LED virtual do simulador público UAP.
+Botão virtual do simulador público UAP.
 """
 
 from app.modules.simulator.devices.virtual_device import (
@@ -7,7 +7,7 @@ from app.modules.simulator.devices.virtual_device import (
 )
 
 
-class VirtualLED(
+class VirtualButton(
     VirtualDevice
 ):
 
@@ -19,41 +19,41 @@ class VirtualLED(
         super().__init__(
             device_id,
             name,
-            "LED",
+            "BUTTON",
         )
 
-        self.brightness = 100
+        self.press_count = 0
 
-    def set_brightness(
-        self,
-        value,
-    ):
-        value = int(
-            value
+    def press(self):
+        if not self.enabled:
+            return False
+
+        self.state = True
+        self.press_count += 1
+
+        self._touch()
+
+        return True
+
+    def release(self):
+        if not self.state:
+            return False
+
+        self.state = False
+
+        self._touch()
+
+        return True
+
+    def is_pressed(self):
+        return bool(
+            self.state
         )
-
-        value = max(
-            0,
-            min(
-                100,
-                value,
-            ),
-        )
-
-        self.brightness = value
-
-        if value == 0:
-            self.off()
-
-        return self.brightness
-
-    def get_brightness(self):
-        return self.brightness
 
     def reset(self):
         super().reset()
 
-        self.brightness = 100
+        self.press_count = 0
 
         return True
 
@@ -63,7 +63,7 @@ class VirtualLED(
         )
 
         data[
-            "brightness"
-        ] = self.brightness
+            "press_count"
+        ] = self.press_count
 
         return data
