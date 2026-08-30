@@ -71,4 +71,4 @@ def info():
         "version_info": (
             VERSION_INFO
         ),
-  }
+    }
