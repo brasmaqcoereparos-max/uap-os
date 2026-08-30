@@ -1,52 +1,37 @@
 """
-Virtual Board Layer (VBL) do UAP.
+Placas virtuais da camada pública do simulador UAP.
 
-Contém as placas eletrônicas disponíveis
-para uso pelo simulador e pelo Board SDK.
+Esta camada é utilizada pelo SimulatorService para criação
+rápida de placas virtuais.
+
+Ela é distinta do Board SDK interno localizado em:
+
+    simulator/programming/simulator/boards/
+
+A separação é preservada para não quebrar os contratos
+existentes do projeto.
 """
 
-from app.modules.simulator.programming.simulator.boards.board_base import (
-    BoardBase,
+from app.modules.simulator.boards.virtual_board import (
+    VirtualBoard,
 )
 
-from app.modules.simulator.programming.simulator.boards.arduino_uno import (
+from app.modules.simulator.boards.arduino_uno import (
     ArduinoUNO,
 )
 
-from app.modules.simulator.programming.simulator.boards.arduino_mega2560 import (
-    ArduinoMega2560,
+from app.modules.simulator.boards.esp32 import (
+    ESP32Board,
 )
 
-from app.modules.simulator.programming.simulator.boards.esp32_devkit import (
-    ESP32DevKit,
-)
-
-from app.modules.simulator.programming.simulator.boards.esp8266 import (
-    ESP8266,
-)
-
-from app.modules.simulator.programming.simulator.boards.raspberry_pi_pico import (
-    RaspberryPiPico,
-)
-
-from app.modules.simulator.programming.simulator.boards.board_manager import (
-    BoardManager,
-    board_manager,
-)
-
-from app.modules.simulator.programming.simulator.boards.board_loader import (
-    BoardLoader,
+from app.modules.simulator.boards.raspberry_pi import (
+    RaspberryPiBoard,
 )
 
 
 __all__ = [
-    "BoardBase",
+    "VirtualBoard",
     "ArduinoUNO",
-    "ArduinoMega2560",
-    "ESP32DevKit",
-    "ESP8266",
-    "RaspberryPiPico",
-    "BoardManager",
-    "board_manager",
-    "BoardLoader",
+    "ESP32Board",
+    "RaspberryPiBoard",
 ]
