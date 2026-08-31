@@ -1,11 +1,20 @@
+"""
+Sequência ordenada de ações da automação UAP.
+"""
+
+
 class AutomationSequence:
+
     def __init__(
         self,
         name,
         description="",
         metadata=None,
     ):
-        self.name = str(name)
+        self.name = str(
+            name
+        )
+
         self.description = str(
             description
         )
@@ -18,6 +27,9 @@ class AutomationSequence:
             metadata or {}
         )
 
+        self.execution_count = 0
+        self.last_result = None
+
     def add_step(
         self,
         step,
@@ -29,16 +41,23 @@ class AutomationSequence:
             "name": (
                 str(name)
                 if name is not None
-                else f"step_{len(self.steps) + 1}"
+                else (
+                    f"step_"
+                    f"{len(self.steps) + 1}"
+                )
             ),
             "action": step,
-            "enabled": bool(enabled),
+            "enabled": bool(
+                enabled
+            ),
             "metadata": dict(
                 metadata or {}
             ),
         }
 
-        self.steps.append(item)
+        self.steps.append(
+            item
+        )
 
         return item
 
@@ -64,7 +83,9 @@ class AutomationSequence:
                 else f"step_{index + 1}"
             ),
             "action": step,
-            "enabled": bool(enabled),
+            "enabled": bool(
+                enabled
+            ),
             "metadata": {},
         }
 
@@ -79,14 +100,20 @@ class AutomationSequence:
         self,
         index,
     ):
-        index = int(index)
+        index = int(
+            index
+        )
 
-        if not 0 <= index < len(
-            self.steps
+        if not (
+            0
+            <= index
+            < len(self.steps)
         ):
             return False
 
-        self.steps.pop(index)
+        self.steps.pop(
+            index
+        )
 
         return True
 
@@ -95,11 +122,18 @@ class AutomationSequence:
         source,
         target,
     ):
-        source = int(source)
-        target = int(target)
+        source = int(
+            source
+        )
 
-        if not 0 <= source < len(
-            self.steps
+        target = int(
+            target
+        )
+
+        if not (
+            0
+            <= source
+            < len(self.steps)
         ):
             return False
 
@@ -130,6 +164,8 @@ class AutomationSequence:
             int(index)
         ]["enabled"] = True
 
+        return True
+
     def disable_step(
         self,
         index,
@@ -138,14 +174,61 @@ class AutomationSequence:
             int(index)
         ]["enabled"] = False
 
+        return True
+
+    def get_step(
+        self,
+        index,
+    ):
+        index = int(
+            index
+        )
+
+        if not (
+            0
+            <= index
+            < len(self.steps)
+        ):
+            return None
+
+        return self.steps[
+            index
+        ]
+
     def clear(self):
+        count = len(
+            self.steps
+        )
+
         self.steps.clear()
 
+        return count
+
     def list_steps(self):
-        return list(self.steps)
+        return list(
+            self.steps
+        )
 
     def count(self):
-        return len(self.steps)
+        return len(
+            self.steps
+        )
+
+    def enable(self):
+        self.enabled = True
+
+        return self
+
+    def disable(self):
+        self.enabled = False
+
+        return self
+
+    def reset_statistics(self):
+        self.execution_count = 0
+        self.last_result = None
+
+        return True
 
     def to_dict(self):
         result = []
@@ -153,7 +236,9 @@ class AutomationSequence:
         for index, step in enumerate(
             self.steps
         ):
-            action = step["action"]
+            action = step[
+                "action"
+            ]
 
             serializer = getattr(
                 action,
@@ -182,9 +267,17 @@ class AutomationSequence:
             "description": (
                 self.description
             ),
-            "enabled": self.enabled,
+            "enabled": (
+                self.enabled
+            ),
             "steps": result,
             "metadata": dict(
                 self.metadata
             ),
-    }
+            "execution_count": (
+                self.execution_count
+            ),
+            "last_result": (
+                self.last_result
+            ),
+                    }
