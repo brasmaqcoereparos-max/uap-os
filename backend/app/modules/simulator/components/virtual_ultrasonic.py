@@ -1,3 +1,7 @@
+"""
+Sensor ultrassônico virtual.
+"""
+
 import random
 
 from app.modules.simulator.components.virtual_sensor import (
@@ -8,6 +12,7 @@ from app.modules.simulator.components.virtual_sensor import (
 class VirtualUltrasonic(
     VirtualSensor
 ):
+
     def __init__(
         self,
         sensor_id,
@@ -19,9 +24,7 @@ class VirtualUltrasonic(
         super().__init__(
             sensor_id=sensor_id,
             name=name,
-            sensor_type=(
-                "ULTRASONIC"
-            ),
+            sensor_type="ULTRASONIC",
             value=0.0,
             unit=unit,
         )
@@ -55,6 +58,8 @@ class VirtualUltrasonic(
             2,
         )
 
+        self.update_count += 1
+
         return self.set_value(
             value
         )
@@ -77,6 +82,29 @@ class VirtualUltrasonic(
             distance
         )
 
+    def set_range(
+        self,
+        minimum,
+        maximum,
+    ):
+        minimum = float(
+            minimum
+        )
+
+        maximum = float(
+            maximum
+        )
+
+        if minimum > maximum:
+            raise ValueError(
+                "Faixa inválida."
+            )
+
+        self.minimum = minimum
+        self.maximum = maximum
+
+        return True
+
     def is_near(
         self,
         threshold,
@@ -86,15 +114,24 @@ class VirtualUltrasonic(
             <= float(threshold)
         )
 
+    def is_far(
+        self,
+        threshold,
+    ):
+        return (
+            float(self.value)
+            > float(threshold)
+        )
+
     def status(self):
         data = super().status()
 
-        data["minimum"] = (
-            self.minimum
-        )
+        data[
+            "minimum"
+        ] = self.minimum
 
-        data["maximum"] = (
-            self.maximum
-        )
+        data[
+            "maximum"
+        ] = self.maximum
 
         return data
