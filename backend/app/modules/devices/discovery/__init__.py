@@ -11,7 +11,9 @@ class DiscoveredDevice:
     device_id: str
     name: str
     protocol: str
+
     address: str | None = None
+
     metadata: dict[str, Any] = field(
         default_factory=dict
     )
@@ -26,14 +28,19 @@ class DeviceDiscovery:
         self,
         device: DiscoveredDevice,
     ):
-        self.devices[device.device_id] = device
+        self.devices[
+            device.device_id
+        ] = device
+
         return device
 
     def get(
         self,
         device_id: str,
     ):
-        return self.devices.get(device_id)
+        return self.devices.get(
+            device_id
+        )
 
     def remove(
         self,
@@ -53,7 +60,17 @@ class DeviceDiscovery:
         self.devices.clear()
 
 
+def create_default_discovery_service():
+    from app.modules.devices.providers import (
+        create_default_discovery_service
+        as factory,
+    )
+
+    return factory()
+
+
 __all__ = [
     "DiscoveredDevice",
     "DeviceDiscovery",
-        ]
+    "create_default_discovery_service",
+]
