@@ -1,3 +1,7 @@
+"""
+Sensor virtual de temperatura.
+"""
+
 import random
 
 from app.modules.simulator.components.virtual_sensor import (
@@ -8,6 +12,7 @@ from app.modules.simulator.components.virtual_sensor import (
 class VirtualTemperature(
     VirtualSensor
 ):
+
     def __init__(
         self,
         sensor_id,
@@ -19,9 +24,7 @@ class VirtualTemperature(
         super().__init__(
             sensor_id=sensor_id,
             name=name,
-            sensor_type=(
-                "TEMPERATURE"
-            ),
+            sensor_type="TEMPERATURE",
             value=0.0,
             unit=unit,
         )
@@ -55,6 +58,8 @@ class VirtualTemperature(
             1,
         )
 
+        self.update_count += 1
+
         return self.set_value(
             value
         )
@@ -64,8 +69,13 @@ class VirtualTemperature(
         minimum,
         maximum,
     ):
-        minimum = float(minimum)
-        maximum = float(maximum)
+        minimum = float(
+            minimum
+        )
+
+        maximum = float(
+            maximum
+        )
 
         if minimum > maximum:
             raise ValueError(
@@ -77,15 +87,28 @@ class VirtualTemperature(
 
         return True
 
+    def in_range(
+        self,
+        value=None,
+    ):
+        if value is None:
+            value = self.value
+
+        return (
+            self.minimum
+            <= float(value)
+            <= self.maximum
+        )
+
     def status(self):
         data = super().status()
 
-        data["minimum"] = (
-            self.minimum
-        )
+        data[
+            "minimum"
+        ] = self.minimum
 
-        data["maximum"] = (
-            self.maximum
-        )
+        data[
+            "maximum"
+        ] = self.maximum
 
         return data
