@@ -1,5 +1,6 @@
 """
-Descoberta de dispositivos do Universal Device Engine.
+Descoberta de dispositivos do
+Universal Device Engine.
 """
 
 from dataclasses import dataclass, field
@@ -11,8 +12,11 @@ class DiscoveryResult:
     device_id: str
     name: str
     device_type: str
+
     protocol: str | None = None
+
     address: str | None = None
+
     metadata: dict[str, Any] = field(
         default_factory=dict
     )
@@ -38,10 +42,14 @@ class DeviceDiscovery:
             device_type=device_type,
             protocol=protocol,
             address=address,
-            metadata=metadata or {},
+            metadata=(
+                metadata or {}
+            ),
         )
 
-        self.devices[device_id] = result
+        self.devices[
+            device_id
+        ] = result
 
         return result
 
@@ -69,3 +77,8 @@ class DeviceDiscovery:
 
     def clear(self):
         self.devices.clear()
+
+
+device_discovery = (
+    DeviceDiscovery()
+        )
