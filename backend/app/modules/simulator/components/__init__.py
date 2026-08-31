@@ -1,3 +1,7 @@
+"""
+Componentes virtuais da camada pública do simulador UAP.
+"""
+
 from app.modules.simulator.components.virtual_sensor import (
     VirtualSensor,
 )
