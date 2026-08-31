@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.core.database import get_db
+from app.database.session import get_db
 from app.schemas.project import (
     ProjectCreate,
     ProjectResponse,
@@ -24,7 +24,6 @@ router = APIRouter(
 def list_projects(
     db: Session = Depends(get_db),
 ):
-
     return project_service.list(
         db
     )
@@ -38,7 +37,6 @@ def create_project(
     data: ProjectCreate,
     db: Session = Depends(get_db),
 ):
-
     return project_service.create(
         db,
         data,
@@ -53,14 +51,12 @@ def get_project(
     project_id: str,
     db: Session = Depends(get_db),
 ):
-
     project = project_service.get(
         db,
         project_id,
     )
 
     if project is None:
-
         raise HTTPException(
             status_code=404,
             detail="Projeto não encontrado.",
