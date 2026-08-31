@@ -1,7 +1,15 @@
+"""
+Trigger universal da automação UAP.
+
+O trigger representa o evento ou condição que permite
+o disparo de uma regra.
+"""
+
 import uuid
 
 
 class AutomationTrigger:
+
     def __init__(
         self,
         name,
@@ -30,13 +38,20 @@ class AutomationTrigger:
 
         self.condition = condition
 
-        self.enabled = bool(enabled)
+        self.enabled = bool(
+            enabled
+        )
 
         self.metadata = dict(
             metadata or {}
         )
 
         self.activation_count = 0
+
+        self.rejection_count = 0
+
+        self.last_context = None
+        self.last_result = None
 
     def set_parameter(
         self,
@@ -59,12 +74,23 @@ class AutomationTrigger:
             default,
         )
 
+    def remove_parameter(
+        self,
+        name,
+    ):
+        return self.parameters.pop(
+            str(name),
+            None,
+        )
+
     def enable(self):
         self.enabled = True
+
         return self
 
     def disable(self):
         self.enabled = False
+
         return self
 
     def can_activate(
@@ -72,9 +98,13 @@ class AutomationTrigger:
         context=None,
     ):
         if not self.enabled:
+            self.last_result = False
+
             return False
 
         if self.condition is None:
+            self.last_result = True
+
             return True
 
         evaluator = getattr(
@@ -85,41 +115,54 @@ class AutomationTrigger:
 
         if callable(evaluator):
             try:
-                return bool(
+                result = bool(
                     evaluator(
                         context or {}
                     )
                 )
+
             except TypeError:
-                return bool(
+                result = bool(
                     evaluator()
                 )
 
-        if callable(
+        elif callable(
             self.condition
         ):
             try:
-                return bool(
+                result = bool(
                     self.condition(
                         context or {}
                     )
                 )
+
             except TypeError:
-                return bool(
+                result = bool(
                     self.condition()
                 )
 
-        return bool(
-            self.condition
-        )
+        else:
+            result = bool(
+                self.condition
+            )
+
+        self.last_result = result
+
+        return result
 
     def activate(
         self,
         context=None,
     ):
+        self.last_context = dict(
+            context or {}
+        )
+
         if not self.can_activate(
             context=context
         ):
+            self.rejection_count += 1
+
             return False
 
         self.activation_count += 1
@@ -128,6 +171,12 @@ class AutomationTrigger:
 
     def reset(self):
         self.activation_count = 0
+        self.rejection_count = 0
+
+        self.last_context = None
+        self.last_result = None
+
+        return True
 
     def to_dict(self):
         return {
@@ -141,7 +190,13 @@ class AutomationTrigger:
             "activation_count": (
                 self.activation_count
             ),
+            "rejection_count": (
+                self.rejection_count
+            ),
+            "last_result": (
+                self.last_result
+            ),
             "metadata": dict(
                 self.metadata
             ),
-        }
+            }
