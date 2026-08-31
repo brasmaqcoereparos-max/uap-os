@@ -3,7 +3,9 @@ Universal Device Engine
 Gerenciador de dispositivos.
 """
 
-from app.modules.ude.device import Device
+from app.modules.ude.device import (
+    Device,
+)
 
 
 class DeviceManager:
@@ -15,7 +17,10 @@ class DeviceManager:
         self,
         device: Device,
     ):
-        self.devices[device.id] = device
+        self.devices[
+            device.id
+        ] = device
+
         return device
 
     def create(
@@ -28,13 +33,17 @@ class DeviceManager:
             device_type=device_type,
         )
 
-        return self.add(device)
+        return self.add(
+            device
+        )
 
     def get(
         self,
         device_id,
     ):
-        return self.devices.get(device_id)
+        return self.devices.get(
+            device_id
+        )
 
     def remove(
         self,
@@ -54,11 +63,15 @@ class DeviceManager:
         self,
         device_id,
     ):
-        device = self.get(device_id)
+        device = self.get(
+            device_id
+        )
 
         if device is None:
             raise KeyError(
-                f"Device '{device_id}' not found"
+                f"Device "
+                f"'{device_id}' "
+                f"not found"
             )
 
         return device.connect()
@@ -67,11 +80,15 @@ class DeviceManager:
         self,
         device_id,
     ):
-        device = self.get(device_id)
+        device = self.get(
+            device_id
+        )
 
         if device is None:
             raise KeyError(
-                f"Device '{device_id}' not found"
+                f"Device "
+                f"'{device_id}' "
+                f"not found"
             )
 
         return device.disconnect()
@@ -80,11 +97,15 @@ class DeviceManager:
         self,
         device_id,
     ):
-        device = self.get(device_id)
+        device = self.get(
+            device_id
+        )
 
         if device is None:
             raise KeyError(
-                f"Device '{device_id}' not found"
+                f"Device "
+                f"'{device_id}' "
+                f"not found"
             )
 
         return device.enable()
@@ -93,14 +114,21 @@ class DeviceManager:
         self,
         device_id,
     ):
-        device = self.get(device_id)
+        device = self.get(
+            device_id
+        )
 
         if device is None:
             raise KeyError(
-                f"Device '{device_id}' not found"
+                f"Device "
+                f"'{device_id}' "
+                f"not found"
             )
 
         return device.disable()
 
     def clear(self):
         self.devices.clear()
+
+
+device_manager = DeviceManager()
