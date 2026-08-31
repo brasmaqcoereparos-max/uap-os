@@ -1,4 +1,3 @@
-
 """
 Dispositivos virtuais públicos do simulador UAP.
 
