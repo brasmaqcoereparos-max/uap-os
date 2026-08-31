@@ -1,3 +1,7 @@
+"""
+Sensor virtual de umidade.
+"""
+
 import random
 
 from app.modules.simulator.components.virtual_sensor import (
@@ -8,6 +12,7 @@ from app.modules.simulator.components.virtual_sensor import (
 class VirtualHumidity(
     VirtualSensor
 ):
+
     def __init__(
         self,
         sensor_id,
@@ -50,6 +55,8 @@ class VirtualHumidity(
             self.maximum,
         )
 
+        self.update_count += 1
+
         return self.set_value(
             value
         )
@@ -59,8 +66,13 @@ class VirtualHumidity(
         minimum,
         maximum,
     ):
-        minimum = int(minimum)
-        maximum = int(maximum)
+        minimum = int(
+            minimum
+        )
+
+        maximum = int(
+            maximum
+        )
 
         if minimum > maximum:
             raise ValueError(
@@ -72,15 +84,28 @@ class VirtualHumidity(
 
         return True
 
+    def in_range(
+        self,
+        value=None,
+    ):
+        if value is None:
+            value = self.value
+
+        return (
+            self.minimum
+            <= int(value)
+            <= self.maximum
+        )
+
     def status(self):
         data = super().status()
 
-        data["minimum"] = (
-            self.minimum
-        )
+        data[
+            "minimum"
+        ] = self.minimum
 
-        data["maximum"] = (
-            self.maximum
-        )
+        data[
+            "maximum"
+        ] = self.maximum
 
         return data
