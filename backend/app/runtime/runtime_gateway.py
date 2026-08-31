@@ -1,26 +1,31 @@
-from app.runtime.runtime_api import (
-    runtime_api,
-)
-
-
 class RuntimeGateway:
 
-    def execute(self, command):
-        return runtime_api.execute(
+    def _api(self):
+        from app.runtime.runtime_api import (
+            runtime_api,
+        )
+
+        return runtime_api
+
+    def execute(
+        self,
+        command,
+    ):
+        return self._api().execute(
             command
         )
 
     def start(self):
-        return runtime_api.start()
+        return self._api().start()
 
     def stop(self):
-        return runtime_api.stop()
+        return self._api().stop()
 
     def health(self):
-        return runtime_api.health()
+        return self._api().health()
 
     def diagnostics(self):
-        return runtime_api.diagnostics()
+        return self._api().diagnostics()
 
 
 runtime_gateway = RuntimeGateway()
