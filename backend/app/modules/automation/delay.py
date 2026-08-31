@@ -1,7 +1,14 @@
+"""
+Temporização básica da automação UAP.
+
+O contrato original de wait(seconds) foi preservado.
+"""
+
 import time
 
 
 class AutomationDelay:
+
     def __init__(
         self,
         sleep_function=None,
@@ -11,10 +18,22 @@ class AutomationDelay:
             or time.sleep
         )
 
+        self.wait_count = 0
+
+        self.total_requested = 0.0
+        self.total_elapsed = 0.0
+
+        self.last_result = None
+
     @staticmethod
-    def validate(seconds):
+    def validate(
+        seconds,
+    ):
         try:
-            value = float(seconds)
+            value = float(
+                seconds
+            )
+
         except (
             TypeError,
             ValueError,
@@ -52,7 +71,17 @@ class AutomationDelay:
             - started_at
         )
 
-        return {
+        self.wait_count += 1
+
+        self.total_requested += (
+            seconds
+        )
+
+        self.total_elapsed += (
+            elapsed
+        )
+
+        self.last_result = {
             "requested_seconds": (
                 seconds
             ),
@@ -62,5 +91,37 @@ class AutomationDelay:
             "completed": True,
         }
 
+        return dict(
+            self.last_result
+        )
 
-automation_delay = AutomationDelay()
+    def reset_statistics(self):
+        self.wait_count = 0
+
+        self.total_requested = 0.0
+        self.total_elapsed = 0.0
+
+        self.last_result = None
+
+        return True
+
+    def status(self):
+        return {
+            "wait_count": (
+                self.wait_count
+            ),
+            "total_requested": (
+                self.total_requested
+            ),
+            "total_elapsed": (
+                self.total_elapsed
+            ),
+            "last_result": (
+                self.last_result
+            ),
+        }
+
+
+automation_delay = (
+    AutomationDelay()
+        )
