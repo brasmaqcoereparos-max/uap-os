@@ -1,6 +1,8 @@
 import uuid
+from typing import Any
 
 from app.modules.ui.enums import (
+    ActionType,
     LayoutType,
     ScreenType,
     WidgetType,
@@ -17,8 +19,8 @@ from app.modules.ui.screen import (
 from app.modules.ui.theme import (
     UITheme,
 )
-from app.modules.ui.widget import (
-    UIWidget,
+from app.modules.ui.widget_factory import (
+    UIWidgetFactory,
 )
 
 
@@ -52,8 +54,11 @@ class UIService:
             layout=layout,
         )
 
-        return ui_registry.register_screen(
-            screen
+        return (
+            ui_registry
+            .register_screen(
+                screen
+            )
         )
 
     @staticmethod
@@ -66,7 +71,9 @@ class UIService:
 
     @staticmethod
     def list_screens():
-        return ui_registry.list_screens()
+        return (
+            ui_registry.list_screens()
+        )
 
     @staticmethod
     def delete_screen(
@@ -84,6 +91,9 @@ class UIService:
         screen_id: str,
         name: str,
         widget_type: WidgetType,
+        properties: (
+            dict[str, Any] | None
+        ) = None,
     ):
         screen = (
             ui_registry.get_screen(
@@ -101,15 +111,81 @@ class UIService:
                 "Screen has no layout"
             )
 
-        widget = UIWidget(
-            id=str(uuid.uuid4()),
-            name=name,
-            widget_type=widget_type,
+        widget = (
+            UIWidgetFactory.create(
+                widget_type=widget_type,
+                name=name,
+                properties=properties,
+            )
         )
 
         screen.layout.add_widget(
             widget
         )
+
+        return widget
+
+    @staticmethod
+    def remove_widget(
+        screen_id: str,
+        widget_id: str,
+    ):
+        screen = (
+            ui_registry.get_screen(
+                screen_id
+            )
+        )
+
+        if (
+            not screen
+            or not screen.layout
+        ):
+            return False
+
+        return (
+            screen.layout
+            .remove_widget(
+                widget_id
+            )
+        )
+
+    @staticmethod
+    def configure_action(
+        screen_id: str,
+        widget_id: str,
+        action_type: ActionType,
+        action: dict[str, Any],
+    ):
+        screen = (
+            ui_registry.get_screen(
+                screen_id
+            )
+        )
+
+        if (
+            not screen
+            or not screen.layout
+        ):
+            raise ValueError(
+                "Screen not found"
+            )
+
+        widget = (
+            screen.layout.get_widget(
+                widget_id
+            )
+        )
+
+        if not widget:
+            raise ValueError(
+                "Widget not found"
+            )
+
+        widget.action_type = (
+            action_type
+        )
+
+        widget.action = dict(action)
 
         return widget
 
@@ -124,10 +200,15 @@ class UIService:
             mode=mode,
         )
 
-        return ui_registry.register_theme(
-            theme
+        return (
+            ui_registry
+            .register_theme(
+                theme
+            )
         )
 
     @staticmethod
     def list_themes():
-        return ui_registry.list_themes()
+        return (
+            ui_registry.list_themes()
+    )
