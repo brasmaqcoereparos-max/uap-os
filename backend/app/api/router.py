@@ -45,6 +45,10 @@ from app.modules.ui.router import (
 from app.modules.ui.studio_router import (
     router as ui_studio_router,
 )
+from app.modules.voice.router import (
+    router as voice_router,
+)
+
 
 router = APIRouter()
 
@@ -142,6 +146,15 @@ router.include_router(
 
 
 # ============================================================
+# VOICE
+# ============================================================
+
+router.include_router(
+    voice_router
+)
+
+
+# ============================================================
 # PLATFORM INFORMATION
 # ============================================================
 
@@ -164,4 +177,4 @@ def version():
     return {
         "name": "UAP OS",
         "version": "0.1.0",
-}
+    }
