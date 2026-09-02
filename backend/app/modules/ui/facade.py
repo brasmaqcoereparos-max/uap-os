@@ -13,6 +13,9 @@ from app.modules.ui.runtime_bridge import (
 from app.modules.ui.service import (
     UIService,
 )
+from app.modules.ui.studio_facade import (
+    ui_studio_facade,
+)
 
 
 class UIFacade:
@@ -22,9 +25,9 @@ class UIFacade:
         name: str,
         title: str = "",
         route: str = "/",
-        screen_type: ScreenType = (
-            ScreenType.STANDARD
-        ),
+        screen_type: (
+            ScreenType
+        ) = ScreenType.STANDARD,
     ):
         return UIService.create_screen(
             name=name,
@@ -66,6 +69,18 @@ class UIFacade:
 
     def health(self):
         return ui_health.check()
+
+    def studio(self):
+        return (
+            ui_studio_facade
+            .snapshot()
+        )
+
+    def initialize_studio(self):
+        return (
+            ui_studio_facade
+            .initialize()
+        )
 
 
 ui_facade = UIFacade()
