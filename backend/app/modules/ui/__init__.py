@@ -36,6 +36,14 @@ from app.modules.ui.state import (
     UIState,
     ui_state,
 )
+from app.modules.ui.studio_facade import (
+    UIStudioFacade,
+    ui_studio_facade,
+)
+from app.modules.ui.studio_service import (
+    UIStudioService,
+    ui_studio_service,
+)
 from app.modules.ui.theme import (
     UITheme,
 )
@@ -58,6 +66,8 @@ __all__ = [
     "UIScreen",
     "UIService",
     "UIState",
+    "UIStudioFacade",
+    "UIStudioService",
     "UITheme",
     "UIWidget",
     "WidgetType",
@@ -65,4 +75,6 @@ __all__ = [
     "ui_registry",
     "ui_runtime_bridge",
     "ui_state",
+    "ui_studio_facade",
+    "ui_studio_service",
 ]
