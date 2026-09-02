@@ -3,6 +3,7 @@ from typing import Any
 from fastapi import APIRouter
 from fastapi import HTTPException
 from pydantic import BaseModel
+from pydantic import Field
 
 from app.modules.ui.enums import (
     ActionType,
@@ -26,45 +27,58 @@ router = APIRouter(
 )
 
 
-class ScreenCreateRequest(BaseModel):
+class ScreenCreateRequest(
+    BaseModel
+):
     name: str
     title: str = ""
     route: str = "/"
 
-    screen_type: ScreenType = (
-        ScreenType.STANDARD
-    )
+    screen_type: (
+        ScreenType
+    ) = ScreenType.STANDARD
 
 
-class WidgetCreateRequest(BaseModel):
+class WidgetCreateRequest(
+    BaseModel
+):
     name: str
     widget_type: WidgetType
 
-    properties: dict[
-        str,
-        Any,
-    ] | None = None
+    properties: (
+        dict[str, Any] | None
+    ) = None
 
 
-class WidgetActionRequest(BaseModel):
+class WidgetActionRequest(
+    BaseModel
+):
     action_type: ActionType
 
     action: dict[
         str,
         Any,
-    ] = {}
+    ] = Field(
+        default_factory=dict
+    )
 
 
-class ThemeCreateRequest(BaseModel):
+class ThemeCreateRequest(
+    BaseModel
+):
     name: str
     mode: str = "light"
 
 
-class StateUpdateRequest(BaseModel):
+class StateUpdateRequest(
+    BaseModel
+):
     value: Any
 
 
-class StateBatchRequest(BaseModel):
+class StateBatchRequest(
+    BaseModel
+):
     values: dict[
         str,
         Any,
@@ -79,7 +93,8 @@ def ui_health_check():
 @router.get("/snapshot")
 def ui_snapshot():
     return (
-        ui_runtime_bridge.snapshot()
+        ui_runtime_bridge
+        .snapshot()
     )
 
 
@@ -96,11 +111,15 @@ def list_screens():
 def create_screen(
     data: ScreenCreateRequest,
 ):
-    screen = UIService.create_screen(
-        name=data.name,
-        title=data.title,
-        route=data.route,
-        screen_type=data.screen_type,
+    screen = (
+        UIService.create_screen(
+            name=data.name,
+            title=data.title,
+            route=data.route,
+            screen_type=(
+                data.screen_type
+            ),
+        )
     )
 
     return screen.to_dict()
@@ -112,8 +131,10 @@ def create_screen(
 def get_screen(
     screen_id: str,
 ):
-    screen = UIService.get_screen(
-        screen_id
+    screen = (
+        UIService.get_screen(
+            screen_id
+        )
     )
 
     if not screen:
@@ -157,15 +178,17 @@ def add_widget(
     data: WidgetCreateRequest,
 ):
     try:
-        widget = UIService.add_widget(
-            screen_id=screen_id,
-            name=data.name,
-            widget_type=(
-                data.widget_type
-            ),
-            properties=(
-                data.properties
-            ),
+        widget = (
+            UIService.add_widget(
+                screen_id=screen_id,
+                name=data.name,
+                widget_type=(
+                    data.widget_type
+                ),
+                properties=(
+                    data.properties
+                ),
+            )
         )
 
     except ValueError as exc:
@@ -178,8 +201,8 @@ def add_widget(
 
 
 @router.delete(
-    "/screens/{screen_id}/"
-    "widgets/{widget_id}"
+    "/screens/{screen_id}"
+    "/widgets/{widget_id}"
 )
 def remove_widget(
     screen_id: str,
@@ -205,8 +228,8 @@ def remove_widget(
 
 
 @router.put(
-    "/screens/{screen_id}/"
-    "widgets/{widget_id}/action"
+    "/screens/{screen_id}"
+    "/widgets/{widget_id}/action"
 )
 def configure_widget_action(
     screen_id: str,
@@ -247,17 +270,17 @@ def list_themes():
 def create_theme(
     data: ThemeCreateRequest,
 ):
-    theme = UIService.create_theme(
-        name=data.name,
-        mode=data.mode,
+    theme = (
+        UIService.create_theme(
+            name=data.name,
+            mode=data.mode,
+        )
     )
 
     return theme.to_dict()
 
 
-@router.put(
-    "/state/{key}"
-)
+@router.put("/state/{key}")
 def update_state(
     key: str,
     data: StateUpdateRequest,
@@ -289,4 +312,4 @@ def update_state_batch(
 
     return {
         "state": state
-        }
+    }
