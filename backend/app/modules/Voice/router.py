@@ -6,6 +6,9 @@ from app.modules.voice.command_api import (
 from app.modules.voice.confirmation_api import (
     router as confirmation_router,
 )
+from app.modules.voice.execution_api import (
+    router as execution_router,
+)
 from app.modules.voice.health_api import (
     router as health_router,
 )
@@ -48,4 +51,8 @@ router.include_router(
 
 router.include_router(
     confirmation_router
+)
+
+router.include_router(
+    execution_router
 )
