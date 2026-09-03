@@ -1,42 +1,32 @@
-from app.modules.ai.mock_provider import (
-    ai_mock_provider,
-)
-from app.modules.ai.provider_registry import (
-    ai_provider_registry,
+from app.modules.ai.providers.registry import (
+    AIProviderRegistry,
 )
 
 
 class AIProviderManager:
 
-    def __init__(self):
-        self._initialized = False
+    def __init__(
+        self,
+        registry: AIProviderRegistry,
+    ):
+        self.registry = registry
 
     def initialize(self):
-        if not self._initialized:
-            ai_provider_registry.register(
-                ai_mock_provider,
-                default=True,
-            )
-
-            self._initialized = True
-
         return self
 
     def get(
         self,
         name: str | None = None,
     ):
-        self.initialize()
-
         if name:
             provider = (
-                ai_provider_registry
-                .get(name)
+                self.registry.get(
+                    name
+                )
             )
         else:
             provider = (
-                ai_provider_registry
-                .default()
+                self.registry.default()
             )
 
         if not provider:
@@ -52,8 +42,6 @@ class AIProviderManager:
         return provider
 
     def providers(self):
-        self.initialize()
-
         return [
             {
                 "name": provider.name,
@@ -62,11 +50,17 @@ class AIProviderManager:
                 ),
             }
             for provider
-            in ai_provider_registry
-            .list_all()
+            in self.registry.list_all()
         ]
 
 
+from app.modules.ai.providers.registry import (
+    ai_provider_registry,
+)
+
+
 ai_provider_manager = (
-    AIProviderManager()
+    AIProviderManager(
+        registry=ai_provider_registry
+    )
 )
