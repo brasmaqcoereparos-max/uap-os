@@ -21,11 +21,8 @@ class VoiceInteractionController:
             .strip(text)
         )
 
-        if wake[
-            "detected"
-        ]:
-            voice_activation_manager
-            .activate(
+        if wake["detected"]:
+            voice_activation_manager.activate(
                 session_id
             )
 
@@ -40,13 +37,9 @@ class VoiceInteractionController:
                 "reason": (
                     "wake_word_required"
                 ),
-                "text": (
-                    wake["text"]
-                ),
+                "text": wake["text"],
                 "wake_word": (
-                    wake[
-                        "wake_word"
-                    ]
+                    wake["wake_word"]
                 ),
             }
 
@@ -76,4 +69,4 @@ class VoiceInteractionController:
 
 voice_interaction_controller = (
     VoiceInteractionController()
-      )
+                )
