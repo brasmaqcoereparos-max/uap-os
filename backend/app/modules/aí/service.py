@@ -1,14 +1,10 @@
-from app.modules.ai.enums import (
-    AIMessageRole,
-)
-from app.modules.ai.message import (
-    AIMessage,
-)
 from app.modules.ai.provider_manager import (
     ai_provider_manager,
 )
-from app.modules.ai.request import (
+from app.modules.ai.schemas import (
+    AIMessage,
     AIRequest,
+    MessageRole,
 )
 
 
@@ -44,16 +40,13 @@ class AIService:
             str | None
         ) = None,
     ):
-        request = AIRequest(
-            model=model
-        )
+        messages = []
 
         if system_prompt:
-            request.add_message(
+            messages.append(
                 AIMessage(
                     role=(
-                        AIMessageRole
-                        .SYSTEM
+                        MessageRole.SYSTEM
                     ),
                     content=(
                         system_prompt
@@ -61,13 +54,18 @@ class AIService:
                 )
             )
 
-        request.add_message(
+        messages.append(
             AIMessage(
                 role=(
-                    AIMessageRole.USER
+                    MessageRole.USER
                 ),
                 content=text,
             )
+        )
+
+        request = AIRequest(
+            messages=messages,
+            model=model,
         )
 
         return self.generate(
