@@ -1,14 +1,38 @@
-"""Proxy package for compatibility.
+from app.modules.voice.command import (
+    VoiceCommand,
+)
+from app.modules.voice.enums import (
+    VoiceInputState,
+    VoiceIntentType,
+)
+from app.modules.voice.intent import (
+    VoiceIntent,
+)
+from app.modules.voice.processor import (
+    VoiceProcessor,
+    voice_processor,
+)
+from app.modules.voice.service import (
+    VoiceService,
+    voice_service,
+)
+from app.modules.voice.session import (
+    VoiceSession,
+)
+from app.modules.voice.transcript import (
+    VoiceTranscript,
+)
 
-This package re-exports the public API from the existing
-app.modules.Voice package (uppercase). Creating this proxy
-avoids duplicating many files while making a lowercase
-package available for imports.
 
-These files are auto-generated wrappers that import from
-app.modules.Voice.<module>. If you need full physical copies
-(without imports), tell me and I can replace the wrappers
-with exact file contents instead.
-"""
-
-from app.modules.Voice import *
+__all__ = [
+    "VoiceCommand",
+    "VoiceInputState",
+    "VoiceIntent",
+    "VoiceIntentType",
+    "VoiceProcessor",
+    "VoiceService",
+    "VoiceSession",
+    "VoiceTranscript",
+    "voice_processor",
+    "voice_service",
+]
