@@ -1,85 +1,54 @@
+from app.modules.ai.context.manager import (
+    ContextManager,
+)
+
+from app.modules.ai.conversation.manager import (
+    ConversationManager,
+)
+
 from app.modules.ai.provider_manager import (
+    AIProviderManager,
     ai_provider_manager,
 )
+
+from app.modules.ai.providers.base import (
+    AIProvider,
+)
+
+from app.modules.ai.providers.registry import (
+    AIProviderRegistry,
+    ai_provider_registry,
+)
+
 from app.modules.ai.schemas import (
     AIMessage,
     AIRequest,
+    AIResponse,
     MessageRole,
+    ProviderHealth,
+    ProviderStatus,
+)
+
+from app.modules.ai.service import (
+    AIService,
+    ai_service,
 )
 
 
-class AIService:
-
-    def generate(
-        self,
-        request: AIRequest,
-        provider_name: (
-            str | None
-        ) = None,
-    ):
-        provider = (
-            ai_provider_manager.get(
-                provider_name
-            )
-        )
-
-        return provider.generate(
-            request
-        )
-
-    def ask(
-        self,
-        text: str,
-        system_prompt: (
-            str | None
-        ) = None,
-        provider_name: (
-            str | None
-        ) = None,
-        model: (
-            str | None
-        ) = None,
-    ):
-        messages = []
-
-        if system_prompt:
-            messages.append(
-                AIMessage(
-                    role=(
-                        MessageRole.SYSTEM
-                    ),
-                    content=(
-                        system_prompt
-                    ),
-                )
-            )
-
-        messages.append(
-            AIMessage(
-                role=(
-                    MessageRole.USER
-                ),
-                content=text,
-            )
-        )
-
-        request = AIRequest(
-            messages=messages,
-            model=model,
-        )
-
-        return self.generate(
-            request=request,
-            provider_name=(
-                provider_name
-            ),
-        )
-
-    def providers(self):
-        return (
-            ai_provider_manager
-            .providers()
-        )
-
-
-ai_service = AIService()
+__all__ = [
+    "AIMessage",
+    "AIProvider",
+    "AIProviderManager",
+    "AIProviderRegistry",
+    "AIRequest",
+    "AIResponse",
+    "AIService",
+    "ContextManager",
+    "ConversationManager",
+    "MessageRole",
+    "ProviderHealth",
+    "ProviderStatus",
+    "ai_provider_manager",
+    "ai_provider_registry",
+    "ai_service",
+]
