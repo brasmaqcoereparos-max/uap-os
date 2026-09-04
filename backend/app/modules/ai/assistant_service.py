@@ -46,8 +46,7 @@ class AIAssistantService:
                 "AI conversation not found"
             )
 
-        ai_session_service
-        .add_user_message(
+        ai_session_service.add_user_message(
             session_id,
             text,
         )
@@ -91,8 +90,7 @@ class AIAssistantService:
         )
 
         if response.success:
-            ai_session_service
-            .add_assistant_message(
+            ai_session_service.add_assistant_message(
                 session_id,
                 response.text,
             )
@@ -102,4 +100,4 @@ class AIAssistantService:
 
 ai_assistant_service = (
     AIAssistantService()
-      )
+            )
