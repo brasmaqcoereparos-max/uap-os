@@ -1,53 +1,98 @@
-from __future__ import annotations
+from app.modules.communication.channel_registry import (
+    communication_channel_registry,
+)
+from app.modules.communication.delivery_result import (
+    CommunicationDeliveryResult,
+)
+from app.modules.communication.message_envelope import (
+    CommunicationMessageEnvelope,
+)
+from app.modules.communication.subscriber_registry import (
+    communication_subscriber_registry,
+)
 
-from collections import defaultdict
-from typing import Callable
 
-from .message import UAPMessage
-
-
-class MessageRouter:
-    def __init__(self) -> None:
-        self._handlers: dict[
-            str,
-            list[Callable[[UAPMessage], None]],
-        ] = defaultdict(list)
-
-    def register(
-        self,
-        message_type: str,
-        handler: Callable[[UAPMessage], None],
-    ) -> None:
-        self._handlers[message_type].append(handler)
-
-    def unregister(
-        self,
-        message_type: str,
-        handler: Callable[[UAPMessage], None],
-    ) -> bool:
-        handlers = self._handlers.get(message_type)
-
-        if not handlers or handler not in handlers:
-            return False
-
-        handlers.remove(handler)
-        return True
+class CommunicationMessageRouter:
 
     def route(
         self,
-        message: UAPMessage,
-    ) -> int:
-        handlers = list(
-            self._handlers.get(
-                message.message_type,
-                [],
+        envelope: (
+            CommunicationMessageEnvelope
+        ),
+    ):
+        channel = (
+            communication_channel_registry
+            .get(
+                envelope.topic
             )
         )
 
-        for handler in handlers:
-            handler(message)
+        if not channel:
+            return (
+                CommunicationDeliveryResult(
+                    delivered=False,
+                    topic=envelope.topic,
+                )
+            )
 
-        return len(handlers)
+        recipients = []
+        results = {}
+        errors = {}
 
-    def clear(self) -> None:
-        self._handlers.clear()
+        for subscriber_id in (
+            channel.subscribers
+        ):
+            subscriber = (
+                communication_subscriber_registry
+                .get(
+                    subscriber_id
+                )
+            )
+
+            if not subscriber:
+                continue
+
+            if envelope.target:
+                if (
+                    subscriber_id
+                    != envelope.target
+                ):
+                    continue
+
+            recipients.append(
+                subscriber_id
+            )
+
+            try:
+                result = (
+                    subscriber.handle(
+                        envelope.to_dict()
+                    )
+                )
+
+                results[
+                    subscriber_id
+                ] = result
+
+            except Exception as exc:
+                errors[
+                    subscriber_id
+                ] = str(exc)
+
+        return (
+            CommunicationDeliveryResult(
+                delivered=(
+                    bool(recipients)
+                    and not errors
+                ),
+                topic=envelope.topic,
+                recipients=recipients,
+                results=results,
+                errors=errors,
+            )
+        )
+
+
+communication_message_router = (
+    CommunicationMessageRouter()
+)
