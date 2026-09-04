@@ -6,6 +6,9 @@ from app.api.routes import drivers
 from app.api.routes import projects
 from app.api.routes import users
 
+from app.modules.ai.router import (
+    router as ai_router,
+)
 from app.modules.automation.router import (
     router as automation_router,
 )
@@ -27,17 +30,17 @@ from app.modules.plugins.router import (
 from app.modules.runtime.router import (
     router as runtime_router,
 )
-from app.modules.simulator.router import (
-    router as simulator_router,
-)
-from app.modules.simulator.programming.router import (
-    router as programming_router,
+from app.modules.simulator.codegen.router import (
+    router as codegen_router,
 )
 from app.modules.simulator.programming.canvas.router import (
     router as canvas_router,
 )
-from app.modules.simulator.codegen.router import (
-    router as codegen_router,
+from app.modules.simulator.programming.router import (
+    router as programming_router,
+)
+from app.modules.simulator.router import (
+    router as simulator_router,
 )
 from app.modules.ui.router import (
     router as ui_router,
@@ -155,6 +158,15 @@ router.include_router(
 
 
 # ============================================================
+# AI
+# ============================================================
+
+router.include_router(
+    ai_router
+)
+
+
+# ============================================================
 # PLATFORM INFORMATION
 # ============================================================
 
@@ -177,4 +189,4 @@ def version():
     return {
         "name": "UAP OS",
         "version": "0.1.0",
-    }
+}
