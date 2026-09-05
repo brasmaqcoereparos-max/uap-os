@@ -36,8 +36,9 @@ class CommunicationProviderBootstrap:
                     provider.name
                 )
             ):
-                communication_provider_registry
-                .register(provider)
+                communication_provider_registry.register(
+                    provider
+                )
 
         self._initialized = True
 
@@ -48,4 +49,4 @@ class CommunicationProviderBootstrap:
 
 communication_provider_bootstrap = (
     CommunicationProviderBootstrap()
-              )
+)
