@@ -13,8 +13,7 @@ def test_message_bus_publish():
 
         return "ok"
 
-    communication_message_bus
-    .subscribe(
+    communication_message_bus.subscribe(
         topic="test.topic",
         subscriber_id=(
             "test-subscriber"
@@ -34,7 +33,6 @@ def test_message_bus_publish():
     )
 
     assert result.delivered is True
-
     assert len(received) == 1
 
 
@@ -52,4 +50,4 @@ def test_unknown_topic_not_delivered():
     assert (
         result.delivered
         is False
-        )
+    )
