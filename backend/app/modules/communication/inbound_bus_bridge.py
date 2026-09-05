@@ -36,9 +36,7 @@ class CommunicationInboundBusBridge:
             ack = (
                 communication_ack_manager
                 .create(
-                    message_id=(
-                        message_id
-                    ),
+                    message_id=message_id,
                     acknowledged=False,
                     reason="duplicate",
                 )
@@ -76,9 +74,7 @@ class CommunicationInboundBusBridge:
             ack = (
                 communication_ack_manager
                 .create(
-                    message_id=(
-                        message_id
-                    ),
+                    message_id=message_id,
                     acknowledged=(
                         result.delivered
                     ),
@@ -91,8 +87,7 @@ class CommunicationInboundBusBridge:
             )
 
             if not result.delivered:
-                communication_dead_letter_queue
-                .push(
+                communication_dead_letter_queue.push(
                     CommunicationDeadLetter(
                         message=(
                             message.to_dict()
@@ -114,8 +109,7 @@ class CommunicationInboundBusBridge:
             }
 
         except Exception as exc:
-            communication_dead_letter_queue
-            .push(
+            communication_dead_letter_queue.push(
                 CommunicationDeadLetter(
                     message=(
                         message.to_dict()
@@ -127,9 +121,7 @@ class CommunicationInboundBusBridge:
             ack = (
                 communication_ack_manager
                 .create(
-                    message_id=(
-                        message_id
-                    ),
+                    message_id=message_id,
                     acknowledged=False,
                     reason=str(exc),
                 )
@@ -144,4 +136,4 @@ class CommunicationInboundBusBridge:
 
 communication_inbound_bus_bridge = (
     CommunicationInboundBusBridge()
-)
+                )
