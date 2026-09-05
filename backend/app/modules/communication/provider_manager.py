@@ -9,8 +9,7 @@ from app.modules.communication.provider_registry import (
 class CommunicationProviderManager:
 
     def initialize(self):
-        communication_provider_bootstrap
-        .initialize()
+        communication_provider_bootstrap.initialize()
 
         return self
 
