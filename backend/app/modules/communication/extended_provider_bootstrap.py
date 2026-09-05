@@ -40,8 +40,7 @@ class CommunicationExtendedProviderBootstrap:
                     provider.name
                 )
             ):
-                communication_provider_registry
-                .register(
+                communication_provider_registry.register(
                     provider
                 )
 
