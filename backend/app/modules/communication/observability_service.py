@@ -46,14 +46,9 @@ class CommunicationObservabilityService:
         }
 
     def clear(self):
-        communication_metrics_registry
-        .clear()
-
-        communication_trace_manager
-        .clear()
-
-        communication_audit_log
-        .clear()
+        communication_metrics_registry.clear()
+        communication_trace_manager.clear()
+        communication_audit_log.clear()
 
         return True
 
