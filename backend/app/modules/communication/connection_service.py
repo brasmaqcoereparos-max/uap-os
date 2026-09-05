@@ -40,9 +40,7 @@ class CommunicationConnectionService:
         session = (
             communication_session_manager
             .create(
-                connection_id=(
-                    connection.id
-                )
+                connection_id=connection.id
             )
         )
 
@@ -66,9 +64,7 @@ class CommunicationConnectionService:
     ):
         connection = (
             communication_connection_manager
-            .get(
-                connection_id
-            )
+            .get(connection_id)
         )
 
         if not connection:
@@ -109,9 +105,7 @@ class CommunicationConnectionService:
     ):
         connection = (
             communication_connection_manager
-            .disconnect(
-                connection_id
-            )
+            .disconnect(connection_id)
         )
 
         if not connection:
@@ -125,8 +119,7 @@ class CommunicationConnectionService:
                 session.connection_id
                 == connection_id
             ):
-                communication_session_manager
-                .close(
+                communication_session_manager.close(
                     session.id
                 )
 
@@ -135,4 +128,4 @@ class CommunicationConnectionService:
 
 communication_connection_service = (
     CommunicationConnectionService()
-              )
+        )
