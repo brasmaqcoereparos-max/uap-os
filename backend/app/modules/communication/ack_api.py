@@ -18,8 +18,7 @@ def list_acks():
 
 @router.delete("/acks")
 def clear_acks():
-    communication_ack_manager
-    .clear()
+    communication_ack_manager.clear()
 
     return {
         "cleared": True
