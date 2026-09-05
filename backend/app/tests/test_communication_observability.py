@@ -7,8 +7,7 @@ from app.modules.communication.observer import (
 
 
 def test_observer_records_success():
-    communication_observer
-    .record_send(
+    communication_observer.record_send(
         source="test",
         target="memory",
         success=True,
@@ -39,8 +38,7 @@ def test_observer_records_success():
 
 
 def test_observer_records_error():
-    communication_observer
-    .record_send(
+    communication_observer.record_send(
         source="test",
         target="invalid",
         success=False,
@@ -91,6 +89,7 @@ def test_audit_log_present():
     )
 
     assert "audit" in snapshot
+
     assert isinstance(
         snapshot["audit"],
         list,
