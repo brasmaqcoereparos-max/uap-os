@@ -11,8 +11,7 @@ from app.modules.communication.transport_registry import (
 class CommunicationTransportManager:
 
     def initialize(self):
-        communication_transport_bootstrap
-        .initialize()
+        communication_transport_bootstrap.initialize()
 
         return self
 
@@ -75,6 +74,11 @@ class CommunicationTransportManager:
     def transports(self):
         self.initialize()
 
+        default_transport = (
+            communication_transport_registry
+            .default()
+        )
+
         return [
             {
                 "name": transport.name,
@@ -82,8 +86,7 @@ class CommunicationTransportManager:
                     transport.available()
                 ),
                 "default": (
-                    communication_transport_registry
-                    .default()
+                    default_transport
                     is transport
                 ),
             }
@@ -95,4 +98,4 @@ class CommunicationTransportManager:
 
 communication_transport_manager = (
     CommunicationTransportManager()
-      )
+)
