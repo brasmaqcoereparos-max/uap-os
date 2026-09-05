@@ -41,8 +41,7 @@ class CommunicationInboundService:
         )
 
     def clear(self):
-        communication_inbound_queue
-        .clear()
+        communication_inbound_queue.clear()
 
         return True
 
