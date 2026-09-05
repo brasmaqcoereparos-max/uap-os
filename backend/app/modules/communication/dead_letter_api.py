@@ -24,8 +24,7 @@ def list_dead_letters():
 
 @router.delete("/dead-letter")
 def clear_dead_letters():
-    communication_dead_letter_queue
-    .clear()
+    communication_dead_letter_queue.clear()
 
     return {
         "cleared": True
