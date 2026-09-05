@@ -12,6 +12,9 @@ from app.modules.ai.router import (
 from app.modules.automation.router import (
     router as automation_router,
 )
+from app.modules.communication.router import (
+    router as communication_router,
+)
 from app.modules.dashboard.router import (
     router as dashboard_router,
 )
@@ -113,6 +116,10 @@ router.include_router(
     education_router
 )
 
+router.include_router(
+    communication_router
+)
+
 
 # ============================================================
 # SIMULATOR / VISUAL PROGRAMMING
@@ -189,4 +196,4 @@ def version():
     return {
         "name": "UAP OS",
         "version": "0.1.0",
-}
+    }
