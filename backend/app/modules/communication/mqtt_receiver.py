@@ -60,15 +60,12 @@ class CommunicationMQTTReceiver:
                 )
 
             except Exception:
-                payload = (
-                    raw.decode(
-                        "utf-8",
-                        errors="replace",
-                    )
+                payload = raw.decode(
+                    "utf-8",
+                    errors="replace",
                 )
 
-            communication_inbound_queue
-            .push(
+            communication_inbound_queue.push(
                 CommunicationInboundMessage(
                     source="mqtt",
                     channel=(
@@ -86,9 +83,7 @@ class CommunicationMQTTReceiver:
                 )
             )
 
-        client.on_message = (
-            on_message
-        )
+        client.on_message = on_message
 
         client.subscribe(
             topic,
@@ -133,11 +128,10 @@ class CommunicationMQTTReceiver:
         return [
             subscription.to_dict()
             for subscription
-            in self._subscriptions
-            .values()
+            in self._subscriptions.values()
         ]
 
 
 communication_mqtt_receiver = (
     CommunicationMQTTReceiver()
-              )
+)
