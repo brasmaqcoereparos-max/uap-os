@@ -33,8 +33,7 @@ class CommunicationMessageBus:
             )
         )
 
-        communication_subscriber_registry
-        .register(
+        communication_subscriber_registry.register(
             subscriber
         )
 
@@ -66,8 +65,7 @@ class CommunicationMessageBus:
                 subscriber_id
             )
 
-        communication_subscriber_registry
-        .remove(
+        communication_subscriber_registry.remove(
             subscriber_id
         )
 
@@ -108,4 +106,4 @@ class CommunicationMessageBus:
 
 communication_message_bus = (
     CommunicationMessageBus()
-      )
+)
