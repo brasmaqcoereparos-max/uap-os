@@ -6,6 +6,9 @@ from app.modules.communication.bus_api import (
 from app.modules.communication.connection_api import (
     router as connection_router,
 )
+from app.modules.communication.final_router import (
+    router as final_router,
+)
 from app.modules.communication.secure_api import (
     router as secure_router,
 )
@@ -45,4 +48,8 @@ router.include_router(
 
 router.include_router(
     transport_router
+)
+
+router.include_router(
+    final_router
 )
