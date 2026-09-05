@@ -1,4 +1,3 @@
-import asyncio
 import json
 
 from app.modules.communication.inbound_message import (
@@ -65,8 +64,7 @@ class CommunicationWebSocketReceiver:
                 except Exception:
                     payload = raw
 
-                communication_inbound_queue
-                .push(
+                communication_inbound_queue.push(
                     CommunicationInboundMessage(
                         source="websocket",
                         channel=url,
