@@ -44,12 +44,13 @@ class CommunicationMessageDeduplicator:
         ):
             return True
 
-        communication_deduplication_cache
-        .add(key)
+        communication_deduplication_cache.add(
+            key
+        )
 
         return False
 
 
 communication_message_deduplicator = (
     CommunicationMessageDeduplicator()
-      )
+)
