@@ -21,20 +21,17 @@ class CommunicationObserver:
         success: bool,
         details: dict | None = None,
     ):
-        communication_metrics_registry
-        .increment(
+        communication_metrics_registry.increment(
             "communication.send.total"
         )
 
         if success:
-            communication_metrics_registry
-            .increment(
+            communication_metrics_registry.increment(
                 "communication.send.success"
             )
 
         else:
-            communication_metrics_registry
-            .increment(
+            communication_metrics_registry.increment(
                 "communication.send.error"
             )
 
@@ -77,4 +74,4 @@ class CommunicationObserver:
 
 communication_observer = (
     CommunicationObserver()
-      )
+)
