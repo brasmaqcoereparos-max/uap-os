@@ -44,8 +44,7 @@ class CommunicationTransportBootstrap:
                     transport.name
                 )
             ):
-                communication_transport_registry
-                .register(
+                communication_transport_registry.register(
                     transport,
                     default=(
                         transport.name
@@ -62,4 +61,4 @@ class CommunicationTransportBootstrap:
 
 communication_transport_bootstrap = (
     CommunicationTransportBootstrap()
-  )
+)
