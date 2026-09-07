@@ -1,5 +1,8 @@
 from fastapi import APIRouter
 
+from app.modules.security.access_api import (
+    router as access_router,
+)
 from app.modules.security.activation_api import (
     router as activation_router,
 )
@@ -15,8 +18,29 @@ from app.modules.security.identity_api import (
 from app.modules.security.license_api import (
     router as license_router,
 )
+from app.modules.security.lockout_api import (
+    router as lockout_router,
+)
 from app.modules.security.module_access_api import (
     router as module_access_router,
+)
+from app.modules.security.protection_api import (
+    router as protection_router,
+)
+from app.modules.security.rate_limit_api import (
+    router as rate_limit_router,
+)
+from app.modules.security.runtime_security_api import (
+    router as runtime_security_router,
+)
+from app.modules.security.security_audit_api import (
+    router as audit_router,
+)
+from app.modules.security.security_event_api import (
+    router as event_router,
+)
+from app.modules.security.session_api import (
+    router as session_router,
 )
 from app.modules.security.signing_api import (
     router as signing_router,
@@ -55,4 +79,36 @@ router.include_router(
 
 router.include_router(
     module_access_router
+)
+
+router.include_router(
+    runtime_security_router
+)
+
+router.include_router(
+    audit_router
+)
+
+router.include_router(
+    session_router
+)
+
+router.include_router(
+    lockout_router
+)
+
+router.include_router(
+    rate_limit_router
+)
+
+router.include_router(
+    event_router
+)
+
+router.include_router(
+    access_router
+)
+
+router.include_router(
+    protection_router
 )
