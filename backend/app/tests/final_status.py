@@ -1,37 +1,60 @@
-from app.modules.security.protection_status import (
-    security_protection_status,
+from app.modules.deployment.deployment_status import (
+    deployment_status,
 )
-from app.modules.security.security_health_service import (
-    security_health_service,
+from app.modules.deployment.preflight_service import (
+    deployment_preflight_service,
 )
-from app.modules.security.security_status import (
-    security_status,
+from app.modules.deployment.version_registry import (
+    deployment_version_registry,
 )
 
 
-class SecurityFinalStatus:
+class DeploymentFinalStatus:
 
-    def snapshot(self):
+    def snapshot(
+        self,
+        target: str = "uap-box",
+        root_path: str = ".uap",
+    ):
+        status = (
+            deployment_status
+            .snapshot()
+        )
+
+        preflight = (
+            deployment_preflight_service
+            .run(
+                target=target,
+                root_path=root_path,
+            )
+        )
+
+        current = (
+            deployment_version_registry
+            .current()
+        )
+
         return {
-            "security": (
-                security_status
-                .snapshot()
-            ),
-            "health": (
-                security_health_service
-                .check()
-            ),
-            "protection": (
-                security_protection_status
-                .snapshot()
+            "status": status,
+            "preflight": preflight,
+            "current_version": (
+                current.to_dict()
+                if current
+                else None
             ),
             "block": {
-                "name": "security",
-                "ready": True,
+                "name": "deployment",
+                "ready": (
+                    preflight[
+                        "readiness"
+                    ][
+                        "ready"
+                    ]
+                ),
             },
         }
 
 
-security_final_status = (
-    SecurityFinalStatus()
+deployment_final_status = (
+    DeploymentFinalStatus()
 )
