@@ -6,8 +6,14 @@ from app.modules.security.access_api import (
 from app.modules.security.activation_api import (
     router as activation_router,
 )
+from app.modules.security.boundary_api import (
+    router as boundary_router,
+)
 from app.modules.security.feature_api import (
     router as feature_router,
+)
+from app.modules.security.final_status_api import (
+    router as final_status_router,
 )
 from app.modules.security.health_api import (
     router as health_router,
@@ -44,6 +50,9 @@ from app.modules.security.session_api import (
 )
 from app.modules.security.signing_api import (
     router as signing_router,
+)
+from app.modules.security.summary_api import (
+    router as summary_router,
 )
 
 
@@ -111,4 +120,16 @@ router.include_router(
 
 router.include_router(
     protection_router
+)
+
+router.include_router(
+    boundary_router
+)
+
+router.include_router(
+    summary_router
+)
+
+router.include_router(
+    final_status_router
 )
