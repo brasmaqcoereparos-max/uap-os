@@ -18,6 +18,9 @@ from app.modules.communication.router import (
 from app.modules.dashboard.router import (
     router as dashboard_router,
 )
+from app.modules.deployment.router import (
+    router as deployment_router,
+)
 from app.modules.education.router import (
     router as education_router,
 )
@@ -62,9 +65,7 @@ from app.modules.voice.router import (
 router = APIRouter()
 
 
-# ============================================================
 # CORE API
-# ============================================================
 
 router.include_router(
     auth.router
@@ -87,9 +88,7 @@ router.include_router(
 )
 
 
-# ============================================================
 # PLATFORM MODULES
-# ============================================================
 
 router.include_router(
     plugins_router
@@ -127,10 +126,12 @@ router.include_router(
     security_router
 )
 
+router.include_router(
+    deployment_router
+)
 
-# ============================================================
-# SIMULATOR / VISUAL PROGRAMMING
-# ============================================================
+
+# SIMULATOR
 
 router.include_router(
     simulator_router
@@ -149,9 +150,7 @@ router.include_router(
 )
 
 
-# ============================================================
-# APP / UI / GRAPHICS
-# ============================================================
+# UI
 
 router.include_router(
     ui_router
@@ -162,27 +161,19 @@ router.include_router(
 )
 
 
-# ============================================================
 # VOICE
-# ============================================================
 
 router.include_router(
     voice_router
 )
 
 
-# ============================================================
 # AI
-# ============================================================
 
 router.include_router(
     ai_router
 )
 
-
-# ============================================================
-# PLATFORM INFORMATION
-# ============================================================
 
 @router.get(
     "/health",
