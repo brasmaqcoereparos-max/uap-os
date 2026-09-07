@@ -33,6 +33,9 @@ from app.modules.plugins.router import (
 from app.modules.runtime.router import (
     router as runtime_router,
 )
+from app.modules.security.router import (
+    router as security_router,
+)
 from app.modules.simulator.codegen.router import (
     router as codegen_router,
 )
@@ -120,6 +123,10 @@ router.include_router(
     communication_router
 )
 
+router.include_router(
+    security_router
+)
+
 
 # ============================================================
 # SIMULATOR / VISUAL PROGRAMMING
@@ -196,4 +203,4 @@ def version():
     return {
         "name": "UAP OS",
         "version": "0.1.0",
-    }
+}
