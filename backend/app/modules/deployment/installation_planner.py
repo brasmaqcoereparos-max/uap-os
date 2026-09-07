@@ -1,57 +1,58 @@
-from dataclasses import dataclass
-from dataclasses import field
-from typing import Any
+from app.modules.deployment.installation_plan import (
+    DeploymentInstallationPlan,
+)
 
 
-@dataclass
-class DeploymentInstallationPlan:
-    target: str
+class DeploymentInstallationPlanner:
 
-    root_path: str
-
-    steps: list[
-        dict[str, Any]
-    ] = field(
-        default_factory=list
-    )
-
-    metadata: dict[
-        str,
-        Any,
-    ] = field(
-        default_factory=dict
-    )
-
-    def add_step(
+    def create(
         self,
-        name: str,
-        action: str,
-        required: bool = True,
+        target: str,
+        root_path: str = ".uap",
     ):
-        step = {
-            "name": name,
-            "action": action,
-            "required": required,
-        }
-
-        self.steps.append(
-            step
+        plan = DeploymentInstallationPlan(
+            target=target,
+            root_path=root_path,
         )
 
-        return step
+        plan.add_step(
+            name="preflight",
+            action=(
+                "validate_system"
+            ),
+        )
 
-    def to_dict(self):
-        return {
-            "target": self.target,
-            "root_path": (
-                self.root_path
+        plan.add_step(
+            name="directories",
+            action=(
+                "create_directories"
             ),
-            "steps": [
-                dict(step)
-                for step
-                in self.steps
-            ],
-            "metadata": dict(
-                self.metadata
+        )
+
+        plan.add_step(
+            name="configuration",
+            action=(
+                "create_configuration"
             ),
-        }
+        )
+
+        plan.add_step(
+            name="runtime",
+            action=(
+                "prepare_runtime"
+            ),
+        )
+
+        plan.add_step(
+            name="startup",
+            action=(
+                "prepare_startup"
+            ),
+        )
+
+        return plan
+
+
+deployment_installation_planner = (
+    DeploymentInstallationPlanner()
+)
