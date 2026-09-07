@@ -45,11 +45,8 @@ def test_lockout_after_failures():
     )
 
     for _ in range(5):
-        security_access_protection_service
-        .record_login(
-            principal_id=(
-                principal
-            ),
+        security_access_protection_service.record_login(
+            principal_id=principal,
             success=False,
         )
 
@@ -72,8 +69,7 @@ def test_successful_login_clears_lockout():
     )
 
     for _ in range(5):
-        security_access_protection_service
-        .record_login(
+        security_access_protection_service.record_login(
             principal_id=principal,
             success=False,
         )
@@ -89,4 +85,4 @@ def test_successful_login_clears_lockout():
     assert (
         result["locked"]
         is False
-  )
+    )
