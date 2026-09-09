@@ -57,6 +57,9 @@ from app.modules.ui.router import (
 from app.modules.ui.studio_router import (
     router as ui_studio_router,
 )
+from app.modules.vision.vision_router import (
+    router as vision_router,
+)
 from app.modules.voice.router import (
     router as voice_router,
 )
@@ -128,6 +131,10 @@ router.include_router(
 
 router.include_router(
     deployment_router
+)
+
+router.include_router(
+    vision_router
 )
 
 
