@@ -22,12 +22,9 @@ class ComponentLibrary:
         tags=None,
         version="1.0",
     ):
-        if not callable(
-            component_class
-        ):
+        if not callable(component_class):
             raise TypeError(
-                "component_class precisa "
-                "ser uma classe ou factory."
+                "component_class precisa ser uma classe ou factory."
             )
 
         key = str(
@@ -40,62 +37,38 @@ class ComponentLibrary:
             and not replace
         ):
             raise ValueError(
-                "Componente já registrado: "
-                f"{key}"
+                f"Componente já registrado: {key}"
             )
 
-        self.components[
-            key
-        ] = component_class
+        self.components[key] = component_class
 
         alias_list = [
             str(alias)
-            for alias
-            in (
-                aliases or []
-            )
+            for alias in (aliases or [])
         ]
 
         tag_list = [
             str(tag)
-            for tag
-            in (
-                tags or []
-            )
+            for tag in (tags or [])
         ]
 
-        self.metadata[
-            key
-        ] = {
+        self.metadata[key] = {
             "name": key,
-            "category": str(
-                category
-            ),
-            "description": str(
-                description
-            ),
+            "category": str(category),
+            "description": str(description),
             "icon": str(icon),
             "aliases": alias_list,
             "tags": tag_list,
-            "version": str(
-                version
-            ),
+            "version": str(version),
         }
 
         for alias in alias_list:
-            self.aliases[
-                alias
-            ] = key
+            self.aliases[alias] = key
 
         return component_class
 
-    def unregister(
-        self,
-        name,
-    ):
-        key = self.resolve_name(
-            name
-        )
+    def unregister(self, name):
+        key = self.resolve_name(name)
 
         if key is None:
             return None
@@ -120,82 +93,53 @@ class ComponentLibrary:
             None,
         )
 
-    def resolve_name(
-        self,
-        name,
-    ):
+    def resolve_name(self, name):
         key = str(name)
 
         if key in self.components:
             return key
 
-        alias = self.aliases.get(
-            key
-        )
+        alias = self.aliases.get(key)
 
         if alias is not None:
             return alias
 
         lowered = key.lower()
 
-        for registered in (
-            self.components
-        ):
-            if (
-                registered.lower()
-                == lowered
-            ):
+        for registered in self.components:
+            if registered.lower() == lowered:
                 return registered
 
-        for alias_name, target in (
-            self.aliases.items()
-        ):
-            if (
-                alias_name.lower()
-                == lowered
-            ):
+        for alias_name, target in self.aliases.items():
+            if alias_name.lower() == lowered:
                 return target
 
         return None
 
-    def get(
-        self,
-        name,
-    ):
-        key = self.resolve_name(
-            name
-        )
+    def get(self, name):
+        key = self.resolve_name(name)
 
         if key is None:
             return None
 
-        return self.components.get(
-            key
-        )
+        return self.components.get(key)
 
-    def exists(
-        self,
-        name,
-    ):
-        return (
-            self.resolve_name(name)
-            is not None
-        )
+    def exists(self, name):
+        return self.resolve_name(name) is not None
 
     def create(
         self,
-        name,
+        component_name,
         *args,
         **kwargs,
     ):
         component_class = self.get(
-            name
+            component_name
         )
 
         if component_class is None:
             raise KeyError(
-                "Componente não registrado: "
-                f"{name}"
+                f"Componente não registrado: {component_name}"
             )
 
         return component_class(
@@ -214,48 +158,34 @@ class ComponentLibrary:
     def categories(self):
         return sorted({
             item["category"]
-            for item
-            in self.metadata.values()
+            for item in self.metadata.values()
         })
 
-    def by_category(
-        self,
-        category,
-    ):
+    def by_category(self, category):
         expected = str(
             category
         ).lower()
 
         return [
             name
-            for name, data
-            in self.metadata.items()
-            if (
-                data.get(
-                    "category",
-                    "",
-                ).lower()
-                == expected
-            )
+            for name, data in self.metadata.items()
+            if data.get(
+                "category",
+                "",
+            ).lower() == expected
         ]
 
-    def by_tag(
-        self,
-        tag,
-    ):
+    def by_tag(self, tag):
         expected = str(
             tag
         ).lower()
 
         result = []
 
-        for name, data in (
-            self.metadata.items()
-        ):
+        for name, data in self.metadata.items():
             tags = [
                 str(item).lower()
-                for item
-                in data.get(
+                for item in data.get(
                     "tags",
                     [],
                 )
@@ -266,10 +196,7 @@ class ComponentLibrary:
 
         return result
 
-    def search(
-        self,
-        text,
-    ):
+    def search(self, text):
         query = str(
             text or ""
         ).strip().lower()
@@ -279,9 +206,7 @@ class ComponentLibrary:
 
         result = []
 
-        for name, data in (
-            self.metadata.items()
-        ):
+        for name, data in self.metadata.items():
             searchable = " ".join([
                 name,
                 data.get(
@@ -307,20 +232,13 @@ class ComponentLibrary:
 
         return result
 
-    def info(
-        self,
-        name,
-    ):
-        key = self.resolve_name(
-            name
-        )
+    def info(self, name):
+        key = self.resolve_name(name)
 
         if key is None:
             return None
 
-        data = self.metadata.get(
-            key
-        )
+        data = self.metadata.get(key)
 
         return (
             dict(data)
@@ -329,9 +247,7 @@ class ComponentLibrary:
         )
 
     def count(self):
-        return len(
-            self.components
-        )
+        return len(self.components)
 
     def clear(self):
         self.components.clear()
@@ -341,9 +257,7 @@ class ComponentLibrary:
     def to_dict(self):
         return {
             "count": self.count(),
-            "categories": (
-                self.categories()
-            ),
+            "categories": self.categories(),
             "components": {
                 name: dict(data)
                 for name, data
@@ -352,6 +266,4 @@ class ComponentLibrary:
         }
 
 
-component_library = (
-    ComponentLibrary()
-        )
+component_library = ComponentLibrary()
