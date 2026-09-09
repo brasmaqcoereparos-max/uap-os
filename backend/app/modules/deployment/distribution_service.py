@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from app.modules.deployment.archive_builder import (
     deployment_archive_builder,
 )
@@ -35,8 +33,7 @@ class DeploymentDistributionService:
             )
         )
 
-        deployment_distribution_layout_service
-        .ensure(
+        deployment_distribution_layout_service.ensure(
             layout
         )
 
@@ -65,12 +62,8 @@ class DeploymentDistributionService:
                 name=name,
                 version=version,
                 target=target,
-                architecture=(
-                    architecture
-                ),
-                package_path=(
-                    archive.path
-                ),
+                architecture=architecture,
+                package_path=archive.path,
                 package_checksum=(
                     archive.checksum
                 ),
@@ -96,9 +89,7 @@ class DeploymentDistributionService:
 
         return {
             "created": (
-                validation[
-                    "valid"
-                ]
+                validation["valid"]
             ),
             "archive": (
                 archive.to_dict()
@@ -120,4 +111,4 @@ class DeploymentDistributionService:
 
 deployment_distribution_service = (
     DeploymentDistributionService()
-      )
+)
