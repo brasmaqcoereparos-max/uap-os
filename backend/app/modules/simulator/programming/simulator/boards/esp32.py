@@ -2,7 +2,7 @@
 ESP32 virtual utilizado pelo SimulatorService.
 """
 
-from app.modules.simulator.boards.virtual_board import (
+from app.modules.simulator.programming.simulator.boards.virtual_board import (
     VirtualBoard,
 )
 
@@ -35,12 +35,12 @@ class ESP32Board(VirtualBoard):
 
     def __init__(
         self,
-        board_id: str,
-        name: str,
+        board_id: str = None,
+        name: str = None,
     ):
         super().__init__(
-            board_id=board_id,
-            name=name,
+            board_id=(board_id or "esp32"),
+            name=(name or self.BOARD_TYPE),
             board_type=self.BOARD_TYPE,
             digital_pins=40,
             analog_pins=20,
