@@ -12,19 +12,19 @@ A separação é preservada para não quebrar os contratos
 existentes do projeto.
 """
 
-from app.modules.simulator.boards.virtual_board import (
+from app.modules.simulator.programming.simulator.boards.virtual_board import (
     VirtualBoard,
 )
 
-from app.modules.simulator.boards.arduino_uno import (
+from app.modules.simulator.programming.simulator.boards.arduino_uno import (
     ArduinoUNO,
 )
 
-from app.modules.simulator.boards.esp32 import (
+from app.modules.simulator.programming.simulator.boards.esp32 import (
     ESP32Board,
 )
 
-from app.modules.simulator.boards.raspberry_pi import (
+from app.modules.simulator.programming.simulator.boards.raspberry_pi import (
     RaspberryPiBoard,
 )
 
