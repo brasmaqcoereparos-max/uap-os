@@ -30,6 +30,9 @@ from app.modules.events.router import (
 from app.modules.flows.router import (
     router as flows_router,
 )
+from app.modules.motion.router import (
+    router as motion_router,
+)
 from app.modules.plugins.router import (
     router as plugins_router,
 )
@@ -74,9 +77,7 @@ from app.modules.voice.router import (
 router = APIRouter()
 
 
-# ============================================================
 # CORE API
-# ============================================================
 
 router.include_router(
     auth.router
@@ -99,9 +100,7 @@ router.include_router(
 )
 
 
-# ============================================================
 # PLATFORM MODULES
-# ============================================================
 
 router.include_router(
     plugins_router
@@ -155,10 +154,12 @@ router.include_router(
     ude_router
 )
 
+router.include_router(
+    motion_router
+)
 
-# ============================================================
+
 # SIMULATOR
-# ============================================================
 
 router.include_router(
     simulator_router
@@ -177,9 +178,7 @@ router.include_router(
 )
 
 
-# ============================================================
 # UI
-# ============================================================
 
 router.include_router(
     ui_router
@@ -190,27 +189,19 @@ router.include_router(
 )
 
 
-# ============================================================
 # VOICE
-# ============================================================
 
 router.include_router(
     voice_router
 )
 
 
-# ============================================================
 # AI
-# ============================================================
 
 router.include_router(
     ai_router
 )
 
-
-# ============================================================
-# PLATFORM INFORMATION
-# ============================================================
 
 @router.get(
     "/health",
@@ -231,4 +222,4 @@ def version():
     return {
         "name": "UAP OS",
         "version": "0.1.0",
-}
+    }
