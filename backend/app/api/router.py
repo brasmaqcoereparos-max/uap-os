@@ -51,6 +51,9 @@ from app.modules.simulator.programming.router import (
 from app.modules.simulator.router import (
     router as simulator_router,
 )
+from app.modules.uhal.router import (
+    router as uhal_router,
+)
 from app.modules.ui.router import (
     router as ui_router,
 )
@@ -137,6 +140,10 @@ router.include_router(
     vision_router
 )
 
+router.include_router(
+    uhal_router
+)
+
 
 # SIMULATOR
 
@@ -201,4 +208,4 @@ def version():
     return {
         "name": "UAP OS",
         "version": "0.1.0",
-}
+    }
