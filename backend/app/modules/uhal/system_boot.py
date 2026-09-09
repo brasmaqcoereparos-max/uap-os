@@ -7,14 +7,12 @@ from app.modules.uhal.register_builtin_drivers import (
 )
 
 
-def initialize_hardware():
+def initialize_hardware(
+    board=None,
+):
 
     register_builtin_drivers()
 
-    driver = auto_loader.load()
-
-    if driver is not None:
-
-        driver.initialize()
-
-    return driver
+    return auto_loader.load(
+        board=board
+    )
