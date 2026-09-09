@@ -9,11 +9,20 @@ from app.modules.uhal.hal_manager import (
 
 class AutoLoader:
 
-    def load(self):
+    def load(
+        self,
+        board=None,
+    ):
 
-        board = board_detector.detect()
+        selected_board = (
+            board_detector.detect(
+                preferred=board,
+            )
+        )
 
-        return hal_manager.load(board)
+        return hal_manager.load(
+            selected_board
+        )
 
 
 auto_loader = AutoLoader()
