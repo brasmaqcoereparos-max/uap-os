@@ -17,8 +17,18 @@ class HALManager:
                 f"Driver de hardware '{board}' não encontrado."
             )
 
-        self.driver = driver
-        self.board = board
+        normalized_board = str(
+            board
+        ).strip().lower()
+
+        if (
+            self.driver is driver
+            and self.board == normalized_board
+        ):
+            return driver
+
+        if self.driver is not None:
+            self.unload()
 
         initialize = getattr(
             driver,
@@ -27,7 +37,15 @@ class HALManager:
         )
 
         if callable(initialize):
-            initialize()
+            result = initialize()
+
+            if result is False:
+                raise RuntimeError(
+                    f"Falha ao inicializar driver de hardware '{normalized_board}'."
+                )
+
+        self.driver = driver
+        self.board = normalized_board
 
         return driver
 
