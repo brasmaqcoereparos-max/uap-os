@@ -62,6 +62,37 @@ class HardwareDevice:
         default_factory=dict
     )
 
+    def __post_init__(self):
+        if not isinstance(
+            self.device_type,
+            DeviceType,
+        ):
+            try:
+                self.device_type = DeviceType(
+                    str(
+                        self.device_type
+                    ).strip().lower()
+                )
+            except ValueError:
+                self.device_type = (
+                    DeviceType.UNKNOWN
+                )
+
+        if not isinstance(
+            self.state,
+            DeviceState,
+        ):
+            try:
+                self.state = DeviceState(
+                    str(
+                        self.state
+                    ).strip().lower()
+                )
+            except ValueError:
+                self.state = (
+                    DeviceState.UNKNOWN
+                )
+
     def add_input(
         self,
         name: str,
@@ -227,6 +258,21 @@ class HardwareAbstractionLayer:
         device = self._require_device(
             device_id
         )
+
+        if not isinstance(
+            state,
+            DeviceState,
+        ):
+            try:
+                state = DeviceState(
+                    str(
+                        state
+                    ).strip().lower()
+                )
+            except ValueError as exc:
+                raise ValueError(
+                    f"Estado de hardware inválido: {state}"
+                ) from exc
 
         device.state = state
 
