@@ -36,17 +36,27 @@ class DeviceAdapter:
                 if device.connections
                 else None
             ),
+            metadata=dict(
+                device.metadata
+            ),
         )
 
-        hardware.state = DeviceState.ONLINE
+        hardware.state = (
+            DeviceState.ONLINE
+        )
 
-        for capability in device.capabilities:
+        for capability in (
+            device.capabilities
+        ):
             if capability.enabled:
                 hardware.add_capability(
                     capability.name
                 )
 
-        for name, value in device.inputs.items():
+        for (
+            name,
+            value,
+        ) in device.inputs.items():
             hardware.add_input(
                 name=name,
                 data_type=(
@@ -62,9 +72,37 @@ class DeviceAdapter:
                     )
                     else "unknown"
                 ),
+                metadata=(
+                    dict(
+                        value.get(
+                            "metadata",
+                            {},
+                        )
+                    )
+                    if isinstance(
+                        value,
+                        dict,
+                    )
+                    else {}
+                ),
             )
 
-        for name, value in device.outputs.items():
+            if (
+                isinstance(
+                    value,
+                    dict,
+                )
+                and "value" in value
+            ):
+                hardware.set_input(
+                    name,
+                    value["value"],
+                )
+
+        for (
+            name,
+            value,
+        ) in device.outputs.items():
             hardware.add_output(
                 name=name,
                 data_type=(
@@ -80,7 +118,32 @@ class DeviceAdapter:
                     )
                     else "unknown"
                 ),
+                metadata=(
+                    dict(
+                        value.get(
+                            "metadata",
+                            {},
+                        )
+                    )
+                    if isinstance(
+                        value,
+                        dict,
+                    )
+                    else {}
+                ),
             )
+
+            if (
+                isinstance(
+                    value,
+                    dict,
+                )
+                and "value" in value
+            ):
+                hardware.set_output(
+                    name,
+                    value["value"],
+                )
 
         return self.hal.register_device(
             hardware
@@ -129,4 +192,4 @@ class DeviceAdapter:
     ):
         return self.hal.unregister_device(
             device_id
-    )
+        )
