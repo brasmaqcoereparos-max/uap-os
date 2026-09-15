@@ -5,22 +5,35 @@ from app.modules.uhal.hardware_service import (
 
 class HardwareController:
 
-    def execute(self, command):
+    def execute(
+        self,
+        command,
+    ):
 
-        if not isinstance(command, dict):
+        if not isinstance(
+            command,
+            dict,
+        ):
             raise TypeError(
                 "Comando de hardware inválido."
             )
 
         action = str(
-            command.get("action", "")
+            command.get(
+                "action",
+                "",
+            )
         ).strip().lower()
+
+        if not action:
+            raise ValueError(
+                "Ação de hardware não informada."
+            )
 
         if action == "hardware.initialize":
             return self.initialize(
                 command.get(
-                    "board",
-                    "raspberry_pi",
+                    "board"
                 )
             )
 
@@ -54,7 +67,10 @@ class HardwareController:
             f"Ação desconhecida: {action}"
         )
 
-    def initialize(self, board):
+    def initialize(
+        self,
+        board=None,
+    ):
         hardware_service.load(
             board
         )
@@ -65,7 +81,7 @@ class HardwareController:
         hardware_service.unload()
 
         return {
-            "success": True
+            "success": True,
         }
 
     def available(self):
@@ -74,18 +90,29 @@ class HardwareController:
     def status(self):
         return hardware_service.status()
 
-    def write(self, pin, value):
+    def write(
+        self,
+        pin,
+        value,
+    ):
         return hardware_service.write(
             pin,
             value,
         )
 
-    def read(self, pin):
+    def read(
+        self,
+        pin,
+    ):
         return hardware_service.read(
             pin
         )
 
-    def pwm(self, pin, duty):
+    def pwm(
+        self,
+        pin,
+        duty,
+    ):
         return hardware_service.pwm(
             pin,
             duty,
