@@ -20,6 +20,7 @@ class DriverLoader:
             )
 
         if initialize:
+
             method = getattr(
                 driver,
                 "initialize",
@@ -27,7 +28,14 @@ class DriverLoader:
             )
 
             if callable(method):
-                method()
+
+                result = method()
+
+                if result is False:
+                    raise RuntimeError(
+                        "Falha ao inicializar "
+                        f"driver '{name}'."
+                    )
 
         return driver
 
