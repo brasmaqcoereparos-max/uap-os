@@ -1,19 +1,38 @@
+from app.modules.uhal.board_detector import (
+    board_detector,
+)
+
 from app.modules.uhal.hal_manager import (
     hal_manager,
+)
+
+from app.modules.uhal.hardware_bootstrap import (
+    bootstrap_hardware,
 )
 
 
 class HardwareService:
 
-    def load(self, board):
+    def load(
+        self,
+        board=None,
+    ):
+        bootstrap_hardware()
+
+        selected = board_detector.detect(
+            preferred=board,
+        )
+
         return hal_manager.load(
-            board
+            selected
         )
 
     def unload(self):
         return hal_manager.unload()
 
     def available(self):
+        bootstrap_hardware()
+
         return hal_manager.available()
 
     def status(self):
@@ -24,6 +43,7 @@ class HardwareService:
             return {
                 "loaded": False,
                 "board": None,
+                "driver": {},
             }
 
         method = getattr(
@@ -34,7 +54,9 @@ class HardwareService:
 
         return {
             "loaded": True,
-            "board": hal_manager.current_board(),
+            "board": (
+                hal_manager.current_board()
+            ),
             "driver": (
                 method()
                 if callable(method)
@@ -42,18 +64,29 @@ class HardwareService:
             ),
         }
 
-    def write(self, pin, value):
+    def write(
+        self,
+        pin,
+        value,
+    ):
         return hal_manager.digital_write(
             pin,
             value,
         )
 
-    def read(self, pin):
+    def read(
+        self,
+        pin,
+    ):
         return hal_manager.digital_read(
             pin
         )
 
-    def pwm(self, pin, duty):
+    def pwm(
+        self,
+        pin,
+        duty,
+    ):
         return hal_manager.pwm_write(
             pin,
             duty,
