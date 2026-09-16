@@ -18,37 +18,50 @@ class AutomationState:
         default_factory=lambda: datetime.now(timezone.utc)
     )
 
+    def _touch(self) -> None:
+        self.updated_at = datetime.now(timezone.utc)
+
     def start(self) -> None:
+        if self.emergency_stop:
+            raise RuntimeError(
+                "Runtime cannot start while emergency stop is active"
+            )
+
         self.running = True
         self.paused = False
-        self.emergency_stop = False
         self.started_at = datetime.now(timezone.utc)
         self.updated_at = self.started_at
 
     def pause(self) -> None:
-        if self.running:
+        if self.running and not self.emergency_stop:
             self.paused = True
-            self.updated_at = datetime.now(timezone.utc)
+            self._touch()
 
     def resume(self) -> None:
         if self.running and not self.emergency_stop:
             self.paused = False
-            self.updated_at = datetime.now(timezone.utc)
+            self._touch()
 
     def stop(self) -> None:
         self.running = False
         self.paused = False
-        self.updated_at = datetime.now(timezone.utc)
+        self._touch()
 
     def emergency_stop_now(self) -> None:
         self.emergency_stop = True
         self.running = False
         self.paused = False
-        self.updated_at = datetime.now(timezone.utc)
+        self._touch()
+
+    def reset_emergency_stop(self) -> None:
+        self.emergency_stop = False
+        self.running = False
+        self.paused = False
+        self._touch()
 
     def increment_cycle(self) -> None:
         self.cycle += 1
-        self.updated_at = datetime.now(timezone.utc)
+        self._touch()
 
     def set_value(
         self,
@@ -56,7 +69,7 @@ class AutomationState:
         value: Any,
     ) -> None:
         self.values[name] = value
-        self.updated_at = datetime.now(timezone.utc)
+        self._touch()
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -65,11 +78,11 @@ class AutomationState:
             "paused": self.paused,
             "emergency_stop": self.emergency_stop,
             "cycle": self.cycle,
-            "values": self.values,
+            "values": dict(self.values),
             "started_at": (
                 self.started_at.isoformat()
                 if self.started_at
                 else None
             ),
             "updated_at": self.updated_at.isoformat(),
-        }
+    }
