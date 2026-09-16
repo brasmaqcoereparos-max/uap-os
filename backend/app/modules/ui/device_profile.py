@@ -99,4 +99,4 @@ class UIDeviceProfile:
             "orientation": (
                 self.orientation
             ),
-    }
+        }
