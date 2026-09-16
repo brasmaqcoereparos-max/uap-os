@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from dataclasses import field
 
@@ -6,7 +8,9 @@ from dataclasses import field
 class UIDockArea:
     position: str
 
-    panel_ids: list[str] = field(
+    panel_ids: list[
+        str
+    ] = field(
         default_factory=list
     )
 
@@ -78,6 +82,49 @@ class UIDockArea:
 
         return True
 
+    def move(
+        self,
+        panel_id: str,
+        index: int,
+    ) -> bool:
+        if (
+            panel_id
+            not in self.panel_ids
+        ):
+            return False
+
+        self.panel_ids.remove(
+            panel_id
+        )
+
+        index = max(
+            0,
+            min(
+                int(index),
+                len(self.panel_ids),
+            ),
+        )
+
+        self.panel_ids.insert(
+            index,
+            panel_id,
+        )
+
+        return True
+
+    def contains(
+        self,
+        panel_id: str,
+    ) -> bool:
+        return (
+            panel_id
+            in self.panel_ids
+        )
+
+    def clear(self) -> None:
+        self.panel_ids.clear()
+        self.active_panel_id = None
+
     def to_dict(self):
         return {
             "position": self.position,
@@ -87,4 +134,4 @@ class UIDockArea:
             "active_panel_id": (
                 self.active_panel_id
             ),
-              }
+        }
