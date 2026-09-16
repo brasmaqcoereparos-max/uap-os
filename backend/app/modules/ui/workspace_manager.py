@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from app.modules.ui.workspace import (
     UIWorkspace,
 )
@@ -34,6 +36,30 @@ class UIWorkspaceManager:
 
         return workspace
 
+    def create(
+        self,
+        workspace_id: str,
+        name: str,
+        user_level: str = "beginner",
+        readonly: bool = False,
+    ) -> UIWorkspace:
+        if workspace_id in self._workspaces:
+            raise ValueError(
+                "Workspace already exists: "
+                f"{workspace_id}"
+            )
+
+        workspace = UIWorkspace(
+            id=workspace_id,
+            name=name,
+            user_level=user_level,
+            readonly=readonly,
+        )
+
+        return self.register(
+            workspace
+        )
+
     def get(
         self,
         workspace_id: str,
@@ -65,6 +91,21 @@ class UIWorkspaceManager:
         )
 
         return True
+
+    def set_active_level(
+        self,
+        level: str,
+    ) -> str:
+        workspace = self.active()
+
+        if workspace is None:
+            raise RuntimeError(
+                "No active workspace"
+            )
+
+        return workspace.set_user_level(
+            level
+        )
 
     def remove(
         self,
@@ -98,7 +139,21 @@ class UIWorkspaceManager:
             self._workspaces.values()
         )
 
+    def clear(self) -> None:
+        self._workspaces.clear()
+        self._active_id = None
+
+    def snapshot(self) -> dict:
+        return {
+            "active_id": self._active_id,
+            "workspaces": [
+                workspace.to_dict()
+                for workspace
+                in self.list_all()
+            ],
+        }
+
 
 ui_workspace_manager = (
     UIWorkspaceManager()
-  )
+            )
