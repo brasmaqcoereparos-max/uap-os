@@ -19,6 +19,9 @@ from app.modules.runtime.interlock_manager import (
 from app.modules.runtime.io_manager import (
     IOManager,
 )
+from app.modules.uhal.hardware_controller import (
+    HardwareController,
+)
 from app.modules.uhal.port_manager import (
     PortManager,
 )
@@ -28,11 +31,18 @@ class RuntimeContext:
     def __init__(
         self,
         project_id: str,
+        hardware: HardwareController | None = None,
     ) -> None:
         self.project_id = project_id
 
         self.ports = PortManager()
-        self.io = IOManager(self.ports)
+
+        self.hardware = hardware
+
+        self.io = IOManager(
+            ports=self.ports,
+            hardware=self.hardware,
+        )
 
         self.sensors = SensorManager()
         self.actuators = ActuatorManager()
@@ -54,7 +64,9 @@ class RuntimeContext:
         }
 
         if metadata:
-            event_metadata.update(metadata)
+            event_metadata.update(
+                metadata
+            )
 
         self.events.publish(
             HardwareEvent(
@@ -66,7 +78,9 @@ class RuntimeContext:
         )
 
     def _check_interlocks(self) -> None:
-        triggered = self.interlocks.check()
+        triggered = (
+            self.interlocks.check()
+        )
 
         if not triggered:
             return
@@ -78,7 +92,8 @@ class RuntimeContext:
             {
                 "interlocks": [
                     interlock.interlock_id
-                    for interlock in triggered
+                    for interlock
+                    in triggered
                 ],
             },
         )
@@ -87,8 +102,36 @@ class RuntimeContext:
             "Runtime blocked by active interlock: "
             + ", ".join(
                 interlock.interlock_id
-                for interlock in triggered
+                for interlock
+                in triggered
             )
+        )
+
+    def bind_hardware(
+        self,
+        hardware: HardwareController,
+    ) -> None:
+        self.hardware = hardware
+        self.io.bind_hardware(
+            hardware
+        )
+
+        self._publish_state(
+            "runtime.hardware_bound"
+        )
+
+    def unbind_hardware(self) -> None:
+        self.io.unbind_hardware()
+        self.hardware = None
+
+        self._publish_state(
+            "runtime.hardware_unbound"
+        )
+
+    def hardware_bound(self) -> bool:
+        return (
+            self.hardware is not None
+            and self.io.is_hardware_bound()
         )
 
     def start(self) -> None:
@@ -154,14 +197,21 @@ class RuntimeContext:
         )
 
     def status(self) -> dict:
-        triggered = self.interlocks.check()
+        triggered = (
+            self.interlocks.check()
+        )
 
         return {
             "project_id": self.project_id,
-            "automation": self.state.to_dict(),
+            "automation": (
+                self.state.to_dict()
+            ),
             "safe": (
                 not self.state.emergency_stop
                 and not triggered
+            ),
+            "hardware_bound": (
+                self.hardware_bound()
             ),
             "interlocks": {
                 "registered": len(
@@ -169,7 +219,8 @@ class RuntimeContext:
                 ),
                 "triggered": [
                     interlock.interlock_id
-                    for interlock in triggered
+                    for interlock
+                    in triggered
                 ],
             },
             "ports": len(
@@ -181,4 +232,4 @@ class RuntimeContext:
             "actuators": len(
                 self.actuators.list()
             ),
-    }
+        }
