@@ -10,6 +10,7 @@ from app.modules.runtime.automation_state import (
     AutomationState,
 )
 from app.modules.runtime.hardware_events import (
+    HardwareEvent,
     HardwareEventBus,
 )
 from app.modules.runtime.io_manager import (
@@ -39,20 +40,56 @@ class RuntimeContext:
             project_id=project_id,
         )
 
+    def _publish_state(
+        self,
+        event_type: str,
+    ) -> None:
+        self.events.publish(
+            HardwareEvent(
+                event_type=event_type,
+                source="runtime",
+                value=self.state.to_dict(),
+                metadata={
+                    "project_id": self.project_id,
+                },
+            )
+        )
+
     def start(self) -> None:
         self.state.start()
+        self._publish_state(
+            "runtime.started"
+        )
 
     def pause(self) -> None:
         self.state.pause()
+        self._publish_state(
+            "runtime.paused"
+        )
 
     def resume(self) -> None:
         self.state.resume()
+        self._publish_state(
+            "runtime.resumed"
+        )
 
     def stop(self) -> None:
         self.state.stop()
+        self._publish_state(
+            "runtime.stopped"
+        )
 
     def emergency_stop(self) -> None:
         self.state.emergency_stop_now()
+        self._publish_state(
+            "runtime.emergency_stop"
+        )
+
+    def reset_emergency_stop(self) -> None:
+        self.state.reset_emergency_stop()
+        self._publish_state(
+            "runtime.emergency_stop_reset"
+        )
 
     def status(self) -> dict:
         return {
