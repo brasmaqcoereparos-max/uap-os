@@ -1,4 +1,12 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
+
+
+VALID_ORIENTATIONS = {
+    "portrait",
+    "landscape",
+}
 
 
 @dataclass
@@ -16,6 +24,31 @@ class UIDeviceProfile:
     touch: bool = False
 
     orientation: str = "landscape"
+
+    def __post_init__(self) -> None:
+        self.width = max(
+            1,
+            int(self.width),
+        )
+
+        self.height = max(
+            1,
+            int(self.height),
+        )
+
+        self.pixel_ratio = max(
+            0.1,
+            float(self.pixel_ratio),
+        )
+
+        if (
+            self.orientation
+            not in VALID_ORIENTATIONS
+        ):
+            raise ValueError(
+                "Unsupported orientation: "
+                f"{self.orientation}"
+            )
 
     def rotate(self):
         self.width, self.height = (
@@ -35,6 +68,21 @@ class UIDeviceProfile:
 
         return self
 
+    def logical_width(self) -> float:
+        return (
+            self.width
+            / self.pixel_ratio
+        )
+
+    def logical_height(self) -> float:
+        return (
+            self.height
+            / self.pixel_ratio
+        )
+
+    def is_touch(self) -> bool:
+        return self.touch
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -51,4 +99,4 @@ class UIDeviceProfile:
             "orientation": (
                 self.orientation
             ),
-  }
+    }
