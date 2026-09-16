@@ -1,150 +1,155 @@
 from __future__ import annotations
 
-from app.modules.ui.registry import (
-    UIRegistry,
-    ui_registry,
-)
+from dataclasses import dataclass
+from dataclasses import field
+from typing import Any
 
 
-class UINavigation:
+VALID_PANEL_POSITIONS = {
+    "left",
+    "right",
+    "top",
+    "bottom",
+    "center",
+}
 
-    def __init__(
-        self,
-        registry: UIRegistry = ui_registry,
-    ):
-        self.registry = registry
 
-        self.current_screen_id: (
-            str | None
-        ) = None
+@dataclass
+class UIPanel:
+    id: str
+    name: str
 
-        self.history: list[
-            str
-        ] = []
+    title: str = ""
 
-        self.forward_history: list[
-            str
-        ] = []
+    position: str = "left"
 
-    def navigate(
-        self,
-        screen_id: str,
-        *,
-        add_history: bool = True,
-    ):
-        screen = self.registry.get_screen(
-            screen_id
-        )
+    width: float = 280
+    height: float | None = None
 
-        if not screen:
-            raise ValueError(
-                "Screen not found: "
-                f"{screen_id}"
-            )
+    visible: bool = True
+    collapsed: bool = False
+    resizable: bool = True
 
+    order: int = 0
+
+    metadata: dict[
+        str,
+        Any,
+    ] = field(
+        default_factory=dict
+    )
+
+    def __post_init__(self) -> None:
         if (
-            add_history
-            and self.current_screen_id
-            and self.current_screen_id
-            != screen_id
+            self.position
+            not in VALID_PANEL_POSITIONS
         ):
-            self.history.append(
-                self.current_screen_id
+            raise ValueError(
+                "Invalid panel position: "
+                f"{self.position}"
             )
 
-            self.forward_history.clear()
-
-        self.current_screen_id = (
-            screen_id
+        self.width = max(
+            1.0,
+            float(self.width),
         )
 
-        return screen
-
-    def back(self):
-        if not self.history:
-            return None
-
-        screen_id = self.history.pop()
-
-        screen = self.registry.get_screen(
-            screen_id
-        )
-
-        if not screen:
-            return None
-
-        if self.current_screen_id:
-            self.forward_history.append(
-                self.current_screen_id
+        if self.height is not None:
+            self.height = max(
+                1.0,
+                float(self.height),
             )
 
-        self.current_screen_id = (
-            screen_id
+        self.order = int(
+            self.order
         )
 
-        return screen
+    def show(self):
+        self.visible = True
+        return self
 
-    def forward(self):
-        if not self.forward_history:
-            return None
+    def hide(self):
+        self.visible = False
+        return self
 
-        screen_id = (
-            self.forward_history.pop()
+    def toggle_visibility(self):
+        self.visible = not self.visible
+        return self.visible
+
+    def collapse(self):
+        self.collapsed = True
+        return self
+
+    def expand(self):
+        self.collapsed = False
+        return self
+
+    def toggle_collapsed(self):
+        self.collapsed = (
+            not self.collapsed
         )
 
-        screen = self.registry.get_screen(
-            screen_id
-        )
+        return self.collapsed
 
-        if not screen:
-            return None
-
-        if self.current_screen_id:
-            self.history.append(
-                self.current_screen_id
+    def set_position(
+        self,
+        position: str,
+    ) -> str:
+        if (
+            position
+            not in VALID_PANEL_POSITIONS
+        ):
+            raise ValueError(
+                "Invalid panel position: "
+                f"{position}"
             )
 
-        self.current_screen_id = (
-            screen_id
-        )
+        self.position = position
 
-        return screen
+        return self.position
 
-    def current(self):
-        if not self.current_screen_id:
-            return None
+    def resize(
+        self,
+        width: float | None = None,
+        height: float | None = None,
+    ):
+        if not self.resizable:
+            return False
 
-        return self.registry.get_screen(
-            self.current_screen_id
-        )
+        if width is not None:
+            self.width = max(
+                1.0,
+                float(width),
+            )
 
-    def can_go_back(self) -> bool:
-        return bool(
-            self.history
-        )
+        if height is not None:
+            self.height = max(
+                1.0,
+                float(height),
+            )
 
-    def can_go_forward(self) -> bool:
-        return bool(
-            self.forward_history
-        )
+        return True
 
-    def reset(self):
-        self.current_screen_id = None
-        self.history.clear()
-        self.forward_history.clear()
-
-    def snapshot(self) -> dict:
+    def to_dict(self):
         return {
-            "current_screen_id": (
-                self.current_screen_id
+            "id": self.id,
+            "name": self.name,
+            "title": (
+                self.title
+                or self.name
             ),
-            "history": list(
-                self.history
+            "position": self.position,
+            "width": self.width,
+            "height": self.height,
+            "visible": self.visible,
+            "collapsed": (
+                self.collapsed
             ),
-            "forward_history": list(
-                self.forward_history
+            "resizable": (
+                self.resizable
+            ),
+            "order": self.order,
+            "metadata": dict(
+                self.metadata
             ),
         }
-
-
-ui_navigation = UINavigation()
