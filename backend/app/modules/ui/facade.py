@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 
 from app.modules.ui.enums import (
@@ -6,6 +8,15 @@ from app.modules.ui.enums import (
 )
 from app.modules.ui.health import (
     ui_health,
+)
+from app.modules.ui.navigation import (
+    ui_navigation,
+)
+from app.modules.ui.preview_service import (
+    ui_studio_preview_service,
+)
+from app.modules.ui.project_registry import (
+    ui_project_registry,
 )
 from app.modules.ui.runtime_bridge import (
     ui_runtime_bridge,
@@ -36,6 +47,14 @@ class UIFacade:
             screen_type=screen_type,
         )
 
+    def get_screen(
+        self,
+        screen_id: str,
+    ):
+        return UIService.get_screen(
+            screen_id
+        )
+
     def add_widget(
         self,
         screen_id: str,
@@ -46,6 +65,102 @@ class UIFacade:
             screen_id=screen_id,
             name=name,
             widget_type=widget_type,
+        )
+
+    def navigate(
+        self,
+        screen_id: str,
+    ):
+        screen = (
+            ui_navigation.navigate(
+                screen_id
+            )
+        )
+
+        active_project = (
+            ui_project_registry
+            .active()
+        )
+
+        if active_project:
+            active_project.set_active_screen(
+                screen.id
+            )
+
+        return screen
+
+    def navigate_route(
+        self,
+        route: str,
+    ):
+        screen = (
+            UIService
+            .get_screen_by_route(
+                route
+            )
+        )
+
+        if screen is None:
+            raise ValueError(
+                "Screen route not found: "
+                f"{route}"
+            )
+
+        return self.navigate(
+            screen.id
+        )
+
+    def back(self):
+        screen = (
+            ui_navigation.back()
+        )
+
+        active_project = (
+            ui_project_registry
+            .active()
+        )
+
+        if (
+            screen is not None
+            and active_project
+        ):
+            active_project.set_active_screen(
+                screen.id
+            )
+
+        return screen
+
+    def forward(self):
+        screen = (
+            ui_navigation.forward()
+        )
+
+        active_project = (
+            ui_project_registry
+            .active()
+        )
+
+        if (
+            screen is not None
+            and active_project
+        ):
+            active_project.set_active_screen(
+                screen.id
+            )
+
+        return screen
+
+    def preview(
+        self,
+        screen_id: str,
+        profile_id: str = "desktop",
+    ):
+        return (
+            ui_studio_preview_service
+            .preview(
+                screen_id=screen_id,
+                profile_id=profile_id,
+            )
         )
 
     def update_state(
@@ -61,11 +176,55 @@ class UIFacade:
             )
         )
 
-    def snapshot(self):
+    def update_runtime_status(
+        self,
+        status: dict[str, Any],
+    ):
         return (
             ui_runtime_bridge
-            .snapshot()
+            .update_runtime_status(
+                status
+            )
         )
+
+    def open_project(
+        self,
+        project_id: str,
+    ):
+        project = (
+            ui_project_registry
+            .get_or_create(
+                project_id
+            )
+        )
+
+        ui_project_registry.activate(
+            project_id
+        )
+
+        return project
+
+    def active_project(self):
+        return (
+            ui_project_registry
+            .active()
+        )
+
+    def snapshot(self):
+        return {
+            "runtime": (
+                ui_runtime_bridge
+                .snapshot()
+            ),
+            "navigation": (
+                ui_navigation
+                .snapshot()
+            ),
+            "projects": (
+                ui_project_registry
+                .snapshot()
+            ),
+        }
 
     def health(self):
         return ui_health.check()
