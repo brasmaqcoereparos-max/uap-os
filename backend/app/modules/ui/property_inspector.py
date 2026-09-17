@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 
 from app.modules.ui.property_definition import (
@@ -27,6 +29,7 @@ class UIPropertyInspector:
             UIPropertyDefinition(
                 name="name",
                 label="Name",
+                required=True,
             ),
             UIPropertyDefinition(
                 name="x",
@@ -68,9 +71,13 @@ class UIPropertyInspector:
         ]
 
         for definition in definitions:
-            widget.add(definition)
+            widget.add(
+                definition
+            )
 
-        self.register_schema(widget)
+        self.register_schema(
+            widget
+        )
 
     def register_schema(
         self,
@@ -98,27 +105,42 @@ class UIPropertyInspector:
             "widget"
         )
 
-        result = {}
-
         if not schema:
-            return result
+            return {
+                "schema": None,
+                "values": {},
+            }
+
+        values = {}
 
         for definition in (
             schema.properties
         ):
-            result[
-                definition.name
-            ] = getattr(
+            if hasattr(
                 widget,
                 definition.name,
-                definition.default,
-            )
+            ):
+                value = getattr(
+                    widget,
+                    definition.name
+                )
+            else:
+                value = (
+                    widget.properties.get(
+                        definition.name,
+                        definition.default,
+                    )
+                )
+
+            values[
+                definition.name
+            ] = value
 
         return {
             "schema": (
                 schema.to_dict()
             ),
-            "values": result,
+            "values": values,
         }
 
     def update_widget(
@@ -136,54 +158,63 @@ class UIPropertyInspector:
         if not schema:
             return widget
 
-        for key, value in (
-            values.items()
-        ):
+        validated = schema.validate(
+            values,
+            partial=True,
+        )
+
+        for (
+            key,
+            value,
+        ) in validated.items():
             definition = (
-                schema.get(key)
+                schema.get(
+                    key
+                )
             )
 
             if (
-                not definition
+                definition is None
                 or not definition.editable
             ):
                 continue
 
-            if (
-                definition.minimum
-                is not None
-                and isinstance(
-                    value,
-                    (int, float),
-                )
-            ):
-                value = max(
-                    definition.minimum,
-                    value,
-                )
-
-            if (
-                definition.maximum
-                is not None
-                and isinstance(
-                    value,
-                    (int, float),
-                )
-            ):
-                value = min(
-                    definition.maximum,
-                    value,
-                )
-
-            setattr(
+            if hasattr(
                 widget,
                 key,
-                value,
-            )
+            ):
+                setattr(
+                    widget,
+                    key,
+                    value,
+                )
+            else:
+                widget.set_property(
+                    key,
+                    value,
+                )
 
         return widget
+
+    def update_property(
+        self,
+        widget,
+        name: str,
+        value: Any,
+    ):
+        return self.update_widget(
+            widget,
+            {
+                name: value,
+            },
+        )
+
+    def schemas(self):
+        return list(
+            self._schemas.values()
+        )
 
 
 ui_property_inspector = (
     UIPropertyInspector()
-      )
+)
