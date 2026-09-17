@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from datetime import datetime
+from datetime import timezone
 
 from app.modules.ui.render_context import (
     UIRenderContext,
@@ -19,10 +22,15 @@ class UIPreview:
 
     tree: dict
 
+    profile_id: str | None = None
+
     def to_dict(self):
         return {
             "screen_id": (
                 self.screen_id
+            ),
+            "profile_id": (
+                self.profile_id
             ),
             "context": (
                 self.context.to_dict()
@@ -31,7 +39,9 @@ class UIPreview:
                 self.rendered_at
                 .isoformat()
             ),
-            "tree": dict(self.tree),
+            "tree": dict(
+                self.tree
+            ),
         }
 
 
@@ -43,7 +53,18 @@ class UIPreviewService:
         context: (
             UIRenderContext | None
         ) = None,
+        profile_id: str | None = None,
     ):
+        if screen is None:
+            raise ValueError(
+                "Screen is required"
+            )
+
+        if not screen.visible:
+            raise RuntimeError(
+                "Cannot preview hidden screen"
+            )
+
         context = (
             context
             or UIRenderContext(
@@ -65,12 +86,15 @@ class UIPreviewService:
             screen_id=screen.id,
             context=context,
             rendered_at=(
-                datetime.utcnow()
+                datetime.now(
+                    timezone.utc
+                )
             ),
             tree=tree.to_dict(),
+            profile_id=profile_id,
         )
 
 
 ui_preview_service = (
     UIPreviewService()
-)
+        )
