@@ -14,6 +14,9 @@ from app.modules.ui.enums import (
 from app.modules.ui.navigation import (
     ui_navigation,
 )
+from app.modules.ui.runtime_bridge import (
+    ui_runtime_bridge,
+)
 from app.modules.ui.state import (
     ui_state,
 )
@@ -257,17 +260,41 @@ class UIActionExecutor:
             action_type
             == ActionType.AUTOMATION
         ):
-            return {
-                "executed": False,
-                "action": "automation",
-                "reason": (
-                    "runtime_bridge_required"
-                ),
-                "payload": payload,
-                "configuration": (
-                    action
-                ),
-            }
+            runtime_action = (
+                action.get(
+                    "runtime_action"
+                )
+                or action.get(
+                    "action"
+                )
+                or action.get(
+                    "command"
+                )
+            )
+
+            if not runtime_action:
+                raise ValueError(
+                    "runtime_action is required"
+                )
+
+            parameters = dict(
+                action.get(
+                    "parameters",
+                    {},
+                )
+            )
+
+            parameters.update(
+                payload
+            )
+
+            return (
+                ui_runtime_bridge
+                .execute_runtime_action(
+                    runtime_action,
+                    parameters,
+                )
+            )
 
         raise ValueError(
             "Unsupported action type: "
@@ -277,4 +304,4 @@ class UIActionExecutor:
 
 ui_action_executor = (
     UIActionExecutor()
-)
+            )
