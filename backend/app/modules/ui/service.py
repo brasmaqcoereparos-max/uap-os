@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import uuid
 from typing import Any
 
@@ -35,12 +37,27 @@ class UIService:
             ScreenType.STANDARD
         ),
     ):
+        existing = (
+            ui_registry
+            .get_screen_by_route(
+                route
+            )
+        )
+
+        if existing is not None:
+            raise ValueError(
+                "Screen route already exists: "
+                f"{route}"
+            )
+
         screen_id = str(
             uuid.uuid4()
         )
 
         layout = UILayout(
-            id=str(uuid.uuid4()),
+            id=str(
+                uuid.uuid4()
+            ),
             name=f"{name} Layout",
             layout_type=LayoutType.FREE,
         )
@@ -70,9 +87,26 @@ class UIService:
         )
 
     @staticmethod
-    def list_screens():
+    def get_screen_by_route(
+        route: str,
+    ):
         return (
-            ui_registry.list_screens()
+            ui_registry
+            .get_screen_by_route(
+                route
+            )
+        )
+
+    @staticmethod
+    def list_screens(
+        visible_only: bool = False,
+        enabled_only: bool = False,
+    ):
+        return (
+            ui_registry.list_screens(
+                visible_only=visible_only,
+                enabled_only=enabled_only,
+            )
         )
 
     @staticmethod
@@ -85,6 +119,60 @@ class UIService:
             )
             is not None
         )
+
+    @staticmethod
+    def update_screen(
+        screen_id: str,
+        *,
+        title: str | None = None,
+        route: str | None = None,
+        visible: bool | None = None,
+        enabled: bool | None = None,
+    ):
+        screen = (
+            ui_registry.require_screen(
+                screen_id
+            )
+        )
+
+        if title is not None:
+            screen.title = str(
+                title
+            )
+
+        if route is not None:
+            existing = (
+                ui_registry
+                .get_screen_by_route(
+                    route
+                )
+            )
+
+            if (
+                existing is not None
+                and existing.id
+                != screen.id
+            ):
+                raise ValueError(
+                    "Screen route already exists: "
+                    f"{route}"
+                )
+
+            screen.set_route(
+                route
+            )
+
+        if visible is not None:
+            screen.visible = bool(
+                visible
+            )
+
+        if enabled is not None:
+            screen.enabled = bool(
+                enabled
+            )
+
+        return screen
 
     @staticmethod
     def add_widget(
@@ -124,6 +212,30 @@ class UIService:
         )
 
         return widget
+
+    @staticmethod
+    def get_widget(
+        screen_id: str,
+        widget_id: str,
+    ):
+        screen = (
+            ui_registry.get_screen(
+                screen_id
+            )
+        )
+
+        if (
+            screen is None
+            or screen.layout is None
+        ):
+            return None
+
+        return (
+            screen.layout
+            .get_widget(
+                widget_id
+            )
+        )
 
     @staticmethod
     def remove_widget(
@@ -185,7 +297,9 @@ class UIService:
             action_type
         )
 
-        widget.action = dict(action)
+        widget.action = dict(
+            action
+        )
 
         return widget
 
@@ -195,7 +309,9 @@ class UIService:
         mode: str = "light",
     ):
         theme = UITheme(
-            id=str(uuid.uuid4()),
+            id=str(
+                uuid.uuid4()
+            ),
             name=name,
             mode=mode,
         )
@@ -208,7 +324,21 @@ class UIService:
         )
 
     @staticmethod
+    def get_theme(
+        theme_id: str,
+    ):
+        return ui_registry.get_theme(
+            theme_id
+        )
+
+    @staticmethod
     def list_themes():
         return (
             ui_registry.list_themes()
+        )
+
+    @staticmethod
+    def snapshot():
+        return (
+            ui_registry.snapshot()
     )
