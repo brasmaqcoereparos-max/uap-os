@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from app.modules.ui.screen import (
     UIScreen,
 )
@@ -23,6 +25,22 @@ class UIRegistry:
         self,
         screen: UIScreen,
     ):
+        existing_route = (
+            self.get_screen_by_route(
+                screen.route
+            )
+        )
+
+        if (
+            existing_route is not None
+            and existing_route.id
+            != screen.id
+        ):
+            raise ValueError(
+                "Screen route already registered: "
+                f"{screen.route}"
+            )
+
         self._screens[
             screen.id
         ] = screen
@@ -37,6 +55,40 @@ class UIRegistry:
             screen_id
         )
 
+    def require_screen(
+        self,
+        screen_id: str,
+    ) -> UIScreen:
+        screen = self.get_screen(
+            screen_id
+        )
+
+        if screen is None:
+            raise KeyError(
+                "Screen not found: "
+                f"{screen_id}"
+            )
+
+        return screen
+
+    def get_screen_by_route(
+        self,
+        route: str,
+    ) -> UIScreen | None:
+        if not route:
+            route = "/"
+
+        if not route.startswith("/"):
+            route = "/" + route
+
+        for screen in (
+            self._screens.values()
+        ):
+            if screen.route == route:
+                return screen
+
+        return None
+
     def remove_screen(
         self,
         screen_id: str,
@@ -46,10 +98,32 @@ class UIRegistry:
             None,
         )
 
-    def list_screens(self):
-        return list(
+    def list_screens(
+        self,
+        visible_only: bool = False,
+        enabled_only: bool = False,
+    ):
+        screens = list(
             self._screens.values()
         )
+
+        if visible_only:
+            screens = [
+                screen
+                for screen
+                in screens
+                if screen.visible
+            ]
+
+        if enabled_only:
+            screens = [
+                screen
+                for screen
+                in screens
+                if screen.enabled
+            ]
+
+        return screens
 
     def register_theme(
         self,
@@ -69,6 +143,22 @@ class UIRegistry:
             theme_id
         )
 
+    def require_theme(
+        self,
+        theme_id: str,
+    ) -> UITheme:
+        theme = self.get_theme(
+            theme_id
+        )
+
+        if theme is None:
+            raise KeyError(
+                "Theme not found: "
+                f"{theme_id}"
+            )
+
+        return theme
+
     def remove_theme(
         self,
         theme_id: str,
@@ -82,6 +172,20 @@ class UIRegistry:
         return list(
             self._themes.values()
         )
+
+    def snapshot(self):
+        return {
+            "screens": [
+                screen.to_dict()
+                for screen
+                in self.list_screens()
+            ],
+            "themes": [
+                theme.to_dict()
+                for theme
+                in self.list_themes()
+            ],
+        }
 
     def clear(self):
         self._screens.clear()
