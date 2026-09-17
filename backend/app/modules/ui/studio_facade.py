@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from app.modules.ui.hierarchy_service import (
     ui_hierarchy_service,
 )
@@ -23,10 +25,15 @@ from app.modules.ui.studio_state import (
 
 class UIStudioFacade:
 
-    def initialize(self):
+    def initialize(
+        self,
+        user_level: str | None = None,
+    ):
         return (
             ui_studio_service
-            .initialize()
+            .initialize(
+                user_level=user_level
+            )
         )
 
     def snapshot(self):
@@ -40,6 +47,41 @@ class UIStudioFacade:
                 .to_dict()
             ),
         }
+
+    def set_user_level(
+        self,
+        level: str,
+    ):
+        return (
+            ui_studio_service
+            .set_user_level(
+                level
+            )
+        )
+
+    def user_level(self):
+        return (
+            ui_studio_service
+            .user_level()
+        )
+
+    def capabilities(self):
+        return dict(
+            ui_studio_service
+            .policy()
+            .capabilities
+        )
+
+    def capability(
+        self,
+        name: str,
+    ) -> bool:
+        return (
+            ui_studio_service
+            .capability(
+                name
+            )
+        )
 
     def select_screen(
         self,
@@ -82,7 +124,8 @@ class UIStudioFacade:
             )
 
         widget = (
-            screen.layout.get_widget(
+            screen.layout
+            .get_widget(
                 widget_id
             )
         )
@@ -116,6 +159,14 @@ class UIStudioFacade:
         self,
         screen_id: str,
     ):
+        if not self.capability(
+            "hierarchy"
+        ):
+            raise PermissionError(
+                "Hierarchy is not available "
+                "for the current user level"
+            )
+
         return (
             ui_hierarchy_service
             .snapshot(
@@ -131,7 +182,9 @@ class UIStudioFacade:
     ):
         return (
             ui_palette_service
-            .items(category)
+            .items(
+                category
+            )
         )
 
     def preview(
@@ -139,12 +192,20 @@ class UIStudioFacade:
         screen_id: str,
         profile_id: str = "desktop",
     ):
+        if not self.capability(
+            "preview"
+        ):
+            raise PermissionError(
+                "Preview is not available "
+                "for the current user level"
+            )
+
         ui_studio_state.set_preview_profile(
             profile_id
         )
 
-        ui_studio_state.preview_enabled = (
-            True
+        ui_studio_state.enable_preview(
+            profile_id
         )
 
         return (
@@ -158,4 +219,4 @@ class UIStudioFacade:
 
 ui_studio_facade = (
     UIStudioFacade()
-    )
+            )
