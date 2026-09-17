@@ -220,4 +220,4 @@ class UIBindingManager:
 
 ui_binding_manager = (
     UIBindingManager()
-        )
+            )
