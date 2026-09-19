@@ -1,79 +1,173 @@
-"""
-AI Schemas - Message, Request, Response structures
-"""
+from __future__ import annotations
 
-from enum import Enum
-from typing import Optional, Any, List, Dict
 from datetime import datetime
-from pydantic import BaseModel, Field
+from enum import Enum
+from typing import Any
+
+from pydantic import BaseModel
+from pydantic import Field
 
 
 class MessageRole(str, Enum):
-    """Message roles in conversation"""
     SYSTEM = "system"
     USER = "user"
     ASSISTANT = "assistant"
 
 
 class AIMessage(BaseModel):
-    """Single message in AI conversation"""
     role: MessageRole
     content: str
-    timestamp: Optional[datetime] = Field(default_factory=datetime.utcnow)
-    metadata: Dict[str, Any] = Field(default_factory=dict)
 
-    class Config:
-        json_encoders = {
-            datetime: lambda v: v.isoformat()
-        }
+    timestamp: datetime = Field(
+        default_factory=datetime.utcnow
+    )
+
+    metadata: dict[str, Any] = Field(
+        default_factory=dict
+    )
 
 
 class AIRequest(BaseModel):
-    """Request to AI service"""
-    conversation_id: Optional[str] = None
-    project_id: Optional[str] = None
-    user_id: Optional[str] = None
-    message: str
-    context: Optional[Dict[str, Any]] = None
-    system_prompt: Optional[str] = None
-    temperature: float = Field(default=0.7, ge=0.0, le=2.0)
-    max_tokens: Optional[int] = Field(default=2000, ge=100)
+    conversation_id: str | None = None
+    project_id: str | None = None
+    user_id: str | None = None
+
+    message: str | None = None
+
+    messages: list[AIMessage] = Field(
+        default_factory=list
+    )
+
+    context: dict[str, Any] | None = None
+
+    system_prompt: str | None = None
+
+    model: str | None = None
+
+    temperature: float = Field(
+        default=0.7,
+        ge=0.0,
+        le=2.0,
+    )
+
+    max_tokens: int | None = Field(
+        default=2000,
+        ge=1,
+    )
+
+    max_output_tokens: int | None = Field(
+        default=None,
+        ge=1,
+    )
+
     include_reasoning: bool = False
     tool_use: bool = False
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "message": "How do I create a smart home automation?",
-                "project_id": "proj_123",
-                "temperature": 0.7,
-            }
-        }
+    metadata: dict[str, Any] = Field(
+        default_factory=dict
+    )
+
+    def normalized_messages(
+        self,
+    ) -> list[AIMessage]:
+        result = list(
+            self.messages
+        )
+
+        if (
+            self.system_prompt
+            and not any(
+                message.role
+                == MessageRole.SYSTEM
+                for message in result
+            )
+        ):
+            result.insert(
+                0,
+                AIMessage(
+                    role=MessageRole.SYSTEM,
+                    content=self.system_prompt,
+                ),
+            )
+
+        if (
+            self.message
+            and not any(
+                message.role
+                == MessageRole.USER
+                and message.content
+                == self.message
+                for message in result
+            )
+        ):
+            result.append(
+                AIMessage(
+                    role=MessageRole.USER,
+                    content=self.message,
+                )
+            )
+
+        return result
 
 
 class AIResponse(BaseModel):
-    """Response from AI service"""
-    conversation_id: str
-    message: str
-    role: MessageRole = MessageRole.ASSISTANT
-    thinking: Optional[str] = None
-    intent: Optional[str] = None
-    plan: Optional[List[str]] = None
-    tools_used: Optional[List[str]] = None
-    structured_output: Optional[Dict[str, Any]] = None
-    safety_level: str = Field(default="safe")  # safe, requires_review, blocked
-    confidence: float = Field(default=1.0, ge=0.0, le=1.0)
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    conversation_id: str | None = None
 
-    class Config:
-        json_encoders = {
-            datetime: lambda v: v.isoformat()
-        }
+    message: str = ""
+    text: str = ""
+
+    role: MessageRole = (
+        MessageRole.ASSISTANT
+    )
+
+    provider: str | None = None
+    model: str | None = None
+
+    success: bool = True
+    error: str | None = None
+
+    thinking: str | None = None
+    intent: str | None = None
+
+    plan: list[str] | None = None
+    tools_used: list[str] | None = None
+
+    structured_output: (
+        dict[str, Any] | None
+    ) = None
+
+    safety_level: str = "safe"
+
+    confidence: float = Field(
+        default=1.0,
+        ge=0.0,
+        le=1.0,
+    )
+
+    usage: dict[str, Any] = Field(
+        default_factory=dict
+    )
+
+    metadata: dict[str, Any] = Field(
+        default_factory=dict
+    )
+
+    timestamp: datetime = Field(
+        default_factory=datetime.utcnow
+    )
+
+    def model_post_init(
+        self,
+        __context: Any,
+    ) -> None:
+        if self.text and not self.message:
+            self.message = self.text
+
+        elif self.message and not self.text:
+            self.text = self.message
 
 
 class ProviderStatus(str, Enum):
-    """AI Provider status"""
     AVAILABLE = "available"
     UNAVAILABLE = "unavailable"
     ERROR = "error"
@@ -81,15 +175,22 @@ class ProviderStatus(str, Enum):
 
 
 class ProviderHealth(BaseModel):
-    """Provider health check"""
     provider_name: str
-    status: ProviderStatus
-    available: bool
-    error: Optional[str] = None
-    last_check: datetime = Field(default_factory=datetime.utcnow)
-    response_time_ms: Optional[float] = None
 
-    class Config:
-        json_encoders = {
-            datetime: lambda v: v.isoformat()
-        }
+    status: ProviderStatus
+
+    available: bool
+
+    error: str | None = None
+
+    last_check: datetime = Field(
+        default_factory=datetime.utcnow
+    )
+
+    response_time_ms: (
+        float | None
+    ) = None
+
+    metadata: dict[str, Any] = Field(
+        default_factory=dict
+    )
