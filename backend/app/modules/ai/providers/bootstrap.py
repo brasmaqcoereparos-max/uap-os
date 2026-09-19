@@ -96,4 +96,4 @@ class AIProviderBootstrap:
 
 ai_provider_bootstrap = (
     AIProviderBootstrap()
-)
+        )
