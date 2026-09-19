@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from app.modules.ai.providers.mock import (
     MockProvider,
 )
@@ -14,51 +16,82 @@ class AIProviderBootstrap:
     def __init__(self):
         self._initialized = False
 
+    @staticmethod
+    def _available(
+        provider,
+    ) -> bool:
+        available = getattr(
+            provider,
+            "available",
+            False,
+        )
+
+        if callable(
+            available
+        ):
+            try:
+                return bool(
+                    available()
+                )
+
+            except Exception:
+                return False
+
+        return bool(
+            available
+        )
+
     def initialize(self):
         if self._initialized:
             return (
                 ai_provider_registry
             )
 
-        existing_mock = (
+        if (
             ai_provider_registry.get(
                 "mock"
             )
-        )
-
-        if not existing_mock:
+            is None
+        ):
             ai_provider_registry.register(
-                MockProvider()
+                MockProvider(),
+                default=True,
             )
 
-        if not (
+        if (
             ai_provider_registry.get(
                 "openai"
             )
+            is None
         ):
             ai_provider_registry.register(
                 openai_provider
             )
 
-        if (
-            openai_provider.available()
+        if self._available(
+            openai_provider
         ):
             ai_provider_registry.set_default(
                 "openai"
             )
 
-        elif (
-            ai_provider_registry.get(
-                "mock"
-            )
-        ):
+        else:
             ai_provider_registry.set_default(
                 "mock"
             )
 
         self._initialized = True
 
-        return ai_provider_registry
+        return (
+            ai_provider_registry
+        )
+
+    def reset(self):
+        self._initialized = False
+
+        ai_provider_registry.clear()
+
+        return self.initialize()
 
 
 ai_provider_bootstrap = (
