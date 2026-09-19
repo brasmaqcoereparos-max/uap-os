@@ -6,8 +6,14 @@ from app.modules.voice.command import (
 from app.modules.voice.dispatch_executor import (
     voice_dispatch_executor,
 )
+from app.modules.voice.multimodal_response import (
+    voice_multimodal_response,
+)
 from app.modules.voice.processor import (
     voice_processor,
+)
+from app.modules.voice.response_builder import (
+    voice_response_builder,
 )
 from app.modules.voice.session import (
     VoiceSession,
@@ -25,6 +31,11 @@ class VoiceSafePipeline:
         session: (
             VoiceSession | None
         ) = None,
+        *,
+        build_response: bool = True,
+        tts_provider: (
+            str | None
+        ) = None,
     ):
         processed = (
             voice_processor.process(
@@ -38,10 +49,24 @@ class VoiceSafePipeline:
         )
 
         if not command_data:
-            processed["dispatch"] = None
-            processed["execution"] = None
+            processed[
+                "dispatch"
+            ] = None
 
-            return processed
+            processed[
+                "execution"
+            ] = None
+
+            return self._finalize(
+                processed,
+                transcript=transcript,
+                build_response=(
+                    build_response
+                ),
+                tts_provider=(
+                    tts_provider
+                ),
+            )
 
         command = VoiceCommand(
             command=command_data[
@@ -78,21 +103,82 @@ class VoiceSafePipeline:
             )
         )
 
-        processed["dispatch"] = (
-            result.get(
-                "dispatch"
+        processed[
+            "dispatch"
+        ] = result.get(
+            "dispatch"
+        )
+
+        processed[
+            "execution"
+        ] = result.get(
+            "execution"
+        )
+
+        return self._finalize(
+            processed,
+            transcript=transcript,
+            build_response=(
+                build_response
+            ),
+            tts_provider=(
+                tts_provider
+            ),
+        )
+
+    def _finalize(
+        self,
+        processed: dict,
+        *,
+        transcript: VoiceTranscript,
+        build_response: bool,
+        tts_provider: str | None,
+    ):
+        if not build_response:
+            return processed
+
+        response = (
+            voice_response_builder
+            .from_result(
+                processed
             )
         )
 
-        processed["execution"] = (
-            result.get(
-                "execution"
+        multimodal = (
+            voice_multimodal_response
+            .build(
+                response=response,
+                language=(
+                    transcript.language
+                    or "pt-BR"
+                ),
+                tts_provider=(
+                    tts_provider
+                ),
             )
         )
+
+        processed[
+            "response"
+        ] = multimodal[
+            "response"
+        ]
+
+        processed[
+            "tts"
+        ] = multimodal[
+            "tts"
+        ]
+
+        processed[
+            "feedback"
+        ] = multimodal[
+            "feedback"
+        ]
 
         return processed
 
 
 voice_safe_pipeline = (
     VoiceSafePipeline()
-)
+        )
