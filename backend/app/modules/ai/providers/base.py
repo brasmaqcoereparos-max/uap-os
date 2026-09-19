@@ -1,69 +1,176 @@
-"""
-AI Provider - Abstract base class
-"""
+from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import Optional, Dict, Any, List
 from datetime import datetime
-import logging
+from typing import Any
 
-from ..schemas import AIMessage, AIResponse, ProviderStatus, ProviderHealth, MessageRole
+from app.modules.ai.schemas import (
+    AIRequest,
+    AIResponse,
+    ProviderHealth,
+    ProviderStatus,
+)
 
-logger = logging.getLogger(__name__)
 
+class AIProvider:
 
-class AIProvider(ABC):
-    """Abstract base for AI providers"""
+    def __init__(
+        self,
+        name: str | None = None,
+        config: (
+            dict[str, Any] | None
+        ) = None,
+    ):
+        self._provider_name = (
+            name
+            or self.__class__.__name__
+            .lower()
+        )
 
-    def __init__(self, name: str, config: Optional[Dict[str, Any]] = None):
-        self.name = name
-        self.config = config or {}
-        self.available = False
-        self.last_error: Optional[str] = None
-        self.last_check: Optional[datetime] = None
-        self.response_time_ms: Optional[float] = None
+        self.config = dict(
+            config or {}
+        )
 
-    @abstractmethod
+        self.last_error: (
+            str | None
+        ) = None
+
+        self.last_check: (
+            datetime | None
+        ) = None
+
+        self.response_time_ms: (
+            float | None
+        ) = None
+
+        self._available = False
+
+    @property
+    def name(self) -> str:
+        return self._provider_name
+
+    def available(self) -> bool:
+        return bool(
+            self._available
+        )
+
+    def generate(
+        self,
+        request: AIRequest,
+    ) -> AIResponse:
+        raise NotImplementedError(
+            f"Provider '{self.name}' "
+            "does not implement generate()"
+        )
+
     async def initialize(self) -> bool:
-        """Initialize provider connection/resources"""
-        pass
+        self._available = True
+        self.last_error = None
+        self.last_check = (
+            datetime.utcnow()
+        )
 
-    @abstractmethod
-    async def health_check(self) -> ProviderHealth:
-        """Check provider health"""
-        pass
+        return True
 
-    @abstractmethod
+    async def health_check(
+        self,
+    ) -> ProviderHealth:
+        self.last_check = (
+            datetime.utcnow()
+        )
+
+        return self.get_health()
+
     async def complete(
         self,
-        messages: List[AIMessage],
+        messages,
         temperature: float = 0.7,
-        max_tokens: Optional[int] = None,
-        **kwargs
+        max_tokens: int | None = None,
+        **kwargs,
     ) -> AIResponse:
-        """Generate AI completion"""
-        pass
+        request = AIRequest(
+            messages=list(
+                messages or []
+            ),
+            temperature=temperature,
+            max_tokens=max_tokens,
+            model=kwargs.get(
+                "model"
+            ),
+            conversation_id=(
+                kwargs.get(
+                    "conversation_id"
+                )
+            ),
+            metadata={
+                key: value
+                for key, value
+                in kwargs.items()
+                if key not in {
+                    "model",
+                    "conversation_id",
+                }
+            },
+        )
+
+        return self.generate(
+            request
+        )
 
     async def shutdown(self):
-        """Cleanup resources"""
-        self.available = False
+        self._available = False
 
-    def get_health(self) -> ProviderHealth:
-        """Get current provider health"""
+    def get_health(
+        self,
+    ) -> ProviderHealth:
+        available = self.available()
+
+        if self.last_error:
+            status = (
+                ProviderStatus.ERROR
+            )
+
+        elif available:
+            status = (
+                ProviderStatus.AVAILABLE
+            )
+
+        else:
+            status = (
+                ProviderStatus.UNAVAILABLE
+            )
+
         return ProviderHealth(
             provider_name=self.name,
-            status=ProviderStatus.AVAILABLE if self.available else ProviderStatus.UNAVAILABLE,
-            available=self.available,
+            status=status,
+            available=available,
             error=self.last_error,
-            last_check=self.last_check or datetime.utcnow(),
-            response_time_ms=self.response_time_ms,
+            last_check=(
+                self.last_check
+                or datetime.utcnow()
+            ),
+            response_time_ms=(
+                self.response_time_ms
+            ),
         )
 
     @staticmethod
-    def validate_message_list(messages: List[AIMessage]) -> bool:
-        """Validate message list structure"""
+    def validate_message_list(
+        messages,
+    ) -> bool:
         if not messages:
             return False
-        if messages[0].role != MessageRole.SYSTEM and messages[0].role != MessageRole.USER:
-            return False
+
+        for message in messages:
+            if not hasattr(
+                message,
+                "role",
+            ):
+                return False
+
+            if not hasattr(
+                message,
+                "content",
+            ):
+                return False
+
         return True
