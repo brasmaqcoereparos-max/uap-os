@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from app.modules.voice.command import (
     VoiceCommand,
 )
-from app.modules.voice.command_dispatcher import (
-    voice_command_dispatcher,
+from app.modules.voice.dispatch_executor import (
+    voice_dispatch_executor,
 )
 from app.modules.voice.processor import (
     voice_processor,
@@ -31,16 +33,13 @@ class VoiceSafePipeline:
             )
         )
 
-        command_data = (
-            processed.get(
-                "command"
-            )
+        command_data = processed.get(
+            "command"
         )
 
         if not command_data:
-            processed[
-                "dispatch"
-            ] = None
+            processed["dispatch"] = None
+            processed["execution"] = None
 
             return processed
 
@@ -58,11 +57,13 @@ class VoiceSafePipeline:
                 "source",
                 "voice",
             ),
-            confidence=command_data.get(
-                "confidence",
-                1.0,
+            confidence=float(
+                command_data.get(
+                    "confidence",
+                    1.0,
+                )
             ),
-            requires_confirmation=(
+            requires_confirmation=bool(
                 command_data.get(
                     "requires_confirmation",
                     False,
@@ -70,14 +71,24 @@ class VoiceSafePipeline:
             ),
         )
 
-        dispatch = (
-            voice_command_dispatcher
-            .dispatch(command)
+        result = (
+            voice_dispatch_executor
+            .dispatch_and_execute(
+                command
+            )
         )
 
-        processed[
-            "dispatch"
-        ] = dispatch.to_dict()
+        processed["dispatch"] = (
+            result.get(
+                "dispatch"
+            )
+        )
+
+        processed["execution"] = (
+            result.get(
+                "execution"
+            )
+        )
 
         return processed
 
