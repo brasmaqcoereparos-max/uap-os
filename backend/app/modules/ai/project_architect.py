@@ -4,6 +4,9 @@ from app.modules.ai.hardware_assistant_service import (
 from app.modules.ai.project_builder_service import (
     ai_project_builder_service,
 )
+from app.modules.ai.safety_service import (
+    ai_safety_service,
+)
 
 
 class AIProjectArchitect:
@@ -51,18 +54,47 @@ class AIProjectArchitect:
                 )
             )
 
-        return {
+        project_data = (
+            project_result.to_dict()
+        )
+
+        architecture = {
             "project": (
-                project_result.to_dict()
+                project_data
             ),
             "hardware": hardware,
             "execution": {
                 "direct_hardware": False,
                 "requires_validation": True,
+                "requires_approval": True,
             },
         }
+
+        safety = (
+            ai_safety_service.inspect(
+                architecture
+            )
+        )
+
+        architecture[
+            "safety"
+        ] = safety.to_dict()
+
+        architecture[
+            "ready_for_execution"
+        ] = (
+            project_result.valid
+            and safety.accepted
+            and not architecture[
+                "execution"
+            ][
+                "requires_approval"
+            ]
+        )
+
+        return architecture
 
 
 ai_project_architect = (
     AIProjectArchitect()
-      )
+)
