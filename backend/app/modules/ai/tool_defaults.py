@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from app.modules.ai.tool_definition import (
     AIToolDefinition,
 )
@@ -26,11 +28,21 @@ class AIToolDefaults:
                 requires_review=False,
             ),
             AIToolDefinition(
+                name="project.explain",
+                description=(
+                    "Explain a UAP project "
+                    "according to user level"
+                ),
+                target="projects",
+                requires_review=False,
+            ),
+            AIToolDefinition(
                 name="automation.propose",
                 description=(
                     "Create automation proposal"
                 ),
                 target="automation",
+                requires_review=True,
             ),
             AIToolDefinition(
                 name="ui.propose",
@@ -38,6 +50,7 @@ class AIToolDefaults:
                     "Create UI proposal"
                 ),
                 target="ui",
+                requires_review=True,
             ),
             AIToolDefinition(
                 name="simulation.propose",
@@ -45,6 +58,7 @@ class AIToolDefaults:
                     "Create simulation proposal"
                 ),
                 target="simulator",
+                requires_review=False,
             ),
             AIToolDefinition(
                 name="hardware.inspect",
@@ -54,6 +68,20 @@ class AIToolDefaults:
                 ),
                 target="uhal",
                 requires_review=False,
+            ),
+            AIToolDefinition(
+                name="runtime.propose",
+                description=(
+                    "Create a reviewed runtime "
+                    "action proposal without "
+                    "executing hardware"
+                ),
+                target="runtime",
+                requires_review=True,
+                metadata={
+                    "direct_execution": False,
+                    "direct_hardware": False,
+                },
             ),
         ]
 
@@ -68,6 +96,10 @@ class AIToolDefaults:
                     requires_review=(
                         tool.requires_review
                     ),
+                    allow_execution=True,
+                    allowed_sources={
+                        "ai",
+                    },
                 )
             )
 
@@ -75,4 +107,6 @@ class AIToolDefaults:
 
 
 def install_default_ai_tools():
-    return AIToolDefaults.install()
+    return (
+        AIToolDefaults.install()
+    )
