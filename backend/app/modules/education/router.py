@@ -18,6 +18,7 @@ router = APIRouter(
 
 @router.get("/status")
 def status():
+
     return (
         education_service.status()
     )
@@ -53,21 +54,14 @@ def disable():
     }
 
 
-@router.post("/catalog/install")
-def install_catalog():
-
-    return (
-        education_service
-        .install_defaults()
-    )
-
-
 @router.get("/lessons")
 def lessons(
     difficulty: str | None = None,
 ):
+
     return (
-        education_service.lessons(
+        education_service
+        .lessons(
             difficulty
         )
     )
@@ -82,6 +76,7 @@ def lesson(
 ):
 
     try:
+
         return (
             education_service.lesson(
                 lesson_id,
@@ -90,6 +85,7 @@ def lesson(
         )
 
     except KeyError as exc:
+
         raise HTTPException(
             status_code=404,
             detail=str(
@@ -98,13 +94,61 @@ def lesson(
         ) from exc
 
 
-@router.get("/exercises")
-def exercises(
-    lesson_id: str | None = None,
+@router.get(
+    "/users/{user_id}/progress"
+)
+def progress(
+    user_id: str,
 ):
+
     return (
-        education_service.exercises(
-            lesson_id
+        education_service
+        .progress(
+            user_id
+        )
+    )
+
+
+@router.get(
+    "/users/{user_id}/lessons/"
+    "{lesson_id}/progress"
+)
+def lesson_progress(
+    user_id: str,
+    lesson_id: str,
+):
+
+    try:
+
+        return (
+            education_service
+            .lesson_progress(
+                user_id,
+                lesson_id,
+            )
+        )
+
+    except KeyError as exc:
+
+        raise HTTPException(
+            status_code=404,
+            detail=str(
+                exc
+            ),
+        ) from exc
+
+
+@router.get(
+    "/users/{user_id}/recommendations"
+)
+def recommendations(
+    user_id: str,
+):
+
+    return (
+        education_service
+        .recommendations(
+            user_id
         )
     )
 
@@ -119,9 +163,13 @@ def assess_exercise(
 ):
 
     try:
-        result = (
-            education_service.assess(
-                user_id=user_id,
+
+        return (
+            education_service
+            .assess(
+                user_id=(
+                    user_id
+                ),
                 exercise_id=(
                     exercise_id
                 ),
@@ -129,9 +177,8 @@ def assess_exercise(
             )
         )
 
-        return result.model_dump()
-
     except KeyError as exc:
+
         raise HTTPException(
             status_code=404,
             detail=str(
@@ -146,10 +193,13 @@ def assess_exercise(
 def profile(
     user_id: str,
 ):
+
     return (
-        education_service.profile(
+        education_service
+        .profile(
             user_id
-        ).model_dump()
+        )
+        .model_dump()
     )
 
 
@@ -162,6 +212,7 @@ def set_level(
 ):
 
     try:
+
         return (
             education_service
             .set_level(
@@ -172,6 +223,7 @@ def set_level(
         )
 
     except ValueError as exc:
+
         raise HTTPException(
             status_code=400,
             detail=str(
@@ -182,6 +234,7 @@ def set_level(
 
 @router.get("/labs")
 def labs():
+
     return (
         education_service.labs()
     )
@@ -195,6 +248,7 @@ def start_lab(
 ):
 
     try:
+
         return (
             education_service
             .start_lab(
@@ -203,6 +257,7 @@ def start_lab(
         )
 
     except KeyError as exc:
+
         raise HTTPException(
             status_code=404,
             detail=str(
@@ -211,6 +266,7 @@ def start_lab(
         ) from exc
 
     except RuntimeError as exc:
+
         raise HTTPException(
             status_code=409,
             detail=str(
@@ -227,6 +283,7 @@ def run_lab(
 ):
 
     try:
+
         return (
             education_service
             .run_lab(
@@ -235,6 +292,7 @@ def run_lab(
         )
 
     except KeyError as exc:
+
         raise HTTPException(
             status_code=404,
             detail=str(
@@ -246,6 +304,7 @@ def run_lab(
         RuntimeError,
         ValueError,
     ) as exc:
+
         raise HTTPException(
             status_code=409,
             detail=str(
