@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from app.modules.education.schemas import (
     AssessmentResult,
     LearningProfile,
@@ -15,6 +17,7 @@ class LearningProfileService:
     }
 
     def __init__(self):
+
         self._profiles: dict[
             str,
             LearningProfile,
@@ -134,7 +137,8 @@ class LearningProfileService:
 
         if (
             lesson_id
-            in profile.completed_lessons
+            in profile
+            .completed_lessons
         ):
             profile.completed_lessons.remove(
                 lesson_id
@@ -208,10 +212,10 @@ class LearningProfileService:
 
         return profile
 
-    def snapshot(
+    def export_profile(
         self,
         user_id: str,
-    ):
+    ) -> dict[str, Any]:
 
         profile = (
             self.get_or_create(
@@ -220,6 +224,131 @@ class LearningProfileService:
         )
 
         return profile.model_dump()
+
+    def import_profile(
+        self,
+        data: dict[str, Any],
+        *,
+        replace: bool = True,
+    ):
+
+        if not isinstance(
+            data,
+            dict,
+        ):
+            raise TypeError(
+                "Profile data must be a dict"
+            )
+
+        profile = LearningProfile(
+            **data
+        )
+
+        if (
+            profile.level
+            not in self.VALID_LEVELS
+        ):
+            raise ValueError(
+                "Invalid education level"
+            )
+
+        existing = self.get(
+            profile.user_id
+        )
+
+        if (
+            existing is not None
+            and not replace
+        ):
+            return existing
+
+        self._profiles[
+            profile.user_id
+        ] = profile
+
+        return profile
+
+    def export_all(
+        self,
+    ) -> dict[str, Any]:
+
+        return {
+            user_id: (
+                profile.model_dump()
+            )
+            for (
+                user_id,
+                profile,
+            ) in self._profiles.items()
+        }
+
+    def import_all(
+        self,
+        profiles: dict[
+            str,
+            Any,
+        ],
+        *,
+        replace: bool = True,
+    ):
+
+        if not isinstance(
+            profiles,
+            dict,
+        ):
+            raise TypeError(
+                "Profiles must be a dict"
+            )
+
+        imported = []
+
+        for (
+            user_id,
+            data,
+        ) in profiles.items():
+
+            if not isinstance(
+                data,
+                dict,
+            ):
+                continue
+
+            normalized = dict(
+                data
+            )
+
+            normalized.setdefault(
+                "user_id",
+                user_id,
+            )
+
+            profile = (
+                self.import_profile(
+                    normalized,
+                    replace=replace,
+                )
+            )
+
+            imported.append(
+                profile
+            )
+
+        return imported
+
+    def snapshot(
+        self,
+        user_id: str,
+    ):
+
+        return self.export_profile(
+            user_id
+        )
+
+    def list_all(self):
+
+        return list(
+            self._profiles.values()
+        )
 
     def clear(self):
 
