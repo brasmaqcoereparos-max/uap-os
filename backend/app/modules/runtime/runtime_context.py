@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from app.modules.devices.actuator_manager import (
     ActuatorManager,
 )
@@ -13,14 +15,8 @@ from app.modules.runtime.hardware_events import (
     HardwareEvent,
     HardwareEventBus,
 )
-from app.modules.runtime.interlock_manager import (
-    InterlockManager,
-)
 from app.modules.runtime.io_manager import (
     IOManager,
-)
-from app.modules.uhal.hardware_controller import (
-    HardwareController,
 )
 from app.modules.uhal.port_manager import (
     PortManager,
@@ -28,39 +24,72 @@ from app.modules.uhal.port_manager import (
 
 
 class RuntimeContext:
+
     def __init__(
         self,
         project_id: str,
-        hardware: HardwareController | None = None,
     ) -> None:
+
         self.project_id = project_id
 
         self.ports = PortManager()
 
-        self.hardware = hardware
-
         self.io = IOManager(
-            ports=self.ports,
-            hardware=self.hardware,
+            self.ports
         )
 
-        self.sensors = SensorManager()
-        self.actuators = ActuatorManager()
-
-        self.events = HardwareEventBus()
-        self.interlocks = InterlockManager()
-
-        self.state = AutomationState(
-            project_id=project_id,
+        self.sensors = (
+            SensorManager()
         )
 
-    def _publish_state(
+        self.actuators = (
+            ActuatorManager()
+        )
+
+        self.events = (
+            HardwareEventBus()
+        )
+
+        self.state = (
+            AutomationState(
+                project_id=project_id,
+            )
+        )
+
+        self._install_metrics_bridge()
+
+    def _install_metrics_bridge(
+        self,
+    ) -> None:
+
+        try:
+            from app.modules.metrics.runtime_metrics_bridge import (
+                runtime_metrics_bridge,
+            )
+
+            runtime_metrics_bridge.attach(
+                self
+            )
+
+        except ImportError:
+            pass
+
+    def _publish(
         self,
         event_type: str,
-        metadata: dict | None = None,
-    ) -> None:
+        value: Any = None,
+        metadata: (
+            dict[str, Any] | None
+        ) = None,
+    ):
+
         event_metadata = {
-            "project_id": self.project_id,
+            "project_id": (
+                self.project_id
+            ),
+            "machine_id": (
+                self.project_id
+            ),
         }
 
         if metadata:
@@ -71,158 +100,203 @@ class RuntimeContext:
         self.events.publish(
             HardwareEvent(
                 event_type=event_type,
+                device_id=(
+                    self.project_id
+                ),
                 source="runtime",
-                value=self.state.to_dict(),
-                metadata=event_metadata,
+                value=value,
+                metadata=(
+                    event_metadata
+                ),
             )
-        )
-
-    def _check_interlocks(self) -> None:
-        triggered = (
-            self.interlocks.check()
-        )
-
-        if not triggered:
-            return
-
-        self.state.emergency_stop_now()
-
-        self._publish_state(
-            "runtime.interlock_triggered",
-            {
-                "interlocks": [
-                    interlock.interlock_id
-                    for interlock
-                    in triggered
-                ],
-            },
-        )
-
-        raise RuntimeError(
-            "Runtime blocked by active interlock: "
-            + ", ".join(
-                interlock.interlock_id
-                for interlock
-                in triggered
-            )
-        )
-
-    def bind_hardware(
-        self,
-        hardware: HardwareController,
-    ) -> None:
-        self.hardware = hardware
-        self.io.bind_hardware(
-            hardware
-        )
-
-        self._publish_state(
-            "runtime.hardware_bound"
-        )
-
-    def unbind_hardware(self) -> None:
-        self.io.unbind_hardware()
-        self.hardware = None
-
-        self._publish_state(
-            "runtime.hardware_unbound"
-        )
-
-    def hardware_bound(self) -> bool:
-        return (
-            self.hardware is not None
-            and self.io.is_hardware_bound()
         )
 
     def start(self) -> None:
-        self._check_interlocks()
+
         self.state.start()
 
-        self._publish_state(
+        self._publish(
             "runtime.started"
         )
 
     def pause(self) -> None:
+
+        was_running = (
+            self.state.running
+        )
+
+        was_paused = (
+            self.state.paused
+        )
+
         self.state.pause()
 
-        self._publish_state(
-            "runtime.paused"
-        )
-
-    def resume(self) -> None:
-        self._check_interlocks()
-        self.state.resume()
-
-        self._publish_state(
-            "runtime.resumed"
-        )
-
-    def stop(self) -> None:
-        self.state.stop()
-
-        self._publish_state(
-            "runtime.stopped"
-        )
-
-    def emergency_stop(
-        self,
-        reason: str = "Emergency stop",
-    ) -> None:
-        self.state.emergency_stop_now()
-
-        self._publish_state(
-            "runtime.emergency_stop",
-            {
-                "reason": reason,
-            },
-        )
-
-    def reset_emergency_stop(self) -> None:
-        if not self.interlocks.is_safe():
-            raise RuntimeError(
-                "Emergency stop cannot be reset "
-                "while an interlock is active"
+        if (
+            was_running
+            and not was_paused
+            and self.state.paused
+        ):
+            self._publish(
+                "runtime.paused"
             )
 
-        self.state.reset_emergency_stop()
+    def resume(self) -> None:
 
-        self._publish_state(
-            "runtime.emergency_stop_reset"
+        was_paused = (
+            self.state.paused
         )
 
-    def is_safe(self) -> bool:
-        return (
-            not self.state.emergency_stop
-            and self.interlocks.is_safe()
+        self.state.resume()
+
+        if (
+            was_paused
+            and not self.state.paused
+            and self.state.running
+        ):
+            self._publish(
+                "runtime.resumed"
+            )
+
+    def stop(self) -> None:
+
+        was_running = (
+            self.state.running
+            or self.state.paused
+        )
+
+        self.state.stop()
+
+        if was_running:
+            self._publish(
+                "runtime.stopped"
+            )
+
+    def emergency_stop(self) -> None:
+
+        self.state.emergency_stop_now()
+
+        self._publish(
+            "runtime.emergency_stop"
+        )
+
+    def complete_cycle(
+        self,
+        duration_seconds: float,
+        *,
+        good_units: int = 1,
+        rejected_units: int = 0,
+        metadata: (
+            dict[str, Any] | None
+        ) = None,
+    ) -> None:
+
+        self.state.increment_cycle()
+
+        self._publish(
+            "runtime.cycle_completed",
+            value={
+                "cycle": (
+                    self.state.cycle
+                ),
+                "duration_seconds": (
+                    float(
+                        duration_seconds
+                    )
+                ),
+                "good_units": (
+                    int(
+                        good_units
+                    )
+                ),
+                "rejected_units": (
+                    int(
+                        rejected_units
+                    )
+                ),
+            },
+            metadata=metadata,
+        )
+
+    def publish_telemetry(
+        self,
+        name: str,
+        value: float,
+        *,
+        unit: str = "",
+        tags: (
+            dict[str, str] | None
+        ) = None,
+        metadata: (
+            dict[str, Any] | None
+        ) = None,
+    ) -> None:
+
+        self._publish(
+            "runtime.telemetry",
+            value={
+                "name": name,
+                "value": value,
+                "unit": unit,
+                "tags": dict(
+                    tags or {}
+                ),
+            },
+            metadata=metadata,
+        )
+
+    def publish_fault(
+        self,
+        code: str,
+        message: str,
+        *,
+        severity: str = "error",
+        metadata: (
+            dict[str, Any] | None
+        ) = None,
+    ) -> None:
+
+        self._publish(
+            "runtime.fault",
+            value={
+                "code": code,
+                "message": message,
+                "severity": severity,
+            },
+            metadata=metadata,
+        )
+
+    def record_consumption(
+        self,
+        resource: str,
+        amount: float,
+        *,
+        unit: str = "",
+        metadata: (
+            dict[str, Any] | None
+        ) = None,
+    ) -> None:
+
+        self._publish(
+            "runtime.consumption",
+            value={
+                "resource": resource,
+                "amount": float(
+                    amount
+                ),
+                "unit": unit,
+            },
+            metadata=metadata,
         )
 
     def status(self) -> dict:
-        triggered = (
-            self.interlocks.check()
-        )
 
         return {
-            "project_id": self.project_id,
+            "project_id": (
+                self.project_id
+            ),
             "automation": (
                 self.state.to_dict()
             ),
-            "safe": (
-                not self.state.emergency_stop
-                and not triggered
-            ),
-            "hardware_bound": (
-                self.hardware_bound()
-            ),
-            "interlocks": {
-                "registered": len(
-                    self.interlocks.list()
-                ),
-                "triggered": [
-                    interlock.interlock_id
-                    for interlock
-                    in triggered
-                ],
-            },
             "ports": len(
                 self.ports.list()
             ),
