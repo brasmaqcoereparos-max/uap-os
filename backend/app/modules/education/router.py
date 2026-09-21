@@ -167,9 +167,7 @@ def assess_exercise(
         return (
             education_service
             .assess(
-                user_id=(
-                    user_id
-                ),
+                user_id=user_id,
                 exercise_id=(
                     exercise_id
                 ),
@@ -230,6 +228,63 @@ def set_level(
                 exc
             ),
         ) from exc
+
+
+@router.post(
+    "/profiles/save"
+)
+def save_profiles():
+
+    return (
+        education_service
+        .save_profiles()
+    )
+
+
+@router.post(
+    "/profiles/load"
+)
+def load_profiles():
+
+    return (
+        education_service
+        .load_profiles()
+    )
+
+
+@router.post(
+    "/project-learning/{user_id}"
+)
+def project_learning(
+    user_id: str,
+    project: dict[str, Any],
+):
+
+    return (
+        education_service
+        .project_learning(
+            user_id,
+            project,
+        )
+    )
+
+
+@router.post(
+    "/project-learning/"
+    "{user_id}/recommendations"
+)
+def project_learning_recommendations(
+    user_id: str,
+    project: dict[str, Any],
+):
+
+    return (
+        education_service
+        .project_recommendations(
+            user_id,
+            project,
+        )
+    )
 
 
 @router.get("/labs")
