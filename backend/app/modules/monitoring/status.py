@@ -33,3 +33,4 @@ class MonitoringStatus:
 
 monitoring_status = (
     MonitoringStatus()
+)
