@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from app.modules.metrics.aggregation_service import (
+    metrics_aggregation_service,
+)
 from app.modules.metrics.alert_service import (
     alert_service,
 )
@@ -18,8 +21,14 @@ from app.modules.metrics.monitoring_bridge import (
 from app.modules.metrics.oee_service import (
     oee_service,
 )
+from app.modules.metrics.persistence import (
+    metrics_persistence,
+)
 from app.modules.metrics.production_service import (
     production_service,
+)
+from app.modules.metrics.productivity_service import (
+    productivity_service,
 )
 from app.modules.metrics.telemetry_service import (
     telemetry_service,
@@ -27,6 +36,10 @@ from app.modules.metrics.telemetry_service import (
 
 
 class MetricsService:
+
+    STORE_NAME = (
+        "metrics_history"
+    )
 
     def record_telemetry(
         self,
@@ -93,6 +106,15 @@ class MetricsService:
                     machine_id
                 )
             ),
+            "productivity": (
+                productivity_service
+                .calculate(
+                    machine_id,
+                    planned_time_seconds=(
+                        planned_time_seconds
+                    ),
+                )
+            ),
             "oee": (
                 oee_service.calculate(
                     machine_id,
@@ -119,23 +141,78 @@ class MetricsService:
                     machine_id
                 )
             ),
-            "active_faults": (
-                fault_service.list(
-                    machine_id,
-                    active_only=True,
-                )
-            ),
             "alerts": (
                 alert_service.alerts(
                     machine_id
                 )
             ),
-            "active_alerts": (
-                alert_service.alerts(
-                    machine_id,
-                    active_only=True,
-                )
+        }
+
+    def aggregate(
+        self,
+        metric_name: str,
+        *,
+        machine_id: str | None = None,
+        start=None,
+        end=None,
+    ):
+
+        return (
+            metrics_aggregation_service
+            .aggregate_telemetry(
+                metric_name,
+                machine_id=(
+                    machine_id
+                ),
+                start=start,
+                end=end,
+            )
+        )
+
+    def save_history(self):
+
+        path = (
+            metrics_persistence.save(
+                self.STORE_NAME,
+                {
+                    "history": (
+                        metrics_history_service
+                        .export_all()
+                    ),
+                },
+            )
+        )
+
+        return {
+            "saved": True,
+            "path": str(
+                path
             ),
+        }
+
+    def load_history(self):
+
+        data = (
+            metrics_persistence.load(
+                self.STORE_NAME
+            )
+        )
+
+        if data is None:
+            return {
+                "loaded": False,
+            }
+
+        metrics_history_service.import_all(
+            data.get(
+                "history",
+                {},
+            ),
+            replace=True,
+        )
+
+        return {
+            "loaded": True,
         }
 
     def health(
@@ -163,23 +240,7 @@ class MetricsService:
             )
         )
 
-    def history(
-        self,
-        category: str,
-        *,
-        machine_id: str | None = None,
-        limit: int | None = None,
-    ):
-
-        return (
-            metrics_history_service.list(
-                category,
-                limit=limit,
-                source=machine_id,
-            )
-        )
-
 
 metrics_service = (
     MetricsService()
-)
+    )
