@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from app.modules.education.catalog_defaults import (
     education_catalog_defaults,
 )
@@ -15,8 +17,14 @@ from app.modules.education.learning_profile_service import (
 from app.modules.education.lesson_service import (
     lesson_service,
 )
+from app.modules.education.persistence import (
+    education_persistence,
+)
 from app.modules.education.progression_service import (
     progression_service,
+)
+from app.modules.education.project_learning_service import (
+    project_learning_service,
 )
 from app.modules.education.simulator_bridge import (
     education_simulator_bridge,
@@ -27,6 +35,10 @@ from app.modules.education.teacher_service import (
 
 
 class EducationService:
+
+    PROFILE_STORE_NAME = (
+        "learning_profiles"
+    )
 
     def __init__(self):
 
@@ -60,6 +72,10 @@ class EducationService:
             ),
             "labs": len(
                 lab_service.list_all()
+            ),
+            "profiles": len(
+                learning_profile_service
+                .list_all()
             ),
         }
 
@@ -204,13 +220,132 @@ class EducationService:
 
         return (
             ai_teacher_service.assess(
-                user_id=(
-                    user_id
-                ),
+                user_id=user_id,
                 exercise_id=(
                     exercise_id
                 ),
                 answer=answer,
+            )
+        )
+
+    def save_profiles(self):
+
+        path = (
+            education_persistence.save(
+                self.PROFILE_STORE_NAME,
+                {
+                    "profiles": (
+                        learning_profile_service
+                        .export_all()
+                    ),
+                },
+            )
+        )
+
+        return {
+            "saved": True,
+            "path": str(
+                path
+            ),
+            "profiles": len(
+                learning_profile_service
+                .list_all()
+            ),
+        }
+
+    def load_profiles(self):
+
+        data = (
+            education_persistence.load(
+                self.PROFILE_STORE_NAME
+            )
+        )
+
+        if data is None:
+            return {
+                "loaded": False,
+                "profiles": 0,
+            }
+
+        profiles = data.get(
+            "profiles",
+            {},
+        )
+
+        imported = (
+            learning_profile_service
+            .import_all(
+                profiles,
+                replace=True,
+            )
+        )
+
+        return {
+            "loaded": True,
+            "profiles": len(
+                imported
+            ),
+        }
+
+    def export_profile(
+        self,
+        user_id: str,
+    ):
+
+        return (
+            learning_profile_service
+            .export_profile(
+                user_id
+            )
+        )
+
+    def import_profile(
+        self,
+        data: dict[
+            str,
+            Any,
+        ],
+    ):
+
+        return (
+            learning_profile_service
+            .import_profile(
+                data,
+                replace=True,
+            )
+        )
+
+    def project_learning(
+        self,
+        user_id: str,
+        project: dict[
+            str,
+            Any,
+        ],
+    ):
+
+        return (
+            project_learning_service
+            .analyze(
+                user_id,
+                project,
+            )
+        )
+
+    def project_recommendations(
+        self,
+        user_id: str,
+        project: dict[
+            str,
+            Any,
+        ],
+    ):
+
+        return (
+            project_learning_service
+            .recommend_learning(
+                user_id,
+                project,
             )
         )
 
@@ -284,9 +419,7 @@ class EducationService:
             "scenario": (
                 scenario.model_dump()
             ),
-            "simulation": (
-                simulation
-            ),
+            "simulation": simulation,
             "assessment": {
                 "passed": passed,
                 "expected": dict(
@@ -298,4 +431,4 @@ class EducationService:
 
 education_service = (
     EducationService()
-        )
+    )
