@@ -20,6 +20,9 @@ from app.modules.education.learning_profile_service import (
 from app.modules.education.lesson_service import (
     lesson_service,
 )
+from app.modules.education.progression_service import (
+    progression_service,
+)
 
 
 class AITeacherService:
@@ -29,6 +32,7 @@ class AITeacherService:
         lesson_id: str,
         user_id: str | None = None,
     ):
+
         lesson = (
             lesson_service.require(
                 lesson_id
@@ -37,7 +41,10 @@ class AITeacherService:
 
         level = "beginner"
 
+        progression = None
+
         if user_id:
+
             profile = (
                 learning_profile_service
                 .get_or_create(
@@ -46,6 +53,32 @@ class AITeacherService:
             )
 
             level = profile.level
+
+            progression = (
+                progression_service
+                .lesson_status(
+                    user_id,
+                    lesson_id,
+                )
+            )
+
+            if not progression[
+                "unlocked"
+            ]:
+                return {
+                    "lesson": (
+                        lesson.model_dump()
+                    ),
+                    "user_level": (
+                        level
+                    ),
+                    "locked": True,
+                    "progression": (
+                        progression
+                    ),
+                    "ai_teacher": None,
+                    "exercises": [],
+                }
 
         explanation = (
             education_ai_teacher_bridge
@@ -71,12 +104,18 @@ class AITeacherService:
                 lesson.model_dump()
             ),
             "user_level": level,
+            "locked": False,
+            "progression": (
+                progression
+            ),
             "explanation_mode": (
                 self._explanation_mode(
                     level
                 )
             ),
-            "ai_teacher": explanation,
+            "ai_teacher": (
+                explanation
+            ),
             "exercises": [
                 exercise.model_dump()
                 for exercise
@@ -103,6 +142,7 @@ class AITeacherService:
         )
 
         if user_id:
+
             profile = (
                 learning_profile_service
                 .get_or_create(
@@ -124,58 +164,99 @@ class AITeacherService:
             )
         )
 
-    def suggest_exercise(
+    def assess(
         self,
-        *,
-        topic: str,
-        lesson_id: str,
-        user_id: str | None = None,
+        user_id: str,
+        exercise_id: str,
+        answer: dict[str, Any],
     ):
 
-        level = "beginner"
-
-        if user_id:
-            level = (
-                learning_profile_service
-                .get_or_create(
-                    user_id
-                )
-                .level
-            )
-
-        return (
-            education_ai_teacher_bridge
-            .propose_exercise(
-                topic=topic,
-                lesson_id=lesson_id,
-                level=level,
+        result = (
+            assessment_service.assess(
+                exercise_id,
+                answer,
             )
         )
 
-    def suggest_lab(
-        self,
-        *,
-        topic: str,
-        user_id: str | None = None,
-    ):
+        learning_profile_service.record_assessment(
+            user_id,
+            result,
+        )
 
-        level = "beginner"
+        if result.passed:
 
-        if user_id:
-            level = (
-                learning_profile_service
-                .get_or_create(
+            exercise = (
+                exercise_service.complete(
+                    exercise_id
+                )
+            )
+
+            if (
+                progression_service
+                .can_complete_lesson(
+                    user_id,
+                    exercise.lesson_id,
+                )
+            ):
+                progression_service.complete_lesson(
+                    user_id,
+                    exercise.lesson_id,
+                )
+
+        return {
+            "assessment": (
+                result.model_dump()
+            ),
+            "progress": (
+                progression_service
+                .progress(
                     user_id
                 )
-                .level
-            )
+            ),
+        }
 
-        return (
-            education_ai_teacher_bridge
-            .propose_lab(
-                topic=topic,
-                level=level,
+    def recommendations(
+        self,
+        user_id: str,
+    ):
+
+        progress = (
+            progression_service.progress(
+                user_id
             )
+        )
+
+        return {
+            "user_id": user_id,
+            "level": (
+                progress[
+                    "level"
+                ]
+            ),
+            "progress_percent": (
+                progress[
+                    "progress_percent"
+                ]
+            ),
+            "mastery": (
+                progress[
+                    "mastery"
+                ]
+            ),
+            "next_lessons": (
+                progress[
+                    "next_lessons"
+                ]
+            ),
+        }
+
+    def start_lab(
+        self,
+        scenario_id: str,
+    ):
+
+        return lab_service.start(
+            scenario_id
         )
 
     def _explanation_mode(
@@ -206,42 +287,7 @@ class AITeacherService:
             "show_advanced_details": True,
         }
 
-    def assess(
-        self,
-        user_id: str,
-        exercise_id: str,
-        answer: dict[str, Any],
-    ):
-
-        result = (
-            assessment_service.assess(
-                exercise_id,
-                answer,
-            )
-        )
-
-        learning_profile_service.record_assessment(
-            user_id,
-            result,
-        )
-
-        if result.passed:
-            exercise_service.complete(
-                exercise_id
-            )
-
-        return result
-
-    def start_lab(
-        self,
-        scenario_id: str,
-    ):
-
-        return lab_service.start(
-            scenario_id
-        )
-
 
 ai_teacher_service = (
     AITeacherService()
-        )
+            )
