@@ -15,6 +15,9 @@ from app.modules.education.learning_profile_service import (
 from app.modules.education.lesson_service import (
     lesson_service,
 )
+from app.modules.education.progression_service import (
+    progression_service,
+)
 from app.modules.education.simulator_bridge import (
     education_simulator_bridge,
 )
@@ -26,21 +29,25 @@ from app.modules.education.teacher_service import (
 class EducationService:
 
     def __init__(self):
+
         self.education_mode = False
 
         education_catalog_defaults.install()
 
     def enable(self):
+
         self.education_mode = True
 
         return self.education_mode
 
     def disable(self):
+
         self.education_mode = False
 
         return self.education_mode
 
     def status(self):
+
         return {
             "education_mode": (
                 self.education_mode
@@ -57,6 +64,7 @@ class EducationService:
         }
 
     def install_defaults(self):
+
         return (
             education_catalog_defaults
             .install()
@@ -66,6 +74,7 @@ class EducationService:
         self,
         difficulty: str | None = None,
     ):
+
         return [
             lesson.model_dump()
             for lesson
@@ -79,6 +88,7 @@ class EducationService:
         lesson_id: str,
         user_id: str | None = None,
     ):
+
         return (
             ai_teacher_service.lesson(
                 lesson_id,
@@ -90,7 +100,9 @@ class EducationService:
         self,
         lesson_id: str | None = None,
     ):
+
         if lesson_id:
+
             exercises = (
                 exercise_service
                 .for_lesson(
@@ -99,6 +111,7 @@ class EducationService:
             )
 
         else:
+
             exercises = (
                 exercise_service
                 .list_all()
@@ -111,6 +124,7 @@ class EducationService:
         ]
 
     def labs(self):
+
         return [
             scenario.model_dump()
             for scenario
@@ -121,6 +135,7 @@ class EducationService:
         self,
         user_id: str,
     ):
+
         return (
             learning_profile_service
             .get_or_create(
@@ -133,11 +148,50 @@ class EducationService:
         user_id: str,
         level: str,
     ):
+
         return (
             learning_profile_service
             .set_level(
                 user_id,
                 level,
+            )
+        )
+
+    def progress(
+        self,
+        user_id: str,
+    ):
+
+        return (
+            progression_service
+            .progress(
+                user_id
+            )
+        )
+
+    def lesson_progress(
+        self,
+        user_id: str,
+        lesson_id: str,
+    ):
+
+        return (
+            progression_service
+            .lesson_status(
+                user_id,
+                lesson_id,
+            )
+        )
+
+    def recommendations(
+        self,
+        user_id: str,
+    ):
+
+        return (
+            ai_teacher_service
+            .recommendations(
+                user_id
             )
         )
 
@@ -147,10 +201,15 @@ class EducationService:
         exercise_id: str,
         answer: dict,
     ):
+
         return (
             ai_teacher_service.assess(
-                user_id=user_id,
-                exercise_id=exercise_id,
+                user_id=(
+                    user_id
+                ),
+                exercise_id=(
+                    exercise_id
+                ),
                 answer=answer,
             )
         )
@@ -159,6 +218,7 @@ class EducationService:
         self,
         scenario_id: str,
     ):
+
         if not self.education_mode:
             raise RuntimeError(
                 "Education mode is disabled"
@@ -175,6 +235,7 @@ class EducationService:
         self,
         scenario_id: str,
     ):
+
         if not self.education_mode:
             raise RuntimeError(
                 "Education mode is disabled"
@@ -223,7 +284,9 @@ class EducationService:
             "scenario": (
                 scenario.model_dump()
             ),
-            "simulation": simulation,
+            "simulation": (
+                simulation
+            ),
             "assessment": {
                 "passed": passed,
                 "expected": dict(
@@ -235,4 +298,4 @@ class EducationService:
 
 education_service = (
     EducationService()
-    )
+        )
