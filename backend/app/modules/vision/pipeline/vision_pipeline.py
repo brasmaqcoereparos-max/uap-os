@@ -1,5 +1,11 @@
 from typing import Any
 
+from app.modules.vision.ai.ai_service import (
+    ai_service,
+)
+from app.modules.vision.automation.automation_flow_executor import (
+    automation_flow_executor,
+)
 from app.modules.vision.automation.vision_event_actions import (
     vision_event_actions,
 )
@@ -15,8 +21,8 @@ from app.modules.vision.events.vision_event_service import (
 from app.modules.vision.processing.frame_analyzer import (
     frame_analyzer,
 )
-from app.modules.vision.automation.automation_flow_executor import (
-    automation_flow_executor,
+from app.modules.vision.vision_config import (
+    vision_config,
 )
 
 
@@ -27,39 +33,111 @@ class VisionPipeline:
         camera_id: str | None,
         frame: Any,
     ):
-        analysis = frame_analyzer.analyze(
-            frame
-        )
 
-        persons = (
-            detection_service
-            .count_persons(
+        analysis = (
+            frame_analyzer.analyze(
                 frame
             )
         )
 
-        detections = (
-            detection_service
-            .objects(
+        if (
+            vision_config
+            .person_detection_enabled
+        ):
+            analysis[
+                "persons"
+            ] = (
+                detection_service
+                .count_persons(
+                    frame
+                )
+            )
+
+        else:
+            analysis[
+                "persons"
+            ] = 0
+
+        if (
+            vision_config
+            .object_detection_enabled
+        ):
+            analysis[
+                "detections"
+            ] = (
+                detection_service
+                .objects(
+                    frame
+                )
+            )
+
+        else:
+            analysis[
+                "detections"
+            ] = []
+
+        analysis[
+            "ai"
+        ] = (
+            self._run_ai(
                 frame
             )
         )
-
-        analysis[
-            "persons"
-        ] = persons
-
-        analysis[
-            "detections"
-        ] = detections
 
         return analysis
+
+    def _run_ai(
+        self,
+        frame: Any,
+    ):
+
+        if not (
+            vision_config
+            .ai_enabled
+        ):
+            return {
+                "enabled": False,
+                "success": True,
+                "results": {},
+                "failed_models": [],
+            }
+
+        models = list(
+            vision_config.ai_models
+        )
+
+        if not models:
+            return {
+                "enabled": True,
+                "success": True,
+                "results": {},
+                "failed_models": [],
+            }
+
+        result = (
+            ai_service
+            .infer_selected(
+                model_names=models,
+                frame=frame,
+                fail_safe=(
+                    vision_config
+                    .ai_fail_safe
+                ),
+            )
+        )
+
+        result[
+            "enabled"
+        ] = True
+
+        return result
 
     def process(
         self,
         camera_id: str | None,
         frame: Any,
     ):
+
         analysis = (
             self.analyze_frame(
                 camera_id,
@@ -124,6 +202,7 @@ class VisionPipeline:
         flow_name: str,
         context: dict,
     ):
+
         return (
             automation_flow_executor
             .execute(
