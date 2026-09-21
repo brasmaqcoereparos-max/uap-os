@@ -30,6 +30,9 @@ from app.modules.events.router import (
 from app.modules.flows.router import (
     router as flows_router,
 )
+from app.modules.metrics.router import (
+    router as metrics_router,
+)
 from app.modules.motion.router import (
     router as motion_router,
 )
@@ -127,6 +130,10 @@ router.include_router(
 )
 
 router.include_router(
+    metrics_router
+)
+
+router.include_router(
     education_router
 )
 
@@ -208,6 +215,7 @@ router.include_router(
     tags=["Platform"],
 )
 def health():
+
     return {
         "status": "ok",
         "service": "uap-api",
@@ -219,7 +227,8 @@ def health():
     tags=["Platform"],
 )
 def version():
+
     return {
         "name": "UAP OS",
         "version": "0.1.0",
-    }
+}
