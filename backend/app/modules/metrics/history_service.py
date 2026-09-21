@@ -12,10 +12,28 @@ def utc_now():
     )
 
 
+def parse_datetime(
+    value,
+):
+    if value is None:
+        return None
+
+    if isinstance(
+        value,
+        datetime,
+    ):
+        return value
+
+    return datetime.fromisoformat(
+        str(
+            value
+        )
+    )
+
+
 class MetricsHistoryService:
 
     def __init__(self):
-
         self._history: dict[
             str,
             list[dict[str, Any]],
@@ -29,8 +47,10 @@ class MetricsHistoryService:
         data: dict[str, Any],
         *,
         source: str | None = None,
+        timestamp: (
+            datetime | None
+        ) = None,
     ):
-
         normalized = str(
             category
         ).strip()
@@ -54,8 +74,9 @@ class MetricsHistoryService:
             "category": normalized,
             "source": source,
             "timestamp": (
-                utc_now().isoformat()
-            ),
+                timestamp
+                or utc_now()
+            ).isoformat(),
             "data": dict(
                 data
             ),
@@ -75,8 +96,13 @@ class MetricsHistoryService:
         *,
         limit: int | None = None,
         source: str | None = None,
+        start: (
+            datetime | str | None
+        ) = None,
+        end: (
+            datetime | str | None
+        ) = None,
     ):
-
         result = list(
             self._history.get(
                 category,
@@ -94,6 +120,38 @@ class MetricsHistoryService:
                 == source
             ]
 
+        start_dt = parse_datetime(
+            start
+        )
+
+        end_dt = parse_datetime(
+            end
+        )
+
+        if start_dt is not None:
+            result = [
+                item
+                for item in result
+                if parse_datetime(
+                    item[
+                        "timestamp"
+                    ]
+                )
+                >= start_dt
+            ]
+
+        if end_dt is not None:
+            result = [
+                item
+                for item in result
+                if parse_datetime(
+                    item[
+                        "timestamp"
+                    ]
+                )
+                <= end_dt
+            ]
+
         if limit is not None:
             result = result[
                 -max(
@@ -104,46 +162,77 @@ class MetricsHistoryService:
 
         return result
 
-    def latest(
-        self,
-        category: str,
-        *,
-        source: str | None = None,
-    ):
+    def export_all(self):
 
-        items = self.list(
-            category,
-            source=source,
-        )
-
-        if not items:
-            return None
-
-        return items[-1]
-
-    def categories(self):
-
-        return sorted(
-            self._history.keys()
-        )
-
-    def count(
-        self,
-        category: str,
-    ):
-
-        return len(
-            self._history.get(
-                category,
-                [],
+        return {
+            category: list(
+                items
             )
-        )
+            for (
+                category,
+                items,
+            ) in self._history.items()
+        }
+
+    def import_all(
+        self,
+        data,
+        *,
+        replace=True,
+    ):
+        if not isinstance(
+            data,
+            dict,
+        ):
+            raise TypeError(
+                "History import "
+                "must be a dict"
+            )
+
+        if replace:
+            self.clear()
+
+        for (
+            category,
+            items,
+        ) in data.items():
+
+            if not isinstance(
+                items,
+                list,
+            ):
+                continue
+
+            for item in items:
+
+                if not isinstance(
+                    item,
+                    dict,
+                ):
+                    continue
+
+                self.record(
+                    category,
+                    dict(
+                        item.get(
+                            "data",
+                            {},
+                        )
+                    ),
+                    source=item.get(
+                        "source"
+                    ),
+                    timestamp=parse_datetime(
+                        item.get(
+                            "timestamp"
+                        )
+                    ),
+                )
 
     def clear(
         self,
         category: str | None = None,
     ):
-
         if category is None:
             self._history.clear()
 
@@ -156,4 +245,4 @@ class MetricsHistoryService:
 
 metrics_history_service = (
     MetricsHistoryService()
-      )
+        )
