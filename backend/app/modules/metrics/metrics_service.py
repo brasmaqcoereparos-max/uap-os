@@ -9,6 +9,9 @@ from app.modules.metrics.alert_service import (
 from app.modules.metrics.consumption_service import (
     consumption_service,
 )
+from app.modules.metrics.dashboard_service import (
+    metrics_dashboard_service,
+)
 from app.modules.metrics.fault_service import (
     fault_service,
 )
@@ -86,6 +89,127 @@ class MetricsService:
             "alerts": alerts,
         }
 
+    def record_cycle(
+        self,
+        machine_id: str,
+        duration_seconds: float,
+        *,
+        good_units: int = 0,
+        rejected_units: int = 0,
+        metadata=None,
+    ):
+
+        cycle = (
+            production_service
+            .record_cycle(
+                machine_id,
+                duration_seconds,
+                good_units=(
+                    good_units
+                ),
+                rejected_units=(
+                    rejected_units
+                ),
+                metadata=metadata,
+            )
+        )
+
+        metrics_history_service.record(
+            "cycle",
+            cycle.to_dict(),
+            source=machine_id,
+        )
+
+        return cycle.to_dict()
+
+    def record_downtime(
+        self,
+        machine_id: str,
+        duration_seconds: float,
+        *,
+        reason: str = "",
+        category: str = "unplanned",
+        metadata=None,
+    ):
+
+        event = (
+            production_service
+            .record_downtime(
+                machine_id,
+                duration_seconds,
+                reason=reason,
+                category=category,
+                metadata=metadata,
+            )
+        )
+
+        metrics_history_service.record(
+            "downtime",
+            event.to_dict(),
+            source=machine_id,
+        )
+
+        return event.to_dict()
+
+    def record_consumption(
+        self,
+        machine_id: str,
+        resource: str,
+        amount: float,
+        *,
+        unit: str = "",
+        metadata=None,
+    ):
+
+        total = (
+            consumption_service.add(
+                machine_id,
+                resource,
+                amount,
+            )
+        )
+
+        result = {
+            "machine_id": (
+                machine_id
+            ),
+            "resource": resource,
+            "amount": float(
+                amount
+            ),
+            "total": total,
+            "unit": unit,
+            "metadata": dict(
+                metadata or {}
+            ),
+        }
+
+        metrics_history_service.record(
+            "consumption",
+            result,
+            source=machine_id,
+        )
+
+        return result
+
+    def record_fault(
+        self,
+        machine_id: str,
+        code: str,
+        message: str,
+        *,
+        severity: str = "error",
+        metadata=None,
+    ):
+
+        return fault_service.record(
+            machine_id=machine_id,
+            code=code,
+            message=message,
+            severity=severity,
+            metadata=metadata,
+        )
+
     def machine_snapshot(
         self,
         machine_id: str,
@@ -99,7 +223,9 @@ class MetricsService:
     ):
 
         return {
-            "machine_id": machine_id,
+            "machine_id": (
+                machine_id
+            ),
             "production": (
                 production_service
                 .summary(
@@ -141,12 +267,49 @@ class MetricsService:
                     machine_id
                 )
             ),
+            "active_faults": (
+                fault_service.list(
+                    machine_id,
+                    active_only=True,
+                )
+            ),
             "alerts": (
                 alert_service.alerts(
                     machine_id
                 )
             ),
+            "active_alerts": (
+                alert_service.alerts(
+                    machine_id,
+                    active_only=True,
+                )
+            ),
         }
+
+    def dashboard(
+        self,
+        machine_id: str,
+        *,
+        planned_time_seconds: (
+            float | None
+        ) = None,
+        ideal_cycle_seconds: (
+            float | None
+        ) = None,
+    ):
+
+        return (
+            metrics_dashboard_service
+            .machine(
+                machine_id,
+                planned_time_seconds=(
+                    planned_time_seconds
+                ),
+                ideal_cycle_seconds=(
+                    ideal_cycle_seconds
+                ),
+            )
+        )
 
     def aggregate(
         self,
@@ -164,6 +327,27 @@ class MetricsService:
                 machine_id=(
                     machine_id
                 ),
+                start=start,
+                end=end,
+            )
+        )
+
+    def history(
+        self,
+        category: str,
+        *,
+        machine_id: str | None = None,
+        limit: int | None = None,
+        start=None,
+        end=None,
+    ):
+
+        return (
+            metrics_history_service
+            .list(
+                category,
+                source=machine_id,
+                limit=limit,
                 start=start,
                 end=end,
             )
@@ -243,4 +427,4 @@ class MetricsService:
 
 metrics_service = (
     MetricsService()
-    )
+        )
