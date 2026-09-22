@@ -31,24 +31,20 @@ class InventoryMovementService:
         reason: str,
         reference: str | None,
         metadata,
+        lot_id: str | None = None,
     ):
 
         movement = StockMovement(
             id=str(
                 uuid.uuid4()
             ),
-            product_id=(
-                product_id
-            ),
-            movement_type=(
-                movement_type
-            ),
-            quantity=(
-                decimal_value(
-                    quantity
-                )
+            product_id=product_id,
+            movement_type=movement_type,
+            quantity=decimal_value(
+                quantity
             ),
             location=location,
+            lot_id=lot_id,
             reason=reason,
             reference=reference,
             before_quantity=(
@@ -81,6 +77,7 @@ class InventoryMovementService:
         reason: str = "purchase",
         reference: str | None = None,
         metadata=None,
+        lot_id: str | None = None,
     ):
 
         (
@@ -97,14 +94,13 @@ class InventoryMovementService:
             product_id=product_id,
             movement_type="in",
             quantity=quantity,
-            location=(
-                balance.location
-            ),
+            location=balance.location,
             before=before,
             after=after,
             reason=reason,
             reference=reference,
             metadata=metadata,
+            lot_id=lot_id,
         )
 
     def issue(
@@ -116,6 +112,7 @@ class InventoryMovementService:
         reason: str = "sale",
         reference: str | None = None,
         metadata=None,
+        lot_id: str | None = None,
     ):
 
         (
@@ -132,14 +129,13 @@ class InventoryMovementService:
             product_id=product_id,
             movement_type="out",
             quantity=quantity,
-            location=(
-                balance.location
-            ),
+            location=balance.location,
             before=before,
             after=after,
             reason=reason,
             reference=reference,
             metadata=metadata,
+            lot_id=lot_id,
         )
 
     def adjust(
@@ -167,9 +163,7 @@ class InventoryMovementService:
 
         return self._record(
             product_id=product_id,
-            movement_type=(
-                "adjustment"
-            ),
+            movement_type="adjustment",
             quantity=(
                 decimal_value(
                     after
@@ -178,9 +172,7 @@ class InventoryMovementService:
                     before
                 )
             ),
-            location=(
-                balance.location
-            ),
+            location=balance.location,
             before=before,
             after=after,
             reason=reason,
@@ -198,6 +190,12 @@ class InventoryMovementService:
             str | None
         ) = None,
         movement_type: (
+            str | None
+        ) = None,
+        lot_id: (
+            str | None
+        ) = None,
+        reference: (
             str | None
         ) = None,
         limit: (
@@ -233,13 +231,27 @@ class InventoryMovementService:
                 == movement_type
             ]
 
+        if lot_id is not None:
+            result = [
+                movement
+                for movement in result
+                if movement.lot_id
+                == lot_id
+            ]
+
+        if reference is not None:
+            result = [
+                movement
+                for movement in result
+                if movement.reference
+                == reference
+            ]
+
         if limit is not None:
             result = result[
                 -max(
                     0,
-                    int(
-                        limit
-                    ),
+                    int(limit),
                 ):
             ]
 
@@ -252,4 +264,4 @@ class InventoryMovementService:
 
 inventory_movement_service = (
     InventoryMovementService()
-        )
+    )
