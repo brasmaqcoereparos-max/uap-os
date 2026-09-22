@@ -1,7 +1,19 @@
 from __future__ import annotations
 
+from app.modules.inventory.expiry_service import (
+    inventory_expiry_service,
+)
+from app.modules.inventory.fefo_service import (
+    fefo_service,
+)
 from app.modules.inventory.inventory_service import (
     inventory_service,
+)
+from app.modules.inventory.lot_service import (
+    inventory_lot_service,
+)
+from app.modules.inventory.low_stock_service import (
+    low_stock_service,
 )
 from app.modules.inventory.movement_service import (
     inventory_movement_service,
@@ -155,6 +167,95 @@ class InventoryFacade:
                 ].to_dict()
             ),
         }
+
+    def create_lot(
+        self,
+        product_id: str,
+        lot_code: str,
+        quantity,
+        **kwargs,
+    ):
+
+        return (
+            inventory_lot_service
+            .create(
+                product_id,
+                lot_code,
+                quantity,
+                **kwargs,
+            )
+            .to_dict()
+        )
+
+    def lots(
+        self,
+        **filters,
+    ):
+
+        return [
+            lot.to_dict()
+            for lot
+            in inventory_lot_service
+            .list(
+                **filters
+            )
+        ]
+
+    def consume_fefo(
+        self,
+        product_id: str,
+        quantity,
+        **kwargs,
+    ):
+
+        return (
+            fefo_service.consume(
+                product_id,
+                quantity,
+                **kwargs,
+            )
+        )
+
+    def expiry_summary(
+        self,
+    ):
+
+        return (
+            inventory_expiry_service
+            .summary()
+        )
+
+    def set_minimum_stock(
+        self,
+        product_id: str,
+        quantity,
+    ):
+
+        minimum = (
+            low_stock_service
+            .set_minimum(
+                product_id,
+                quantity,
+            )
+        )
+
+        return {
+            "product_id": (
+                product_id
+            ),
+            "minimum": str(
+                minimum
+            ),
+        }
+
+    def low_stock(
+        self,
+    ):
+
+        return (
+            low_stock_service
+            .low_stock_products()
+        )
 
     def history(
         self,
