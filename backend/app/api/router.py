@@ -30,6 +30,9 @@ from app.modules.events.router import (
 from app.modules.flows.router import (
     router as flows_router,
 )
+from app.modules.inventory.router import (
+    router as inventory_router,
+)
 from app.modules.metrics.router import (
     router as metrics_router,
 )
@@ -38,6 +41,9 @@ from app.modules.motion.router import (
 )
 from app.modules.plugins.router import (
     router as plugins_router,
+)
+from app.modules.products.router import (
+    router as products_router,
 )
 from app.modules.runtime.router import (
     router as runtime_router,
@@ -80,8 +86,6 @@ from app.modules.voice.router import (
 router = APIRouter()
 
 
-# CORE API
-
 router.include_router(
     auth.router
 )
@@ -102,8 +106,6 @@ router.include_router(
     users.router
 )
 
-
-# PLATFORM MODULES
 
 router.include_router(
     plugins_router
@@ -130,11 +132,19 @@ router.include_router(
 )
 
 router.include_router(
+    education_router
+)
+
+router.include_router(
     metrics_router
 )
 
 router.include_router(
-    education_router
+    products_router
+)
+
+router.include_router(
+    inventory_router
 )
 
 router.include_router(
@@ -166,8 +176,6 @@ router.include_router(
 )
 
 
-# SIMULATOR
-
 router.include_router(
     simulator_router
 )
@@ -185,8 +193,6 @@ router.include_router(
 )
 
 
-# UI
-
 router.include_router(
     ui_router
 )
@@ -196,14 +202,10 @@ router.include_router(
 )
 
 
-# VOICE
-
 router.include_router(
     voice_router
 )
 
-
-# AI
 
 router.include_router(
     ai_router
@@ -215,7 +217,6 @@ router.include_router(
     tags=["Platform"],
 )
 def health():
-
     return {
         "status": "ok",
         "service": "uap-api",
@@ -227,7 +228,6 @@ def health():
     tags=["Platform"],
 )
 def version():
-
     return {
         "name": "UAP OS",
         "version": "0.1.0",
