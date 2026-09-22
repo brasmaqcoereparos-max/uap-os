@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 from datetime import date
-from decimal import Decimal
 
 from app.modules.inventory.lot_service import (
     inventory_lot_service,
 )
 from app.modules.inventory.models import (
     decimal_value,
+)
+from app.modules.inventory.movement_service import (
+    inventory_movement_service,
 )
 
 
@@ -71,28 +73,23 @@ class FEFOService:
             if remaining <= 0:
                 break
 
-            available = (
-                lot.quantity
-            )
-
-            if available <= 0:
+            if lot.quantity <= 0:
                 continue
 
             allocated = min(
-                available,
+                lot.quantity,
                 remaining,
             )
 
             allocations.append(
                 {
-                    "lot_id": (
-                        lot.id
-                    ),
+                    "lot_id": lot.id,
                     "lot_code": (
                         lot.lot_code
                     ),
-                    "quantity": (
-                        allocated
+                    "quantity": allocated,
+                    "location": (
+                        lot.location
                     ),
                     "expiration_date": (
                         lot.expiration_date
@@ -104,7 +101,8 @@ class FEFOService:
 
         if remaining > 0:
             raise ValueError(
-                "Insufficient valid lot stock"
+                "Insufficient valid "
+                "lot stock"
             )
 
         return allocations
@@ -115,14 +113,15 @@ class FEFOService:
         quantity,
         *,
         location: str | None = None,
+        reason: str = "sale",
+        reference: str | None = None,
+        metadata=None,
     ):
 
-        allocations = (
-            self.allocate(
-                product_id,
-                quantity,
-                location=location,
-            )
+        allocations = self.allocate(
+            product_id,
+            quantity,
+            location=location,
         )
 
         consumed = []
@@ -131,21 +130,47 @@ class FEFOService:
 
             lot = (
                 inventory_lot_service
-                .consume(
+                .require(
                     allocation[
                         "lot_id"
-                    ],
-                    allocation[
-                        "quantity"
-                    ],
+                    ]
+                )
+            )
+
+            before = lot.quantity
+
+            inventory_lot_service.consume(
+                lot.id,
+                allocation[
+                    "quantity"
+                ],
+            )
+
+            movement = (
+                inventory_movement_service
+                ._record(
+                    product_id=product_id,
+                    movement_type="out",
+                    quantity=(
+                        allocation[
+                            "quantity"
+                        ]
+                    ),
+                    location=lot.location,
+                    before=before,
+                    after=lot.quantity,
+                    reason=reason,
+                    reference=reference,
+                    metadata=dict(
+                        metadata or {}
+                    ),
+                    lot_id=lot.id,
                 )
             )
 
             consumed.append(
                 {
-                    "lot_id": (
-                        lot.id
-                    ),
+                    "lot_id": lot.id,
                     "lot_code": (
                         lot.lot_code
                     ),
@@ -156,6 +181,9 @@ class FEFOService:
                     ),
                     "remaining": str(
                         lot.quantity
+                    ),
+                    "movement_id": (
+                        movement.id
                     ),
                 }
             )
